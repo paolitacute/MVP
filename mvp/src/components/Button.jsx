@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from './Auth.module.css';
+import '../App.css'
 
 export function Button({ children, ...props }) {
   return (

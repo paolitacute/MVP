@@ -3,41 +3,42 @@ import React from 'react';
 import { Image as ImageIcon } from 'lucide-react';
 import styles from './Dashboard.module.css';
 
-// Mock Data for the UI
+// 1. Align mock IDs with OrdersWorkflow.jsx
 const pendingData = [
-  { id: 1, product: 'Ceramic Mug', buyer: 'Alice Smith', price: '$24.00' },
-  { id: 2, product: 'Wool Scarf', buyer: 'Bob Jones', price: '$45.00' },
-  { id: 3, product: 'Desk Lamp', buyer: 'Charlie Day', price: '$60.00' },
+  { id: 'ORD-001', product: 'Ceramic Mug & Plate', buyer: 'Alice Smith', price: '$48.00' },
+  { id: 'ORD-003', product: 'Desk Lamp', buyer: 'Charlie Day', price: '$60.00' },
 ];
 
 const ordersData = [
-  { id: 4, product: 'Leather Wallet', buyer: 'Diana Prince', price: '$55.00' },
-  { id: 5, product: 'Oak Coasters', buyer: 'Evan Wright', price: '$18.00' },
-  { id: 6, product: 'Linen Apron', buyer: 'Fiona Apple', price: '$32.00' },
+  { id: 'ORD-002', product: 'Wool Scarf', buyer: 'Bob Jones', price: '$45.00' },
+  { id: 'ORD-004', product: 'Leather Wallet', buyer: 'Diana Prince', price: '$55.00' },
 ];
 
 const listingsData = [
-  { id: 7, product: 'Ceramic Mug', price: '$24.00' },
-  { id: 8, product: 'Wool Scarf', price: '$45.00' },
-  { id: 9, product: 'Desk Lamp', price: '$60.00' },
+  { id: 'L1', product: 'Ceramic Mug', price: '$24.00' },
+  { id: 'L2', product: 'Wool Scarf', price: '$45.00' },
+  { id: 'L3', product: 'Desk Lamp', price: '$60.00' },
 ];
 
-// Reusable Card Component
-const ProductCard = ({ product, buyer, price }) => (
-  <div className={styles.card}>
+// 2. Add an onClick prop and apply it to the card
+const ProductCard = ({ product, buyer, price, onClick }) => (
+  <div 
+    className={styles.card} 
+    onClick={onClick}
+    style={{ cursor: onClick ? 'pointer' : 'default' }} // Make it look clickable
+  >
     <div className={styles.cardImagePlaceholder}>
       <ImageIcon size={24} />
     </div>
     <div className={styles.cardDetails}>
       <span className={styles.productName}>{product}</span>
-      {/* Only render buyer name if it is passed in as a prop */}
       {buyer && <span className={styles.buyerName}>for {buyer}</span>}
       <span className={styles.price}>{price}</span>
     </div>
   </div>
 );
 
-export default function Home() {
+export default function Home({ onNavigate }) {
   return (
     <div className={styles.homeContainer}>
       
@@ -45,7 +46,9 @@ export default function Home() {
       <section className={styles.section}>
         <div className={styles.sectionHeader}>
           <h2 className={styles.sectionTitle}>Pending</h2>
-          <button className={styles.viewAll}>View all</button>
+          <button className={styles.viewAll} onClick={() => onNavigate('orders')}>
+            View all
+          </button>
         </div>
         <div className={styles.cardList}>
           {pendingData.map((item) => (
@@ -53,7 +56,8 @@ export default function Home() {
               key={item.id} 
               product={item.product} 
               buyer={item.buyer} 
-              price={item.price} 
+              price={item.price}
+              onClick={() => onNavigate('orders', item.id)} // 3. Pass ID on click
             />
           ))}
         </div>
@@ -63,7 +67,9 @@ export default function Home() {
       <section className={styles.section}>
         <div className={styles.sectionHeader}>
           <h2 className={styles.sectionTitle}>Orders</h2>
-          <button className={styles.viewAll}>View all</button>
+          <button className={styles.viewAll} onClick={() => onNavigate('orders')}>
+            View all
+          </button>
         </div>
         <div className={styles.cardList}>
           {ordersData.map((item) => (
@@ -71,13 +77,14 @@ export default function Home() {
               key={item.id} 
               product={item.product} 
               buyer={item.buyer} 
-              price={item.price} 
+              price={item.price}
+              onClick={() => onNavigate('orders', item.id)} // 3. Pass ID on click
             />
           ))}
         </div>
       </section>
 
-      {/* Listings Section (No buyer name) */}
+      {/* Listings Section (No navigation on click for listings yet) */}
       <section className={styles.section}>
         <div className={styles.sectionHeader}>
           <h2 className={styles.sectionTitle}>Listings</h2>
@@ -89,7 +96,6 @@ export default function Home() {
               key={item.id} 
               product={item.product} 
               price={item.price} 
-              // Notice: buyer prop is intentionally omitted here
             />
           ))}
         </div>

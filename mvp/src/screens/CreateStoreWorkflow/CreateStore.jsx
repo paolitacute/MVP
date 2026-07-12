@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Store, Phone, Mail, MapPin, AlignLeft, ArrowLeft } from 'lucide-react';
-import { Input } from './Input';
-import { Button } from './Button';
-import authStyles from './Auth.module.css';
-import styles from './CreateStore.module.css';
+import { Input } from '../../components/Input';
+import { Button } from '../../components/Button';
+import '../../App.css';
+import store from './CreateStore.module.css';
 
 export default function CreateStore({ onBack, onSubmit, sellerData }) {
   const [formData, setFormData] = useState({
@@ -66,17 +66,17 @@ export default function CreateStore({ onBack, onSubmit, sellerData }) {
 
   return (
     <div style={{ width: '100%', maxWidth: '800px', margin: '0 auto' }}>
-      <button type="button" className={authStyles.backButton} onClick={onBack}>
+      <button type="button" className={backButton} onClick={onBack}>
         <ArrowLeft size={16} /> Back to seller details
       </button>
 
-      <h1 className={authStyles.title} style={{ textAlign: 'left', marginBottom: '1.5rem' }}>
+      <h1 className={title} style={{ textAlign: 'left', marginBottom: '1.5rem' }}>
         Create a store
       </h1>
 
-      <form onSubmit={handleSubmit} className={styles.storeForm} noValidate>
+      <form onSubmit={handleSubmit} className={store.storeForm} noValidate>
         {/* LEFT COLUMN */}
-        <div className={styles.column}>
+        <div className={store.column}>
           <Input
             label="Store name"
             type="text"
@@ -88,14 +88,14 @@ export default function CreateStore({ onBack, onSubmit, sellerData }) {
             required
           />
 
-          <div className={authStyles.inputGroup}>
-            <label className={authStyles.label}>URL Slug</label>
-            <div className={styles.inputWithPrefix}>
-              <span className={styles.prefix}>app.com/</span>
+          <div className={inputGroup}>
+            <label className={label}>URL Slug</label>
+            <div className={store.inputWithPrefix}>
+              <span className={store.prefix}>app.com/</span>
               <input
                 type="text"
                 name="slug"
-                className={`${authStyles.input} ${styles.prefixedInput}`}
+                className={`${input} ${store.prefixedInput}`}
                 value={formData.slug}
                 onChange={handleSlugChange}
                 required
@@ -103,10 +103,10 @@ export default function CreateStore({ onBack, onSubmit, sellerData }) {
             </div>
           </div>
 
-          <label className={styles.checkboxLabel}>
+          <label className={store.checkboxLabel}>
             <input
               type="checkbox"
-              className={styles.checkbox}
+              className={store.checkbox}
               checked={formData.sameAsSeller}
               onChange={handleSameAsSellerToggle}
             />
@@ -136,32 +136,32 @@ export default function CreateStore({ onBack, onSubmit, sellerData }) {
             required
           />
 
-          <div className={styles.toggleContainer}>
-            <span className={styles.toggleLabel}>Delivery availability</span>
-            <label className={styles.switch}>
+          <div className={store.toggleContainer}>
+            <span className={store.toggleLabel}>Delivery availability</span>
+            <label className={store.switch}>
               <input
                 type="checkbox"
                 name="deliveryAvailable"
                 checked={formData.deliveryAvailable}
                 onChange={handleChange}
               />
-              <span className={styles.slider}></span>
+              <span className={store.slider}></span>
             </label>
           </div>
 
-          <div className={styles.divider}></div>
+          <div className={store.divider}></div>
           
-          <div className={authStyles.inputGroup}>
-            <label className={authStyles.label}>
+          <div className={inputGroup}>
+            <label className={label}>
               Instagram <span style={{ fontWeight: 'normal', color: '#9ca3af' }}>(optional)</span>
             </label>
-            <div className={styles.inputWithPrefix}>
-              <span className={styles.prefix} style={{ left: '0.8rem' }}>@</span>
+            <div className={store.inputWithPrefix}>
+              <span className={store.prefix} style={{ left: '0.8rem' }}>@</span>
               <input
                 type="text"
                 name="instagram"
                 placeholder="instagram_handle"
-                className={`${authStyles.input} ${styles.igPrefixedInput}`}
+                className={`${input} ${store.igPrefixedInput}`}
                 value={formData.instagram}
                 onChange={handleChange}
               />
@@ -170,7 +170,7 @@ export default function CreateStore({ onBack, onSubmit, sellerData }) {
         </div>
 
         {/* RIGHT COLUMN */}
-        <div className={styles.column}>
+        <div className={store.column}>
           <Input
             label={<>Store address <span style={{ fontWeight: 'normal', color: '#9ca3af' }}>(optional)</span></>}
             type="text"
@@ -191,13 +191,13 @@ export default function CreateStore({ onBack, onSubmit, sellerData }) {
             onChange={handleChange}
           />
 
-          <div className={authStyles.inputGroup}>
-            <label className={authStyles.label}>
+          <div className={inputGroup}>
+            <label className={label}>
                 Custom message <span style={{ fontWeight: 'normal', color: '#9ca3af' }}>(optional)</span>
             </label>
             <textarea
               name="customMessage"
-              className={styles.textarea}
+              className={store.textarea}
               placeholder="Hola! Somos NombreTienda&#10;&#10;Hiciste una orden el dia [FechaOrden].&#10;&#10;Según tu dirección el monto del delivery sería: [Introduce]&#10;&#10;Confirma para enviarte método de pago."
               value={formData.customMessage}
               onChange={handleChange}

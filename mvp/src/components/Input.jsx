@@ -1,5 +1,5 @@
 import React, { useId } from 'react';
-import styles from './Auth.module.css';
+import '../App.css'
 
 export function Input({ label, icon: Icon, error, ...props }) {
   const inputId = useId();

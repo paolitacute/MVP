@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import CreateStore from './CreateStore';
+import CreateStore from '../CreateStoreWorkflow/CreateStore';
 import { User, Lock, Mail, Phone, ArrowLeft } from 'lucide-react';
-import { Input } from './Input';
-import { Button } from './Button';
-import styles from './Auth.module.css';
+import { Input } from '../../components/Input';
+import { Button } from '../../components/Button';
+import '../../App.css';
 
 export default function Auth({ onLogin }) {
   const [view, setView] = useState('login'); // 'login' or 'signup'
