@@ -5,7 +5,7 @@ import { Input } from './Input';
 import { Button } from './Button';
 import styles from './Auth.module.css';
 
-export default function Auth() {
+export default function Auth({ onLogin }) {
   const [view, setView] = useState('login'); // 'login' or 'signup'
   const [signUpStep, setSignUpStep] = useState(1); // 1: Base Auth, 2: Seller Details, 3: Store
   const [errors, setErrors] = useState({});
@@ -51,6 +51,7 @@ export default function Auth() {
     
     if (view === 'login') {
       console.log('Logging in with:', { username: formData.username, password: formData.password });
+      onLogin();
       return;
     }
 
@@ -59,8 +60,11 @@ export default function Auth() {
       setSignUpStep(2);
     } else if (signUpStep === 2) {
       if (validateSellerDetails()) {
-        setSignUpStep(3); // Move to store creation
+        setSignUpStep(3);
       }
+    } else if (signUpStep === 3) {
+      // If you are handling the final store creation step in Auth.jsx directly:
+      onLogin(); // <--- Or add it wherever your final successful API callback happens!
     }
   };
 
@@ -81,6 +85,8 @@ export default function Auth() {
             onSubmit={(storeData) => {
               console.log("Final Registration Data:", { seller: formData, store: storeData });
               // Execute final API call
+              
+              onLogin(); // <--- Add this line to transition to the Home dashboard!
             }}
           />
         </div>
