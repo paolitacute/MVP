@@ -20,6 +20,7 @@ import Product from './links/Product';
 import Cart from './links/Cart';
 import OrderSuccess from './links/OrderSuccess';
 import './App.css';
+import './index.css';
 
 const App = () => {
   return (
