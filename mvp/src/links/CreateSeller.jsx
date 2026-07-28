@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { supabase } from '../client';
 import HeaderText from '../components/HeaderText';
 import Input from '../components/Input';
 import ActionButton from '../components/ActionButton';
@@ -15,6 +16,11 @@ const CreateSeller = () => {
     phone: '',
     password: ''
   });
+  
+  // Added state for handling UI feedback during auth
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
+  
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -22,20 +28,56 @@ const CreateSeller = () => {
     setFormData(prev => ({ ...prev, [id]: value }));
   };
 
-  const handleCreateAccount = (e) => {
+  const handleCreateAccount = async (e) => {
     e.preventDefault();
+    setError(null);
+    setLoading(true);
     
-    // Account creation logic goes here
-    console.log('Account created for:', formData.name);
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email: formData.createEmail,
+        password: formData.password,
+        options: {
+          data: {
+            full_name: formData.name,
+            phone: formData.phone,
+          }
+        }
+      })
 
-    // Follow the flow: Create Seller -> Create Store
-    navigate('/create-store');
+      //1. Check if Supabase returned an authentication error
+      if (error) {
+       setError(error.message); // Display the error to the user
+       setLoading(false);
+       console.log("There was an error", error);
+        return;  //Stop execution so they don't proceed to the next page
+      }
+
+      setLoading(false);
+      console.log('Account created for:', formData.name);
+
+      // Follow the flow: Create Seller -> Create Store
+      // navigate('/create-store');
+
+    } catch (err) {
+      // 2. This catch block will now only handle unexpected exceptions or network failures
+      console.log(err);
+      setError("An unexpected error occurred.");
+      setLoading(false);
+    }
   };
 
   return (
     <main className="page-container flex-center">
       <form onSubmit={handleCreateAccount} className="form-container">
         <HeaderText text="Create Seller Account" />
+        
+        {/* Error messaging display */}
+        {error && (
+          <div className="error-message" style={{ color: 'red', marginBottom: '1rem', textAlign: 'center' }}>
+            {error}
+          </div>
+        )}
         
         <div className="form-inputs">
           <Input 
@@ -45,11 +87,12 @@ const CreateSeller = () => {
             onChange={handleChange} 
             required 
           />
+          {/* Changed value from formData.email to formData.createEmail to match state */}
           <Input 
             label="Email Address" 
             type="email" 
             id="createEmail" 
-            value={formData.email} 
+            value={formData.createEmail} 
             onChange={handleChange}
             pattern="[a-z0-9]+@[a-z0-9]+\.[a-z]{2,}"
             customErrorMessage="Please enter a valid lowercase email (e.g., name@domain.com)"
@@ -74,7 +117,12 @@ const CreateSeller = () => {
           />
         </div>
 
-        <ActionButton text="Continue to Store Setup" type="submit" />
+        {/* Updated ActionButton to reflect loading state */}
+        <ActionButton 
+          text={loading ? "Creating Account..." : "Continue to Store Setup"} 
+          type="submit" 
+          disabled={loading} 
+        />
       </form>
     </main>
   );

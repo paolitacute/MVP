@@ -8,6 +8,10 @@
 - Delete a Listing
 - Set if a customization is available
 - In CreateStore and CreateSeller, sanitize the phone number to be only numbers, no trailing one and no symbols
+- Create listing base price and amount available cannot be negative
+- Create listing amount available cannot be a decimal.
+- Phone numer input needs to indicate what is the expected format
+- After the @, email addresses must only take letters (error seen in buyer form).
 
 
 
