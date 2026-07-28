@@ -1,90 +1,181 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User } from 'lucide-react';
 import SectionWithCards from '../components/SectionWithCards';
 import NavBar from '../components/NavBar';
-import { MOCK_SELLER, MOCK_ORDERS, MOCK_LISTINGS } from '../data/MockData';
+import { supabase } from '../client';
 
 const Home = () => {
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-  
   const navigate = useNavigate();
 
-  // Helper to calculate a single product's total price including customizations
-  const calculateProductPrice = (product) => {
-    const basePrice = parseFloat(product.price.replace('$', '')) || 0;
-    const customizationsPrice = product.customizations?.reduce((sum, cust) => {
-      return sum + (parseFloat(cust.price.replace('$', '')) || 0);
-    }, 0) || 0;
-    
-    return basePrice + customizationsPrice;
+  const [sellerName, setSellerName] = useState('');
+  const [newOrders, setNewOrders] = useState([]);
+  const [allOrders, setAllOrders] = useState([]);
+  const [listings, setListings] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    fetchHomeData();
+  }, []);
+
+  const fetchHomeData = async () => {
+    try {
+      setLoading(true);
+
+      // 1. Get current authenticated user
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      if (authError || !user) throw authError || new Error('No user authenticated');
+
+      // 2. Fetch seller details and their store ID
+      const { data: sellerData, error: sellerError } = await supabase
+        .from('seller')
+        .select('name')
+        .eq('id', user.id)
+        .single();
+
+      if (sellerError) throw sellerError;
+      setSellerName(sellerData?.name || 'Seller');
+
+      const { data: storeData, error: storeError } = await supabase
+        .from('store')
+        .select('id')
+        .eq('seller_id', user.id)
+        .single();
+
+      if (storeError || !storeData) return; // Exit if user has no associated store yet
+
+      const storeId = storeData.id;
+
+      // 3. Fetch Orders (with status, line items, and product thumbnails)
+      const { data: ordersData, error: ordersError } = await supabase
+        .from('orders')
+        .select(`
+          id,
+          total,
+          buyer_name,
+          created_at,
+          order_status (
+            name
+          ),
+          order_item (
+            product_name,
+            product_id,
+            product (
+              product_image (
+                image_url
+              )
+            )
+          )
+        `)
+        .eq('store_id', storeId)
+        .order('created_at', { ascending: false });
+
+      if (ordersError) throw ordersError;
+
+      // 4. Fetch Product Listings (with product images)
+      const { data: productsData, error: productsError } = await supabase
+        .from('product')
+        .select(`
+          id,
+          name,
+          base_price,
+          stock_quantity,
+          product_image (
+            image_url
+          )
+        `)
+        .eq('store_id', storeId)
+        .order('created_at', { ascending: false });
+
+      if (productsError) throw productsError;
+
+      // --- Data Formatting Helpers ---
+
+      // Map raw SQL orders into card structures
+      const formattedOrders = (ordersData || []).map((order) => {
+        const firstItem = order.order_item?.[0];
+        const itemImage = firstItem?.product?.product_image?.[0]?.image_url || null;
+        const totalAmount = parseFloat(order.total) || 0;
+
+        return {
+          id: order.id,
+          status: order.order_status?.name,
+          imageSrc: itemImage,
+          text1: firstItem?.product_name || 'Order Details',
+          text2: order.buyer_name,
+          text3: `$${totalAmount.toFixed(2)}`,
+          onClick: () => navigate(`/order/${order.id}`)
+        };
+      });
+
+      // Filter "New" orders specifically
+      const formattedNewOrders = formattedOrders.filter(
+        (order) => order.status?.toLowerCase() === 'new'
+      );
+
+      // Map product listings into card structures
+      const formattedListings = (productsData || []).map((listing) => {
+        const price = parseFloat(listing.base_price) || 0;
+        const mainImage = listing.product_image?.[0]?.image_url || null;
+
+        return {
+          id: listing.id,
+          imageSrc: mainImage,
+          text1: listing.name,
+          text2: `$${price.toFixed(2)}`,
+          text3:
+            listing.stock_quantity !== null && listing.stock_quantity > 0
+              ? `${listing.stock_quantity} in stock`
+              : 'Made to order',
+          onClick: () => navigate(`/listing/${listing.id}`)
+        };
+      });
+
+      // Set State
+      setAllOrders(formattedOrders);
+      setNewOrders(formattedNewOrders);
+      setListings(formattedListings);
+
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // Helper to calculate the grand total for an entire order
-  const calculateOrderPrice = (order) => {
-    const total = order.products?.reduce((sum, product) => {
-      return sum + calculateProductPrice(product);
-    }, 0) || 0;
-    
-    return `$${total.toFixed(2)}`;
-  };
-
-  const newData = MOCK_ORDERS
-    .filter(order => order.status === 'New')
-    .map(order => ({
-      id: order.id,
-      imageSrc: order.products[0]?.image,
-      text1: order.products[0]?.name,
-      text2: order.buyer.name,
-      text3: calculateOrderPrice(order),
-      onClick: () => navigate(`/order/${order.id}`)
-    }));
-
-  const ordersData = MOCK_ORDERS.map(order => ({
-    id: order.id,
-    imageSrc: order.products[0]?.image,
-    text1: order.products[0]?.name,
-    text2: order.buyer.name,
-    text3: calculateOrderPrice(order),
-    onClick: () => navigate(`/order/${order.id}`)
-  }));
-
-  const listingsData = MOCK_LISTINGS.map(listing => ({
-    id: listing.id,
-    // If the image is an array, grab the first one for the thumbnail. Otherwise, use the string.
-    imageSrc: Array.isArray(listing.image) ? listing.image[0] : listing.image,
-    text1: listing.name,
-    text2: `$${listing.price.toFixed(2)}`,
-    text3: listing.amountAvailable !== null ? `${listing.amountAvailable} in stock` : 'Made to order',
-    onClick: () => navigate(`/listing/${listing.id}`)
-  }));
-
+  if (loading) {
+    return (
+      <div className="home-layout">
+        <nav className="topbar">
+          <p>Loading your store...</p>
+        </nav>
+      </div>
+    );
+  }
 
   return (
     <div className="home-layout">
       <nav className="topbar">
-      <p>Hello {MOCK_SELLER.name}!</p>
+        <p>Hello {sellerName}!</p>
       </nav>
 
       <main className="home-content">
-        <div style={{backgroundColor: '#efe9f7', padding: '0.5rem 0 0 0'}}>
-        <SectionWithCards 
-          title="New" 
-          viewAllRoute="/new-orders" 
-          cards={newData} 
-        />
+        <div style={{ backgroundColor: '#efe9f7', padding: '0.5rem 0 0 0' }}>
+          <SectionWithCards 
+            title="New" 
+            viewAllRoute="/new-orders" 
+            cards={newOrders} 
+          />
         </div>
         <SectionWithCards 
           title="Orders" 
           viewAllRoute="/all-orders" 
-          cards={ordersData} 
+          cards={allOrders} 
         />
         <SectionWithCards 
           title="Listings" 
           viewAllRoute="/listings" 
-          cards={listingsData} 
+          cards={listings} 
         />
       </main>
 

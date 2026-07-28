@@ -1,24 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { supabase } from '../client';
 import HeaderText from '../components/HeaderText';
 import Input from '../components/Input';
 import Checkbox from '../components/Checkbox';
 import ActionButton from '../components/ActionButton';
 
-// Mocking the logged-in seller data until your backend is ready
-const MOCK_SELLER_DATA = {
-  phone: '+1234567890',
-  email: 'seller@example.com'
-};
-
 const CreateStore = () => {
-
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-
-  
   const navigate = useNavigate();
+
+  // State to hold the securely fetched seller details
+  const [sellerDetails, setSellerDetails] = useState({
+    email: '',
+    phone: ''
+  });
+
   const [formData, setFormData] = useState({
     storeName: '',
     slug: '',
@@ -28,50 +24,94 @@ const CreateStore = () => {
     instagram: '',
     address: '',
     description: '',
-    customMessage: ''
   });
+  
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-  const handleCreateStore = (e) => {
+  // Fetch session data once when the component mounts
+  useEffect(() => {
+    window.scrollTo(0, 0);
+
+    const fetchSellerData = async () => {
+      const { data: { user }, error } = await supabase.auth.getUser();
+
+      if (user) {
+        setSellerDetails({
+          email: user.email || '',
+          phone: user.user_metadata?.phone || '' // Extracting phone from the metadata saved during sign-up
+        });
+      } else if (error) {
+        console.error("Error fetching user data:", error.message);
+      }
+    };
+
+    fetchSellerData();
+  }, []); // Empty dependency array ensures this only runs once
+
+  const handleCreateStore = async (e) => {
     e.preventDefault();
-    console.log('Store created:', formData);
-    navigate('/home', { replace: true });
+    setError(null);
+    setLoading(true);
+
+    try {
+      const { data: storeId, error } = await supabase.rpc('storecreation', {
+        p_storename: formData.storeName,
+        p_storeslug: formData.slug,
+        p_storephone: formData.phone,
+        p_storeemail: formData.email,
+        p_storeinstagram: formData.instagram,
+        p_storeaddress: formData.address, 
+        p_storedescription: formData.description,
+      });
+
+      if (error) {
+        setError(error.message); 
+        setLoading(false);
+        console.log("There was an error", error);
+        return;  
+      }
+
+      setLoading(false);
+      console.log('Store created:', formData.storeName);
+      navigate('/home');
+
+    } catch (err) {
+      console.log(err);
+      setError("An unexpected error occurred.");
+      setLoading(false);
+    }
   };
 
-
-   // Utility function to format the slug
   const formatSlug = (text) => {
     return text
       .toLowerCase()
       .trim()
-      .normalize("NFD")                   // 1. Splits accented characters into base letter + accent mark
-      .replace(/[\u0300-\u036f]/g, "")    // 2. Strips the accent marks away
-      .replace(/[\s_]+/g, '-')            // 3. Replaces spaces and underscores with hyphens
-      .replace(/[^a-z0-9-]/g, '');        // 4. Removes any remaining unsupported characters
+      .normalize("NFD")                   
+      .replace(/[\u0300-\u036f]/g, "")    
+      .replace(/[\s_]+/g, '-')            
+      .replace(/[^a-z0-9-]/g, '');        
   };
 
   const handleChange = (e) => {
     const { id, value, type, checked } = e.target;
     
     setFormData((prev) => {
-      // Create a copy of the new state
       const updatedState = {
         ...prev,
         [id]: type === 'checkbox' ? checked : value
       };
 
-      // 1. Handle auto-filling slug
       if (id === 'storeName') {
         updatedState.slug = formatSlug(value);
       }
 
-      // 2. Handle checking/unchecking "Same as the seller"
       if (id === 'sameAsSeller') {
         if (checked) {
-          // Auto-fill fields with mock seller data
-          updatedState.phone = MOCK_SELLER_DATA.phone;
-          updatedState.email = MOCK_SELLER_DATA.email;
+          // Auto-fill fields using the securely fetched sellerDetails state
+          updatedState.phone = sellerDetails.phone;
+          updatedState.email = sellerDetails.email;
         } else {
-          // Clear fields if unchecked (or leave them to let user edit)
           updatedState.phone = '';
           updatedState.email = '';
         }
@@ -81,12 +121,17 @@ const CreateStore = () => {
     });
   };
 
-
   return (
     <main className="page-container flex-center" style={{ alignItems: 'flex-start', paddingTop: '4rem' }}>
       <form onSubmit={handleCreateStore} className="form-container">
         <HeaderText text="Create a store" />
         
+        {error && (
+          <div className="error-message" style={{ color: 'red', marginBottom: '1rem', textAlign: 'center' }}>
+            {error}
+          </div>
+        )}
+
         <div className="form-inputs">
           <Input label="Store name" id="storeName" value={formData.storeName} onChange={handleChange} required />
           <Input label="Slug" id="slug" value={formData.slug} onChange={handleChange} prefix="mvpname/" required />
@@ -101,7 +146,7 @@ const CreateStore = () => {
           <Input label="Store description" id="description" value={formData.description} onChange={handleChange} type='textarea' rows={5} />
         </div>
 
-        <ActionButton text="Create Store" type="submit" />
+        <ActionButton text={loading ? "Creating Store..." : "Create Store"} type="submit" disabled={loading} />
       </form>
     </main>
   );

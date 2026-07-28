@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { supabase } from '../client';
 import HeaderText from '../components/HeaderText';
 import Input from '../components/Input';
 import ActionButton from '../components/ActionButton';
@@ -12,23 +13,56 @@ const Login = () => {
   
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  
+  // Added state for handling UI feedback during login
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
+  
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
+    setError(null);
+    setLoading(true);
     
-    // Authentication logic would go here
-    console.log('Logging in with:', email);
+    try {
+      // 1. Authenticate the user with Supabase
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: email,
+        password: password,
+      });
 
-    // Navigate to Home and replace the history stack 
-    // to prevent looping back to the login screen
-    navigate('/home', { replace: true });
+      // 2. Handle authentication errors (e.g., wrong password, user doesn't exist)
+      if (signInError) {
+        setError(signInError.message);
+        setLoading(false);
+        return; // Stop execution
+      }
+
+      setLoading(false);
+      
+      // 3. Navigate to Home and replace the history stack 
+      // to prevent looping back to the login screen
+      navigate('/home', { replace: true });
+      
+    } catch (err) {
+      console.error(err);
+      setError("An unexpected error occurred.");
+      setLoading(false);
+    }
   };
 
   return (
     <main className="page-container flex-center">
       <form onSubmit={handleLogin} className="form-container">
         <HeaderText text="Login to account" />
+        
+        {/* Error messaging display */}
+        {error && (
+          <div className="error-message" style={{ color: 'red', marginBottom: '1rem', textAlign: 'center' }}>
+            {error}
+          </div>
+        )}
         
         <div className="form-inputs">
           <Input 
@@ -51,7 +85,12 @@ const Login = () => {
           />
         </div>
 
-        <ActionButton text="Login" type="submit" />
+        {/* Updated ActionButton to reflect loading state */}
+        <ActionButton 
+          text={loading ? "Logging in..." : "Login"} 
+          type="submit" 
+          disabled={loading}
+        />
         
         <div style={{ textAlign: 'center', marginTop: '1rem' }}>
           <span style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>

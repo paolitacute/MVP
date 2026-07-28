@@ -40,24 +40,27 @@ const CreateSeller = () => {
         options: {
           data: {
             full_name: formData.name,
-            phone: formData.phone,
+              phone: formData.phone, 
           }
         }
       })
 
       //1. Check if Supabase returned an authentication error
       if (error) {
-       setError(error.message); // Display the error to the user
-       setLoading(false);
-       console.log("There was an error", error);
+        setError(error.message); // Display the error to the user
+        setLoading(false);
+        console.log("There was an error", error);
         return;  //Stop execution so they don't proceed to the next page
       }
 
       setLoading(false);
       console.log('Account created for:', formData.name);
 
-      // Follow the flow: Create Seller -> Create Store
-      // navigate('/create-store');
+      // 2. Extract the user ID
+      const sellerId = data.user?.id;
+
+      // 3. Only pass the ID in the URL parameters
+      navigate(`/create-store?id=${sellerId}`);
 
     } catch (err) {
       // 2. This catch block will now only handle unexpected exceptions or network failures

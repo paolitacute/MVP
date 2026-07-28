@@ -17,11 +17,11 @@ const ModifyListingPage = ({
   buttonText, 
   initialData = {}, 
   onSubmitSuccess, 
-  successMessage 
+  successMessage,
+  onSave // <--- NEW PROP
 }) => {
   const navigate = useNavigate();
 
-  // Normalize images to always be an array
   const [images, setImages] = useState(() => {
     if (Array.isArray(initialData.image)) return initialData.image;
     if (typeof initialData.image === 'string' && initialData.image.trim() !== '') return [initialData.image];
@@ -35,13 +35,22 @@ const ModifyListingPage = ({
   const [haveDelivery, setHaveDelivery] = useState(initialData.delivery || false);
   const [customizations, setCustomizations] = useState(initialData.customizations || []);
   const [showToast, setShowToast] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false); // Prevent double submissions
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
   const handleAddCustomization = () => {
-    setCustomizations([...customizations, { id: Date.now(), options: [{ id: Date.now() + 1, name: '', price: '' }]}]);
+    setCustomizations([
+      ...customizations, 
+      { 
+        id: Date.now(), 
+        field: '',         // Explicitly initialize the field name
+        required: true,    // Explicitly initialize as required
+        options: [{ id: Date.now() + 1, name: '', price: '', image: null }] 
+      }
+    ]);
   };
 
   const handleCustomizationChange = (id, updatedFields) => {
@@ -54,30 +63,43 @@ const ModifyListingPage = ({
     setCustomizations(customizations.filter((cust) => cust.id !== idToRemove));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
+
     const formData = {
       name: productName,
+      price: productPrice, // Passed to RPC
       description,
-      amount,
+      amount,              // Mapped to p_stockquantity in parent
       delivery: haveDelivery,
       customizations,
-      image: images // Include images in the saved data
+      image: images 
     };
 
-    console.log("Saving product data:", formData);
-    setShowToast(true);
+    let isSuccess = true;
+    
+    // Execute the database call if the prop is provided
+    if (onSave) {
+      isSuccess = await onSave(formData);
+    }
 
-    setTimeout(() => {
-      setShowToast(false);
+    setIsSubmitting(false);
+
+    // Only show toast and navigate if the database insert didn't fail
+    if (isSuccess) {
+      setShowToast(true);
       setTimeout(() => {
-        if (onSubmitSuccess) {
-          onSubmitSuccess();
-        } else {
-          navigate(-1); 
-        }
-      }, 300);
-    }, 2000);
+        setShowToast(false);
+        setTimeout(() => {
+          if (onSubmitSuccess) {
+            onSubmitSuccess();
+          } else {
+            navigate(-1); 
+          }
+        }, 300);
+      }, 2000);
+    }
   };
 
   return (
@@ -116,7 +138,6 @@ const ModifyListingPage = ({
                     }}
                     title="Edit Images"
                   >
-                    {/* Render Image Component for 1 image, Carousel for 2+ */}
                     {images.length === 1 ? (
                       <div style={{ width: '100%', height: '100%' }}>
                         <Image 
@@ -129,10 +150,8 @@ const ModifyListingPage = ({
                     ) : (
                       <ImageCarousel images={images} />
                     )}
-                    
                   </div>
 
-                  {/* Thumbnail and fixed uploader row using Grid */}
                   <div style={{ 
                     display: 'grid', 
                     gridTemplateColumns: '80px minmax(0, 1fr)', 
@@ -140,13 +159,10 @@ const ModifyListingPage = ({
                     width: '100%',
                     alignItems: 'center'
                   }}>
-                    
-                    {/* Fixed uploader */}
                     <div style={{ height: '80px', width: '100%' }}>
                       <ImageUploader />
                     </div>
                     
-                    {/* Scrollable thumbnails */}
                     <div style={{ 
                     display: 'flex', 
                     gap: '0.5rem', 
@@ -157,21 +173,19 @@ const ModifyListingPage = ({
                       <div 
                         key={index}
                         onClick={() => {
-                          // Filter out the image at the specific index that was clicked
                           setImages(images.filter((_, i) => i !== index));
                         }}
                         style={{ 
-                          position: 'relative', // Added to contain the absolute banner
+                          position: 'relative', 
                           width: '80px', 
                           height: '80px', 
                           flexShrink: 0, 
                           borderRadius: '8px', 
                           overflow: 'hidden', 
                           border: '1px solid var(--border-light)',
-                          cursor: 'pointer' // Indicates to the user that it's clickable
+                          cursor: 'pointer' 
                         }}
                       >
-                        {/* Make sure the image fills the thumbnail square cleanly */}
                         <Image 
                           src={img} 
                           alt={`Thumbnail ${index + 1}`}
@@ -179,7 +193,6 @@ const ModifyListingPage = ({
                           imgClass="carousel-image" 
                         />
                         
-                        {/* Delete Banner overlay */}
                         <div style={{
                           position: 'absolute',
                           bottom: 0,
@@ -191,7 +204,7 @@ const ModifyListingPage = ({
                           justifyContent: 'center',
                           gap: '0.25rem',
                           padding: '0.15rem 0',
-                          fontSize: '1rem', // Slightly smaller font to fit the 80px square
+                          fontSize: '1rem',
                           fontWeight: '600'
                         }}>
                           <Trash2 size={18} />
@@ -281,7 +294,8 @@ const ModifyListingPage = ({
           </div>
 
           <div className="footer-action">
-            <ActionButton text={buttonText} type="submit"/>
+            {/* Disable button while network request is pending */}
+            <ActionButton text={isSubmitting ? 'Saving...' : buttonText} type="submit" disabled={isSubmitting} />
           </div>
        </form>
 
