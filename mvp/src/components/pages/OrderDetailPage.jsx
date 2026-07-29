@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { ArrowLeft } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import HeaderText from '../HeaderText';
 import DetailsLine from '../DetailsLine';
 import HorizontalCardLeft from '../HorizontalCardLeft';
@@ -49,6 +49,7 @@ const OrderDetailPage = ({
   onStatusChange
 }) => {
   const navigate = useNavigate();
+  const { username } = useParams(); // Extract the dynamic username from the URL
 
   // The hook must be at the top level of your component
   useEffect(() => {
@@ -110,7 +111,8 @@ const OrderDetailPage = ({
       <div className="summary-button-container">
         <button 
           className="secondary-action-btn"
-          onClick={() => navigate(`/order/${orderId}/summary`)}
+          // Dynamically route using the username
+          onClick={() => navigate(`/${username}/order/${orderId}/summary`)}
         >
           Generar Recibo de Orden
         </button>
@@ -124,7 +126,8 @@ const OrderDetailPage = ({
         {products.map((product) => (
             <div 
               key={product.id} 
-              onClick={() => navigate(`/order/${orderId}/product/${product.id}`)}
+              // Dynamically route using the username
+              onClick={() => navigate(`/${username}/order/${orderId}/product/${product.id}`)}
               style={{ cursor: 'pointer' }}
             >
               <HorizontalCardLeft 

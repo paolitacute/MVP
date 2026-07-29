@@ -5,7 +5,7 @@ import NavBar from '../components/NavBar';
 import { supabase } from '../client'; // Adjust path according to your project setup
 
 const ListingDetail = () => {
-  const { id } = useParams();
+  const { username, id } = useParams();
   const navigate = useNavigate();
   
   const [listing, setListing] = useState(null);
@@ -86,7 +86,7 @@ const ListingDetail = () => {
   }, [id]);
 
   const handleEdit = () => {
-    navigate(`/edit-listing/${id}`);
+    navigate(`/${username}/edit-listing/${id}`);
   };
 
   if (loading) {
@@ -116,7 +116,7 @@ const ListingDetail = () => {
 
   return (
     <>
-      <ListingDetailPage listing={listing} onEdit={handleEdit} onBack="/listings" />
+      <ListingDetailPage listing={listing} onEdit={handleEdit} onBack={`/${username}/listings`} />
       <NavBar />
     </>
   );

@@ -1,14 +1,16 @@
 import React, { useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import VerticalCard from './VerticalCard';
 
 const SectionWithCards = ({ 
   title, 
   viewAllRoute, 
   cards, 
-  emptyMessage = "Nothing to see here yet." // Default empty message
+  emptyMessage = "Nothing to see here yet." 
 }) => {
   const navigate = useNavigate();
+  const { username } = useParams();
+  
   // 1. Create a reference for the scrollable container
   const scrollRef = useRef(null);
 
@@ -27,20 +29,28 @@ const SectionWithCards = ({
   // Determine if there are cards to display
   const hasCards = cards && cards.length > 0;
 
+  // 3. Format the route safely to prevent double-prefixing 
+  // if the parent component already included the username in the prop
+  const safeViewAllRoute = viewAllRoute.startsWith(`/${username}`)
+    ? viewAllRoute
+    : viewAllRoute.startsWith('/') 
+      ? `/${username}${viewAllRoute}` 
+      : `/${username}/${viewAllRoute}`;
+
   return (
     <section className="section-with-cards">
       <div className="section-header">
         <h2 className="section-title">{title}</h2>
         <button 
           className="view-all-link" 
-          onClick={() => navigate(viewAllRoute)}
+          onClick={() => navigate(safeViewAllRoute)}
           aria-label={`View all ${title}`}
         >
           View all
         </button>
       </div>
       
-      {/* 3. A relative wrapper to position the absolute arrows */}
+      {/* A relative wrapper to position the absolute arrows */}
       <div className="scroll-wrapper">
         
         {/* Only show left arrow if there are cards */}

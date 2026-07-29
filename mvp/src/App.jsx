@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import { supabase } from './client'; // Imported to check session and db status
+import { supabase } from './client'; 
 import Login from './links/Login';
 import Home from './links/Home';
 import CreateSeller from './links/CreateSeller';
@@ -24,41 +24,42 @@ import './App.css';
 import './index.css';
 
 // 1. Create the Route Guard Component
-// 1. Create the Route Guard Component
 const AuthGuard = ({ children }) => {
   const location = useLocation();
   const path = location.pathname;
-
-  // Define reserved seller routes to distinguish them from the /:slug storefront route
-  const reservedSellerPaths = [
-    'login', 'create-seller', 'create-store', 'home', 
-    'create-listing', 'profile', 'new-orders', 'all-orders', 'listings'
-  ];
 
   // Determine if the current path is intended for a buyer
   const isBuyerRoute = 
     path.startsWith('/product/') || 
     path === '/cart' || 
     path === '/order-success' || 
-    // Safely captures /:slug by ensuring it's a top-level path that is NOT a reserved seller route
-    (path !== '/' && path.split('/').length === 2 && !reservedSellerPaths.includes(path.split('/')[1]));
+    (path.split('/').length === 2 && !['', 'login', 'create-seller', 'create-store'].includes(path.split('/')[1]));
 
-  const [authStatus, setAuthStatus] = useState('loading'); // 'loading' | 'unauth' | 'no_store' | 'has_store'
+  const [authStatus, setAuthStatus] = useState('loading'); 
+  const [username, setUsername] = useState(''); 
 
   useEffect(() => {
     let isMounted = true;
 
     const checkStatus = async () => {
-      // Fetch the current session
       const { data: { session } } = await supabase.auth.getSession();
 
-      // Rule 4 Check: No session exists
       if (!session) {
         if (isMounted) setAuthStatus('unauth');
         return;
       }
 
-      // Session exists (meaning Seller exists). Check if a store is tied to them.
+      // Fetch the seller's name to generate the URL slug
+      const { data: seller } = await supabase
+        .from('seller')
+        .select('name')
+        .eq('id', session.user.id)
+        .single();
+        
+      if (seller && isMounted) {
+        setUsername(seller.name.toLowerCase().replace(/\s+/g, ''));
+      }
+
       const { data: stores } = await supabase
         .from('store') 
         .select('id')
@@ -76,7 +77,6 @@ const AuthGuard = ({ children }) => {
 
     checkStatus();
 
-    // Listen for auth changes (like logging in or out) to re-evaluate rules
     const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {
       checkStatus();
     });
@@ -87,12 +87,12 @@ const AuthGuard = ({ children }) => {
     };
   }, []);
 
-  // --- NEW LOGIC: Bypass auth checks and loading screens for buyers ---
+  // Bypass auth checks and loading screens for buyers
   if (isBuyerRoute) {
     return children;
   }
 
-  // Show a blank loading screen while verifying the database state for sellers
+  // Show a loading screen while verifying the database state for sellers
   if (authStatus === 'loading') {
     return <div className="page-container flex-center">Loading...</div>; 
   }
@@ -100,62 +100,74 @@ const AuthGuard = ({ children }) => {
   const isPublicRoute = path === '/login' || path === '/create-seller';
   const isCreateStoreRoute = path === '/create-store';
 
-  // Rule 4 Enforcement: No session -> user can ONLY access login and create-seller
   if (authStatus === 'unauth' && !isPublicRoute) {
     return <Navigate to="/login" replace />;
   }
 
-  // Rule 1 Enforcement: Session logged in -> user CANNOT access login or create-seller
   if (authStatus !== 'unauth' && isPublicRoute) {
-     return <Navigate to={authStatus === 'has_store' ? '/home' : '/create-store'} replace />;
+     return <Navigate to={authStatus === 'has_store' ? `/${username}/home` : '/create-store'} replace />;
   }
 
-  // Rule 3 Enforcement: Seller exists but NO store -> user can ONLY access create-store
   if (authStatus === 'no_store' && !isCreateStoreRoute) {
     return <Navigate to="/create-store" replace />;
   }
 
-  // Rule 2 Enforcement: Store exists -> user CANNOT access create-store
   if (authStatus === 'has_store' && isCreateStoreRoute) {
-    return <Navigate to="/home" replace />;
+    return <Navigate to={`/${username}/home`} replace />;
+  }
+
+  // --- NEW ENFORCEMENT: URL Ownership Check ---
+  // If a seller is logged in, ensure they can only access their own parameterized routes
+  if (authStatus === 'has_store' && !isPublicRoute && !isCreateStoreRoute) {
+    // Extract the username currently in the browser's URL
+    const urlUsername = path.split('/')[1];
+
+    // If it doesn't match their actual authenticated username
+    if (urlUsername !== username) {
+      // Extract the rest of the path (e.g., "/home" or "/new-orders") 
+      const remainingPath = path.substring(urlUsername.length + 1);
+      
+      // Forcefully seamlessly redirect them to their own version of the page
+      return <Navigate to={`/${username}${remainingPath}`} replace />;
+    }
   }
 
   // If the user passes all rule checks, render the page they requested
   return children;
 };
 
-
 // 2. Wrap the Routes in the App Component
 const App = () => {
   return (
     <Router>
-      {/* AuthGuard must be inside Router to use the useLocation hook */}
       <AuthGuard>
         <Routes>
           {/* Core Auth & Flow Routes */}
           <Route path="/login" element={<Login />} />
           <Route path="/create-seller" element={<CreateSeller />} />
           <Route path="/create-store" element={<CreateStore />} />
-          <Route path="/home" element={<Home />} />
 
+          {/* --- SELLER ROUTES (Prefixed with /:username) --- */}
+          <Route path="/:username/home" element={<Home />} />
+          
           {/* NavBar links */}
-          <Route path="/create-listing" element={<CreateListing />} />
-          <Route path="/profile" element={<AccountSettings />} />
-          <Route path="/profile/edit" element={<EditAccountSettings />} />
+          <Route path="/:username/create-listing" element={<CreateListing />} />
+          <Route path="/:username/profile" element={<AccountSettings />} />
+          <Route path="/:username/profile/edit" element={<EditAccountSettings />} />
           
           {/* Order Flows */}
-          <Route path="/new-orders" element={<NewOrders />} />
-          <Route path="/all-orders" element={<AllOrders />} />
-          <Route path="/order/:id" element={<OrderDetail />} />
-          <Route path="/order/:orderId/summary" element={<OrderSummary />} />
-          <Route path="/order/:orderId/product/:productId" element={<ProductOrderedDetail />} />
+          <Route path="/:username/new-orders" element={<NewOrders />} />
+          <Route path="/:username/all-orders" element={<AllOrders />} />
+          <Route path="/:username/order/:id" element={<OrderDetail />} />
+          <Route path="/:username/order/:orderId/summary" element={<OrderSummary />} />
+          <Route path="/:username/order/:orderId/product/:productId" element={<ProductOrderedDetail />} />
           
           {/* Listing Flows */}
-          <Route path="/listings" element={<Listings />} />
-          <Route path="/listing/:id" element={<ListingDetail />} />
-          <Route path="/edit-listing/:id" element={<EditListing />} />
+          <Route path="/:username/listings" element={<Listings />} />
+          <Route path="/:username/listing/:id" element={<ListingDetail />} />
+          <Route path="/:username/edit-listing/:id" element={<EditListing />} />
 
-          {/* Buyer Flows */}
+          {/* --- BUYER FLOWS --- */}
           <Route path="/:slug" element={<StoreFront />} />
           <Route path="/product/:id" element={<Product />} />
           <Route path="/cart" element={<Cart />} />

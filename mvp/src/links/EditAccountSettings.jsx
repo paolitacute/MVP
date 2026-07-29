@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { supabase } from '../client'; 
 import BackButton from '../components/BackButton';
 import HeaderText from '../components/HeaderText';
@@ -10,6 +10,7 @@ import Toast from '../components/Toast';
 
 const EditAccountSettings = () => {
   const navigate = useNavigate();
+  const { username } = useParams();
 
   const [sellerForm, setSellerForm] = useState({});
   const [storeForm, setStoreForm] = useState({});
@@ -80,7 +81,7 @@ const EditAccountSettings = () => {
       
       // Wait a tiny bit for the hide animation to finish before navigating
       setTimeout(() => {
-        navigate('/profile');
+        navigate(`/${username}/profile`);
       }, 300);
       
     }, 2000);

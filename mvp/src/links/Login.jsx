@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { supabase } from '../client';
 import HeaderText from '../components/HeaderText';
 import Input from '../components/Input';
@@ -19,6 +19,7 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   
   const navigate = useNavigate();
+  const { username } = useParams();
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -43,7 +44,7 @@ const Login = () => {
       
       // 3. Navigate to Home and replace the history stack 
       // to prevent looping back to the login screen
-      navigate('/home', { replace: true });
+      navigate(`/${username}/home`, { replace: true });
       
     } catch (err) {
       console.error(err);

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { supabase } from '../client'; 
 import EditButton from '../components/EditButton';
 import BackButton from '../components/BackButton';
@@ -10,6 +10,7 @@ import ActionButton from '../components/ActionButton';
 
 const AccountSettings = () => {
   const navigate = useNavigate();
+  const { username } = useParams();
 
   const [seller, setSeller] = useState(null);
   const [store, setStore] = useState(null);
@@ -103,12 +104,12 @@ const AccountSettings = () => {
         {/* Header Area */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <BackButton goTo="/home"/>
+            <BackButton goTo={`/${username}/home`}/>
             <HeaderText text="Account Settings" />
           </div>
           
           {/* Navigation to the edit screen */}
-          <EditButton onClick={() => navigate('/profile/edit')} />
+          <EditButton onClick={() => navigate(`/${username}/profile/edit`)} />
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>

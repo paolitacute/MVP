@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import SectionWithCards from '../components/SectionWithCards';
 import NavBar from '../components/NavBar';
 import { supabase } from '../client';
 
 const Home = () => {
   const navigate = useNavigate();
+  const { username } = useParams();
 
   const [sellerName, setSellerName] = useState('');
   const [newOrders, setNewOrders] = useState([]);
@@ -104,7 +105,7 @@ const Home = () => {
           text1: firstItem?.product_name || 'Order Details',
           text2: order.buyer_name,
           text3: `$${totalAmount.toFixed(2)}`,
-          onClick: () => navigate(`/order/${order.id}`)
+          onClick: () => navigate(`/${username}/order/${order.id}`)
         };
       });
 
@@ -127,7 +128,7 @@ const Home = () => {
             listing.stock_quantity !== null && listing.stock_quantity > 0
               ? `${listing.stock_quantity} in stock`
               : 'Made to order',
-          onClick: () => navigate(`/listing/${listing.id}`)
+          onClick: () => navigate(`/${username}/listing/${listing.id}`)
         };
       });
 
@@ -163,20 +164,20 @@ const Home = () => {
         <div style={{ backgroundColor: '#efe9f7', padding: '0.5rem 0 0 0' }}>
           <SectionWithCards 
             title="New" 
-            viewAllRoute="/new-orders" 
+            viewAllRoute={`/${username}/new-orders`} 
             cards={newOrders} 
             emptyMessage="When you get new orders, you'll see them here."
           />
         </div>
         <SectionWithCards 
           title="Orders" 
-          viewAllRoute="/all-orders" 
+          viewAllRoute={`/${username}/all-orders`} 
           cards={allOrders} 
           emptyMessage="When you get new orders, you'll see them here."
         />
         <SectionWithCards 
           title="Listings" 
-          viewAllRoute="/listings" 
+          viewAllRoute={`/${username}/listings`} 
           cards={listings} 
           emptyMessage="When you create listings, you'll see them here."
         />

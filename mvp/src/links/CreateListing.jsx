@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import ModifyListingPage from '../components/pages/ModifyListingPage';
 import NavBar from '../components/NavBar';
 import { supabase } from '../client'; 
@@ -10,6 +10,7 @@ const CreateListing = () => {
   }, []);
   
   const navigate = useNavigate();
+  const { username } = useParams();
 
   // The function that interacts with Supabase using the new RPC
   const handleCreateProduct = async (formData) => {
@@ -71,7 +72,7 @@ const CreateListing = () => {
         buttonText="Create Listing"
         successMessage="Listing created successfully!"
         onSave={handleCreateProduct} // Pass the updated DB logic down as a prop
-        onSubmitSuccess={() => navigate('/home')}
+        onSubmitSuccess={() => navigate(`/${username}/home`)}
       />
       <NavBar />
     </>

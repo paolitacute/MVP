@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import CardListPage from '../components/pages/CardListPage';
 import NavBar from '../components/NavBar';
 import { supabase } from '../client'; // Adjust path according to your project setup
 
 const Listings = () => {
   const navigate = useNavigate();
+  const { username } = useParams();
   
   const [listings, setListings] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -69,7 +70,7 @@ const Listings = () => {
   };
 
   const handleItemClick = (id) => {
-    navigate(`/listing/${id}`);
+    navigate(`/${username}/listing/${id}`);
   };
 
   if (loading) {
@@ -96,7 +97,7 @@ const Listings = () => {
         title="Listings"
         data={listings}
         onItemClick={handleItemClick}
-        onBack="/home"
+        onBack={`/${username}/home`}
       />
       <NavBar />
     </div>

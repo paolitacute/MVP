@@ -11,7 +11,7 @@ const EditListing = () => {
   }, []);
   
   const navigate = useNavigate();
-  const { id } = useParams();
+  const { username, id } = useParams();
 
   // Find the specific listing from your mock data using the ID from the URL
   const listing = MOCK_LISTINGS.find(item => item.id === parseInt(id));
@@ -43,7 +43,7 @@ const EditListing = () => {
         buttonText="Save Changes"
         successMessage="Listing updated successfully!"
         initialData={existingProductData}
-        onSubmitSuccess={() => navigate(`/listing/${id}`)}
+        onSubmitSuccess={() => navigate(`/${username}/listing/${id}`)}
       />
 
       <NavBar />
