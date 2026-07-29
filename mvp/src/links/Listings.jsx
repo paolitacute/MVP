@@ -56,7 +56,6 @@ const Listings = () => {
         name: listing.name,
         price: parseFloat(listing.base_price) || 0,
         amountAvailable: listing.stock_quantity,
-        // Extract the first image URL from the joined product_image array
         image: listing.product_image?.[0]?.image_url || null, 
       }));
 
@@ -70,7 +69,7 @@ const Listings = () => {
   };
 
   const handleItemClick = (id) => {
-    navigate(`/listing/${id}`); // Navigates to the ListingDetail page
+    navigate(`/listing/${id}`);
   };
 
   if (loading) {

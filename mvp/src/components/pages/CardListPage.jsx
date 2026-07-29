@@ -4,7 +4,13 @@ import SearchBar from '../SearchBar';
 import VerticalCard from '../VerticalCard';
 import BackButton from '../BackButton';
 
-const CardListPage = ({ title, data, onItemClick, onBack = -1 }) => {
+const CardListPage = ({ 
+  title, 
+  data, 
+  onItemClick, 
+  onBack = -1,
+  emptyMessage = "Nothing to see here yet." // Add the prop with a default fallback
+}) => {
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -19,32 +25,38 @@ const CardListPage = ({ title, data, onItemClick, onBack = -1 }) => {
 
   return (
     <>
-
       <BackButton goTo={onBack}/>
 
       <div className="section-header">
         <HeaderText text={title} />
       </div>
       
-        <SearchBar 
-          value={searchTerm} 
-          onChange={(e) => setSearchTerm(e.target.value)} 
-          placeholder="search" 
-        />
+      <SearchBar 
+        value={searchTerm} 
+        onChange={(e) => setSearchTerm(e.target.value)} 
+        placeholder="search" 
+      />
       
-
-      <div className="cards-grid-container">
-        {filteredData.map((item) => (
-          <VerticalCard
-            key={item.id}
-            imageSrc={item.image}
-            text1={item.name}
-            text2={`$${item.price.toFixed(2)}`}
-            text3={item.amountAvailable !== null ? `${item.amountAvailable} in stock` : 'Made to order'}
-            onClick={() => onItemClick(item.id)}
-          />
-        ))}
-      </div>
+      {/* Conditionally render the grid OR the empty message */}
+      {filteredData.length > 0 ? (
+        <div className="cards-grid-container">
+          {filteredData.map((item) => (
+            <VerticalCard
+              key={item.id}
+              imageSrc={item.image}
+              text1={item.name}
+              text2={`$${item.price.toFixed(2)}`}
+              text3={item.amountAvailable !== null ? `${item.amountAvailable} in stock` : 'Made to order'}
+              onClick={() => onItemClick(item.id)}
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="empty-section-message" style={{ marginTop: '1.5rem' }}>
+          {/* If there's a search term, you might want to dynamically adjust the message */}
+          {searchTerm ? `No results found for "${searchTerm}"` : emptyMessage}
+        </div>
+      )}
     </>
   );
 };

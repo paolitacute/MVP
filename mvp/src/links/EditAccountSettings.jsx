@@ -1,26 +1,69 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { supabase } from '../client'; 
 import BackButton from '../components/BackButton';
 import HeaderText from '../components/HeaderText';
 import Input from '../components/Input';
 import ActionButton from '../components/ActionButton';
 import NavBar from '../components/NavBar';
 import Toast from '../components/Toast';
-import { MOCK_SELLER, MOCK_STORE } from '../data/MockData';
 
 const EditAccountSettings = () => {
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-  
   const navigate = useNavigate();
 
-  const [sellerForm, setSellerForm] = useState(MOCK_SELLER);
-  const [storeForm, setStoreForm] = useState(MOCK_STORE);
+  const [sellerForm, setSellerForm] = useState({});
+  const [storeForm, setStoreForm] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   
-  // New state variables for the toast notification
+  // State variables for the toast notification
   const [showToast, setShowToast] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    fetchAccountDetails();
+  }, []);
+
+  const fetchAccountDetails = async () => {
+    try {
+      setLoading(true);
+      
+      // 1. Get authenticated user
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      if (authError || !user) throw authError || new Error('No user authenticated');
+
+      // 2. Fetch seller information
+      const { data: sellerData, error: sellerError } = await supabase
+        .from('seller')
+        .select('name, email, phone')
+        .eq('id', user.id)
+        .single();
+
+      if (sellerError) throw sellerError;
+
+      // 3. Fetch store information
+      const { data: storeData, error: storeError } = await supabase
+        .from('store')
+        .select('name, slug, phone, email, instagram, address, description')
+        .eq('seller_id', user.id)
+        .single();
+
+      if (storeError && storeError.code !== 'PGRST116') { 
+        throw storeError;
+      }
+
+      // Populate forms with fetched data
+      if (sellerData) setSellerForm(sellerData);
+      if (storeData) setStoreForm(storeData);
+
+    } catch (err) {
+      console.error("Error fetching account settings:", err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSave = (e) => {
     e.preventDefault();
@@ -42,6 +85,24 @@ const EditAccountSettings = () => {
       
     }, 2000);
   };
+
+  if (loading) {
+    return (
+      <div className="page-container flex-center" style={{ paddingBottom: '6rem' }}>
+        <p>Loading editable details...</p>
+        <NavBar />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="page-container flex-center" style={{ paddingBottom: '6rem', color: 'red' }}>
+        <p>Error loading details: {error}</p>
+        <NavBar />
+      </div>
+    );
+  }
 
   return (
     <>
@@ -84,6 +145,7 @@ const EditAccountSettings = () => {
               type="password"
               value="********" 
               onChange={(e) => setSellerForm({ ...sellerForm, password: e.target.value })}
+              required
             />
           </div>
 
@@ -126,7 +188,6 @@ const EditAccountSettings = () => {
               label="Address" 
               value={storeForm.address || ''} 
               onChange={(e) => setStoreForm({ ...storeForm, address: e.target.value })}
-              required 
             />
             <Input 
               label="Store Description" 
@@ -147,11 +208,9 @@ const EditAccountSettings = () => {
         </form>
 
         <Toast 
-        show={showToast} 
-        message="Changes saved successfully!" 
+          show={showToast} 
+          message="Changes saved successfully!" 
         />
-
-
       </div>
       
       <NavBar />

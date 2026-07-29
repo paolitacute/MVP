@@ -165,17 +165,20 @@ const Home = () => {
             title="New" 
             viewAllRoute="/new-orders" 
             cards={newOrders} 
+            emptyMessage="When you get new orders, you'll see them here."
           />
         </div>
         <SectionWithCards 
           title="Orders" 
           viewAllRoute="/all-orders" 
           cards={allOrders} 
+          emptyMessage="When you get new orders, you'll see them here."
         />
         <SectionWithCards 
           title="Listings" 
           viewAllRoute="/listings" 
           cards={listings} 
+          emptyMessage="When you create listings, you'll see them here."
         />
       </main>
 

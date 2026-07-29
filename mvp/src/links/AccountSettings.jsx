@@ -1,20 +1,63 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '../client'; // Ensure you import your supabase client
+import { supabase } from '../client'; 
 import EditButton from '../components/EditButton';
 import BackButton from '../components/BackButton';
 import HeaderText from '../components/HeaderText';
 import CategoryDetail from '../components/CategoryDetail';
 import NavBar from '../components/NavBar';
-import ActionButton from '../components/ActionButton'; // Import the ActionButton[cite: 7]
-import { MOCK_SELLER, MOCK_STORE } from '../data/MockData';
+import ActionButton from '../components/ActionButton'; 
 
 const AccountSettings = () => {
+  const navigate = useNavigate();
+
+  const [seller, setSeller] = useState(null);
+  const [store, setStore] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
   useEffect(() => {
     window.scrollTo(0, 0);
+    fetchAccountDetails();
   }, []);
 
-  const navigate = useNavigate();
+  const fetchAccountDetails = async () => {
+    try {
+      setLoading(true);
+      
+      // 1. Get authenticated user
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      if (authError || !user) throw authError || new Error('No user authenticated');
+
+      // 2. Fetch seller information
+      const { data: sellerData, error: sellerError } = await supabase
+        .from('seller')
+        .select('name, email, phone')
+        .eq('id', user.id)
+        .single();
+
+      if (sellerError) throw sellerError;
+
+      // 3. Fetch store information
+      const { data: storeData, error: storeError } = await supabase
+        .from('store')
+        .select('name, slug, phone, email, instagram, address, description')
+        .eq('seller_id', user.id)
+        .single();
+
+      if (storeError && storeError.code !== 'PGRST116') { // Ignore error if they don't have a store yet
+        throw storeError;
+      }
+
+      setSeller(sellerData);
+      setStore(storeData);
+    } catch (err) {
+      console.error("Error fetching account settings:", err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Handle the logout sequence
   const handleLogout = async () => {
@@ -27,13 +70,31 @@ const AccountSettings = () => {
         return;
       }
       
-      // 2. Redirect the user back to the login screen[cite: 6]
-      navigate('/login', { replace: true }); // Using replace prevents them from using the back arrow to return here
+      // 2. Redirect the user back to the login screen
+      navigate('/login', { replace: true }); 
       
     } catch (err) {
       console.error("Unexpected error during logout:", err);
     }
   };
+
+  if (loading) {
+    return (
+      <div className="page-container flex-center" style={{ paddingBottom: '6rem' }}>
+        <p>Loading account details...</p>
+        <NavBar />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="page-container flex-center" style={{ paddingBottom: '6rem', color: 'red' }}>
+        <p>Error loading account: {error}</p>
+        <NavBar />
+      </div>
+    );
+  }
 
   return (
     <>
@@ -46,7 +107,7 @@ const AccountSettings = () => {
             <HeaderText text="Account Settings" />
           </div>
           
-          {/* Navigation to the new edit screen */}
+          {/* Navigation to the edit screen */}
           <EditButton onClick={() => navigate('/profile/edit')} />
         </div>
 
@@ -57,30 +118,32 @@ const AccountSettings = () => {
             <h3 className="section-subtitle" style={{ color: 'var(--text-main)', marginBottom: '0.5rem' }}>
                 Seller Information
             </h3>
-            <CategoryDetail category="Name" option={MOCK_SELLER.name} />
-            <CategoryDetail category="Email" option={MOCK_SELLER.email} />
-            <CategoryDetail category="Phone" option={MOCK_SELLER.phone} />
-            <CategoryDetail category="Password" option="*******" />
+            <CategoryDetail category="Name" option={seller?.name || 'N/A'} />
+            <CategoryDetail category="Email" option={seller?.email || 'N/A'} />
+            <CategoryDetail category="Phone" option={seller?.phone || 'N/A'} />
+            <CategoryDetail category="Password" option="********" />
           </div>
 
           {/* Section 2: Store Information */}
-          <div className="form-container" style={{ gap: '1rem', padding: '1.5rem', width: '100%', maxWidth: '100%', marginBottom: '2rem' }}>
-            <h3 className="section-subtitle" style={{ color: 'var(--text-main)', marginBottom: '0.5rem' }}>
-                Store Information
-            </h3>
-            <CategoryDetail category="Store Name" option={MOCK_STORE.name} />
-            <CategoryDetail category="Store Slug" option={MOCK_STORE.slug} />
-            <CategoryDetail category="Phone" option={MOCK_STORE.phone} />
-            <CategoryDetail category="Email" option={MOCK_STORE.email} />
-            <CategoryDetail category="Instagram" option={MOCK_STORE.instagram} />
-            <CategoryDetail category="Address" option={MOCK_STORE.address} />
-            
-            {/* Multi-line read-only fields utilizing listing-detail typography */}
-            <div style={{ marginTop: '0.5rem' }}>
-                <span className="meta-label">Store Description</span>
-                <p className="listing-description">{MOCK_STORE.description}</p>
+          {store && (
+            <div className="form-container" style={{ gap: '1rem', padding: '1.5rem', width: '100%', maxWidth: '100%', marginBottom: '2rem' }}>
+              <h3 className="section-subtitle" style={{ color: 'var(--text-main)', marginBottom: '0.5rem' }}>
+                  Store Information
+              </h3>
+              <CategoryDetail category="Store Name" option={store.name || 'N/A'} />
+              <CategoryDetail category="Store Slug" option={store.slug || 'N/A'} />
+              <CategoryDetail category="Phone" option={store.phone || 'N/A'} />
+              <CategoryDetail category="Email" option={store.email || 'N/A'} />
+              <CategoryDetail category="Instagram" option={store.instagram || 'N/A'} />
+              <CategoryDetail category="Address" option={store.address || 'N/A'} />
+              
+              {/* Multi-line read-only fields utilizing listing-detail typography */}
+              <div style={{ marginTop: '0.5rem' }}>
+                  <span className="meta-label">Store Description</span>
+                  <p className="listing-description">{store.description || 'No description provided.'}</p>
+              </div>
             </div>
-          </div>
+          )}
           
           {/* Logout Button */}
           <div style={{ marginTop: '1rem' }}>
