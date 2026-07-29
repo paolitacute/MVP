@@ -77,7 +77,7 @@ const CreateStore = () => {
 
       setTimeout(() => {
         navigate('/home'); 
-      }, 1000);
+      }, 3000);
 
     } catch (err) {
       console.log(err);
