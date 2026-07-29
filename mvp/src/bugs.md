@@ -12,7 +12,8 @@
 - Create listing amount available cannot be a decimal.
 - Phone numer input needs to indicate what is the expected format
 - After the @, email addresses must only take letters (error seen in buyer form).
-
+- Add image input in create a store
+- When creating a listing, the number values change unintendedly, fijalos a solo input de teclado
 
 
 
