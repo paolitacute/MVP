@@ -76,7 +76,7 @@ const CreateStore = () => {
       console.log('Store created:', formData.storeName);
 
       setTimeout(() => {
-        window.location.href = '/home'; 
+        navigate('/home'); 
       }, 1000);
 
     } catch (err) {
