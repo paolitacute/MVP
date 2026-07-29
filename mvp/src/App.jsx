@@ -24,15 +24,32 @@ import './App.css';
 import './index.css';
 
 // 1. Create the Route Guard Component
+// 1. Create the Route Guard Component
 const AuthGuard = ({ children }) => {
   const location = useLocation();
+  const path = location.pathname;
+
+  // Define reserved seller routes to distinguish them from the /:slug storefront route
+  const reservedSellerPaths = [
+    'login', 'create-seller', 'create-store', 'home', 
+    'create-listing', 'profile', 'new-orders', 'all-orders', 'listings'
+  ];
+
+  // Determine if the current path is intended for a buyer
+  const isBuyerRoute = 
+    path.startsWith('/product/') || 
+    path === '/cart' || 
+    path === '/order-success' || 
+    // Safely captures /:slug by ensuring it's a top-level path that is NOT a reserved seller route
+    (path !== '/' && path.split('/').length === 2 && !reservedSellerPaths.includes(path.split('/')[1]));
+
   const [authStatus, setAuthStatus] = useState('loading'); // 'loading' | 'unauth' | 'no_store' | 'has_store'
 
   useEffect(() => {
     let isMounted = true;
 
     const checkStatus = async () => {
-      // Fetch the current session[cite: 12, 13]
+      // Fetch the current session
       const { data: { session } } = await supabase.auth.getSession();
 
       // Rule 4 Check: No session exists
@@ -42,7 +59,6 @@ const AuthGuard = ({ children }) => {
       }
 
       // Session exists (meaning Seller exists). Check if a store is tied to them.
-      // UPDATE 'stores' and 'seller_id' TO MATCH YOUR DB SCHEMA
       const { data: stores } = await supabase
         .from('store') 
         .select('id')
@@ -71,12 +87,16 @@ const AuthGuard = ({ children }) => {
     };
   }, []);
 
-  // Show a blank loading screen while verifying the database state
+  // --- NEW LOGIC: Bypass auth checks and loading screens for buyers ---
+  if (isBuyerRoute) {
+    return children;
+  }
+
+  // Show a blank loading screen while verifying the database state for sellers
   if (authStatus === 'loading') {
     return <div className="page-container flex-center">Loading...</div>; 
   }
 
-  const path = location.pathname;
   const isPublicRoute = path === '/login' || path === '/create-seller';
   const isCreateStoreRoute = path === '/create-store';
 
