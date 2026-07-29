@@ -11,6 +11,11 @@ const Product = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Added useEffect to instantly scroll to top on route entry
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [id]);
+
   useEffect(() => {
     const fetchProduct = async () => {
       try {
@@ -116,16 +121,12 @@ const Product = () => {
       </div>
     );
   }
-
-  useEffect(() => {
-      window.scrollTo(0, 0);
-    }, []);
-    
+  
   return (
     <ProductPage 
       product={product} 
       onAddToCart={handleAddToCart} 
-      onBack={-1} // Alternatively, you could dynamically query the store slug to route back
+      onBack={-1} 
     />
   );
 };
