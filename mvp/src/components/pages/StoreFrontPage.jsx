@@ -4,9 +4,8 @@ import StoreWelcomeBanner from '../StoreWelcomeBanner';
 import CartButton from '../CartButton';
 import SearchBar from '../SearchBar';
 import VerticalCard from '../VerticalCard';
-import { MOCK_STORE, MOCK_LISTINGS } from '../../data/MockData'; 
 
-const StoreFrontPage = () => {
+const StoreFrontPage = ({ storeData, listings }) => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -18,8 +17,8 @@ const StoreFrontPage = () => {
     navigate(`/product/${id}`);
   };
 
-  // Filters the listings based on the search bar input
-  const filteredData = MOCK_LISTINGS.filter(item =>
+  // Filters the dynamic listings based on the search bar input
+  const filteredData = listings.filter(item =>
     item.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -28,7 +27,12 @@ const StoreFrontPage = () => {
     <CartButton />
     <div className="storefront-container">
       
-      <StoreWelcomeBanner storeName={MOCK_STORE.name} storeLogo={MOCK_STORE.logo} style={{height: '100px'}}/>
+      {/* Use the dynamically fetched store data */}
+      <StoreWelcomeBanner 
+        storeName={storeData?.name || 'Store'} 
+        storeLogo={storeData?.logo} 
+        style={{height: '100px'}}
+      />
       
       {/* We reuse the spacing classes from list-page-layout, adjusting top padding to fit below the banner */}
       <div style={{ paddingTop: '1.5rem' }}>

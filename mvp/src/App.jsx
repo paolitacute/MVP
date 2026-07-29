@@ -136,7 +136,7 @@ const App = () => {
           <Route path="/edit-listing/:id" element={<EditListing />} />
 
           {/* Buyer Flows */}
-          <Route path="/storefront" element={<StoreFront />} />
+          <Route path="/:slug" element={<StoreFront />} />
           <Route path="/product/:id" element={<Product />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/order-success" element={<OrderSuccess />} />
