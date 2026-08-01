@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Trash2, Plus, Pencil } from 'lucide-react';
+import { Trash2 } from 'lucide-react';
 import Input from './Input';
 import Checkbox from './Checkbox';
 import Toast from './Toast';
@@ -101,7 +101,6 @@ const CustomizationInputGroup = ({ customization, onChange, onDelete }) => {
           <React.Fragment key={option.id}>
             <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'stretch' }}>
               
-              
               <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                 
                 {/* Option Trash Pill */}   
@@ -168,7 +167,7 @@ const CustomizationInputGroup = ({ customization, onChange, onDelete }) => {
                   justifyContent: 'center',
                   cursor: 'pointer',
                   position: 'relative',
-                  overflow: 'hidden', // Ensures the image and banner stay within the rounded corners
+                  overflow: 'hidden',
                   transition: 'all 0.2s ease'
                 }}
                 onMouseEnter={(e) => {
@@ -185,13 +184,11 @@ const CustomizationInputGroup = ({ customization, onChange, onDelete }) => {
                 }}
                 title="Upload Image"
               >
-                {option.image ? (
-                    <ImageUploader image={option.image} />
-                    
-                    ) : (
-
-                  <ImageUploader />
-                )}
+                <ImageUploader 
+                  image={option.image}
+                  onImageSelected={(files) => handleOptionChange(option.id, 'image', files[0])}
+                  onDelete={() => handleOptionChange(option.id, 'image', null)}
+                />
               </div>
               </div>
               </div>

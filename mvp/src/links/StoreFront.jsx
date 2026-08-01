@@ -1,93 +1,44 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useParams } from 'react-router-dom';
 import StoreFrontPage from '../components/pages/StoreFrontPage';
-import { supabase } from '../client'; // Adjust path as necessary
+import { useStoreFront } from '../hooks/useStoreFront'; // 1. Import the custom hook
 
 const StoreFront = () => {
   // Assuming buyers navigate to something like /store/:slug
   const { slug } = useParams(); 
   
-  const [storeData, setStoreData] = useState(null);
-  const [listings, setListings] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  // 2. Destructure data, loading state, and error from TanStack Query
+  const { data, isLoading, error } = useStoreFront(slug);
 
-  useEffect(() => {
-    const fetchStoreAndListings = async () => {
-      try {
-        setLoading(true);
-
-        // 1. Fetch store details using the URL slug
-        const { data: store, error: storeError } = await supabase
-          .from('store')
-          .select('id, name, logo')
-          .eq('slug', slug)
-          .single();
-
-        if (storeError) throw storeError;
-        if (!store) throw new Error('Store not found');
-
-        setStoreData({
-          name: store.name,
-          logo: store.logo
-        });
-
-        // 2. Fetch published products for this specific store
-        const { data: productsData, error: productsError } = await supabase
-          .from('product')
-          .select(`
-            id,
-            name,
-            base_price,
-            product_image (
-              image_url
-            )
-          `)
-          .eq('store_id', store.id)
-          .order('created_at', { ascending: false });
-
-        if (productsError) throw productsError;
-
-        // 3. Map to the expected UI structure
-        const formattedListings = (productsData || []).map((item) => ({
-          id: item.id,
-          name: item.name,
-          price: parseFloat(item.base_price) || 0,
-          image: item.product_image?.[0]?.image_url || null,
-        }));
-
-        setListings(formattedListings);
-      } catch (err) {
-        console.error('Error fetching storefront:', err);
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (slug) {
-      fetchStoreAndListings();
-    }
-  }, [slug]);
-
-  if (loading) {
+  // 3. Update loading state handling to use isLoading
+  if (isLoading) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', paddingTop: '3rem' }}>
-        <p>Loading store...</p>
-      </div>
+      <>
+      </>
+      // <div style={{ display: 'flex', justifyContent: 'center', paddingTop: '3rem' }}>
+      //   <p>Loading store...</p>
+      // </div>
     );
   }
 
+  // 4. Update error state handling to read error.message
   if (error) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', paddingTop: '3rem', color: 'red' }}>
-        <p>Error loading store: {error}</p>
+        <p>Error loading store: {error.message}</p>
       </div>
     );
   }
 
-  // 4. Pass the formatted data and the slug as props to the presentation component
-  return <StoreFrontPage storeData={storeData} listings={listings} slug={slug} />; /*[cite: 11] */
+  // 5. Pass the formatted data and the slug as props to the presentation component
+  // Provide empty objects/arrays as fallbacks to ensure StoreFrontPage doesn't crash on undefined
+  return (
+    <StoreFrontPage 
+      storeData={data?.storeData || {}} 
+      listings={data?.listings || []} 
+      slug={slug} 
+    />
+  );
 };
 
 export default StoreFront;

@@ -1,85 +1,39 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { supabase } from '../client'; 
 import EditButton from '../components/EditButton';
 import BackButton from '../components/BackButton';
 import HeaderText from '../components/HeaderText';
 import CategoryDetail from '../components/CategoryDetail';
 import NavBar from '../components/NavBar';
 import ActionButton from '../components/ActionButton'; 
+import { useAccountSettings, useLogout } from '../hooks/useAccountSettings'; // 1. Import new hooks
 
 const AccountSettings = () => {
   const navigate = useNavigate();
   const { username } = useParams();
 
-  const [seller, setSeller] = useState(null);
-  const [store, setStore] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  // 2. Destructure data, loading state, and error from TanStack Query
+  const { data, isLoading, error } = useAccountSettings();
+  const logoutMutation = useLogout();
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    fetchAccountDetails();
   }, []);
-
-  const fetchAccountDetails = async () => {
-    try {
-      setLoading(true);
-      
-      // 1. Get authenticated user
-      const { data: { user }, error: authError } = await supabase.auth.getUser();
-      if (authError || !user) throw authError || new Error('No user authenticated');
-
-      // 2. Fetch seller information
-      const { data: sellerData, error: sellerError } = await supabase
-        .from('seller')
-        .select('name, email, phone')
-        .eq('id', user.id)
-        .single();
-
-      if (sellerError) throw sellerError;
-
-      // 3. Fetch store information
-      const { data: storeData, error: storeError } = await supabase
-        .from('store')
-        .select('name, slug, phone, email, instagram, address, description, delivery')
-        .eq('seller_id', user.id)
-        .single();
-
-      if (storeError && storeError.code !== 'PGRST116') { // Ignore error if they don't have a store yet
-        throw storeError;
-      }
-
-      setSeller(sellerData);
-      setStore(storeData);
-    } catch (err) {
-      console.error("Error fetching account settings:", err);
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   // Handle the logout sequence
   const handleLogout = async () => {
     try {
-      // 1. Tell Supabase to destroy the session and clear local tokens
-      const { error } = await supabase.auth.signOut();
+      await logoutMutation.mutateAsync();
       
-      if (error) {
-        console.error("Error logging out:", error.message);
-        return;
-      }
-      
-      // 2. Redirect the user back to the login screen
+      // Redirect the user back to the login screen
       navigate('/login', { replace: true }); 
-      
     } catch (err) {
       console.error("Unexpected error during logout:", err);
     }
   };
 
-  if (loading) {
+  // 3. Update loading state handling
+  if (isLoading) {
     return (
       <div className="page-container flex-center" style={{ paddingBottom: '6rem' }}>
         <p>Loading account details...</p>
@@ -88,14 +42,17 @@ const AccountSettings = () => {
     );
   }
 
+  // 4. Update error state handling to read error.message
   if (error) {
     return (
       <div className="page-container flex-center" style={{ paddingBottom: '6rem', color: 'red' }}>
-        <p>Error loading account: {error}</p>
+        <p>Error loading account: {error.message}</p>
         <NavBar />
       </div>
     );
   }
+
+  const { seller, store } = data;
 
   return (
     <>
@@ -150,7 +107,7 @@ const AccountSettings = () => {
           {/* Logout Button */}
           <div style={{ marginTop: '1rem' }}>
             <ActionButton 
-              text="Log Out" 
+              text={logoutMutation.isPending ? "Logging out..." : "Log Out"} 
               onClick={handleLogout} 
             />
           </div>

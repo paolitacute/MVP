@@ -20,24 +20,29 @@ const ModifyListingPage = ({
   successMessage,
   onSave 
 }) => {
-  const navigate = useNavigate();
+  const navigate = useNavigate(); 
 
   const [images, setImages] = useState(() => {
-    if (Array.isArray(initialData.image)) return initialData.image;
-    if (typeof initialData.image === 'string' && initialData.image.trim() !== '') return [initialData.image];
-    return [];
+    if (Array.isArray(initialData.image)) return initialData.image; 
+    if (typeof initialData.image === 'string' && initialData.image.trim() !== '') return [initialData.image]; 
+    return []; 
   });
 
-  const [productName, setProductName] = useState(initialData.name || '');
-  const [productPrice, setProductPrice] = useState(initialData.price || '');
-  const [description, setDescription] = useState(initialData.description || '');
-  const [amount, setAmount] = useState(initialData.amount || '');
-  const [customizations, setCustomizations] = useState(initialData.customizations || []);
-  const [showToast, setShowToast] = useState(false);
+  const [productName, setProductName] = useState(initialData.name || ''); 
+  const [productPrice, setProductPrice] = useState(initialData.price || ''); 
+  const [description, setDescription] = useState(initialData.description || ''); 
+  const [amount, setAmount] = useState(initialData.amount || ''); 
+  const [customizations, setCustomizations] = useState(initialData.customizations || []); 
+  const [showToast, setShowToast] = useState(false); 
   const [isSubmitting, setIsSubmitting] = useState(false); 
 
+  // Create a derived array of URLs for rendering components that expect string sources
+  const displayImages = images.map(img => 
+    img instanceof File ? URL.createObjectURL(img) : img
+  );
+
   useEffect(() => {
-    window.scrollTo(0, 0);
+    window.scrollTo(0, 0); 
   }, []);
 
   const handleAddCustomization = () => {
@@ -54,47 +59,53 @@ const ModifyListingPage = ({
 
   const handleCustomizationChange = (id, updatedFields) => {
     setCustomizations(customizations.map(cust => 
-      cust.id === id ? { ...cust, ...updatedFields } : cust
+      cust.id === id ? { ...cust, ...updatedFields } : cust 
     ));
   };
 
   const handleDeleteCustomization = (idToRemove) => {
-    setCustomizations(customizations.filter((cust) => cust.id !== idToRemove));
+    setCustomizations(customizations.filter((cust) => cust.id !== idToRemove)); 
+  };
+
+  // Handler to append newly selected files to the existing images state array
+  const handleImageUpload = (files) => {
+    const newFilesArray = Array.from(files);
+    setImages((prevImages) => [...prevImages, ...newFilesArray]);
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsSubmitting(true);
+    e.preventDefault(); 
+    setIsSubmitting(true); 
 
     const formData = {
-      name: productName,
-      price: productPrice, 
-      description,
-      amount,              
-      customizations,
-      image: images 
+      name: productName, 
+      price: productPrice,  
+      description, 
+      amount,               
+      customizations, 
+      productImages: images 
     };
 
-    let isSuccess = true;
+    let isSuccess = true; 
     
     if (onSave) {
-      isSuccess = await onSave(formData);
+      isSuccess = await onSave(formData); 
     }
 
-    setIsSubmitting(false);
+    setIsSubmitting(false); 
 
     if (isSuccess) {
-      setShowToast(true);
+      setShowToast(true); 
       setTimeout(() => {
-        setShowToast(false);
+        setShowToast(false); 
         setTimeout(() => {
           if (onSubmitSuccess) {
-            onSubmitSuccess();
+            onSubmitSuccess(); 
           } else {
             navigate(-1); 
           }
-        }, 300);
-      }, 2000);
+        }, 300); 
+      }, 2000); 
     }
   };
 
@@ -108,7 +119,7 @@ const ModifyListingPage = ({
         <form onSubmit={handleSubmit}
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
-                  e.preventDefault();
+                  e.preventDefault(); 
                 }
         }}>
 
@@ -118,90 +129,90 @@ const ModifyListingPage = ({
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '1rem' }}>
               {images.length === 0 ? (
                 <div style={{ height: '250px', width: '100%' }}>
-                  <ImageUploader />
+                  <ImageUploader onImageSelected={handleImageUpload} />
                 </div>
               ) : (
                 <>
                   <div 
                     style={{ 
-                      position: 'relative', 
-                      width: '100%', 
-                      height: '250px', 
-                      borderRadius: '16px', 
-                      overflow: 'hidden', 
-                      cursor: 'pointer',
-                      border: '1px solid var(--border-light)'
+                      position: 'relative',  
+                      width: '100%',  
+                      height: '250px',  
+                      borderRadius: '16px',  
+                      overflow: 'hidden',  
+                      cursor: 'pointer', 
+                      border: '1px solid var(--border-light)' 
                     }}
                     title="Edit Images"
                   >
                     {images.length === 1 ? (
                       <div style={{ width: '100%', height: '100%' }}>
                         <Image 
-                          src={images[0]} 
-                          alt="Product view" 
-                          containerClass="carousel-image-wrapper" 
-                          imgClass="carousel-image" 
+                          src={displayImages[0]} 
+                          alt="Product view"  
+                          containerClass="carousel-image-wrapper"  
+                          imgClass="carousel-image"  
                         />
                       </div>
                     ) : (
-                      <ImageCarousel images={images} />
+                      <ImageCarousel images={displayImages} />
                     )}
                   </div>
 
                   <div style={{ 
-                    display: 'grid', 
-                    gridTemplateColumns: '80px minmax(0, 1fr)', 
-                    gap: '0.5rem', 
-                    width: '100%',
-                    alignItems: 'center'
+                    display: 'grid',  
+                    gridTemplateColumns: '80px minmax(0, 1fr)',  
+                    gap: '0.5rem',  
+                    width: '100%', 
+                    alignItems: 'center' 
                   }}>
                     <div style={{ height: '80px', width: '100%' }}>
-                      <ImageUploader />
+                      <ImageUploader onImageSelected={handleImageUpload} />
                     </div>
                     
                     <div style={{ 
-                    display: 'flex', 
-                    gap: '0.5rem', 
-                    overflowX: 'auto',
-                    scrollbarWidth: 'none',
+                    display: 'flex',  
+                    gap: '0.5rem',  
+                    overflowX: 'auto', 
+                    scrollbarWidth: 'none', 
                   }}>
-                    {images.map((img, index) => (
+                    {displayImages.map((imgSrc, index) => (
                       <div 
-                        key={index}
+                        key={index} 
                         onClick={() => {
-                          setImages(images.filter((_, i) => i !== index));
+                          setImages(images.filter((_, i) => i !== index)); 
                         }}
                         style={{ 
-                          position: 'relative', 
-                          width: '80px', 
-                          height: '80px', 
-                          flexShrink: 0, 
-                          borderRadius: '8px', 
-                          overflow: 'hidden', 
-                          border: '1px solid var(--border-light)',
-                          cursor: 'pointer' 
+                          position: 'relative',  
+                          width: '80px',  
+                          height: '80px',  
+                          flexShrink: 0,  
+                          borderRadius: '8px',  
+                          overflow: 'hidden',  
+                          border: '1px solid var(--border-light)', 
+                          cursor: 'pointer'  
                         }}
                       >
                         <Image 
-                          src={img} 
-                          alt={`Thumbnail ${index + 1}`}
-                          containerClass="carousel-image-wrapper" 
-                          imgClass="carousel-image" 
+                          src={imgSrc} 
+                          alt={`Thumbnail ${index + 1}`} 
+                          containerClass="carousel-image-wrapper"  
+                          imgClass="carousel-image"  
                         />
                         
                         <div style={{
-                          position: 'absolute',
-                          bottom: 0,
-                          width: '100%',
-                          backgroundColor: 'rgba(0, 0, 0, 0.65)',
-                          color: 'white',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          gap: '0.25rem',
-                          padding: '0.15rem 0',
-                          fontSize: '1rem',
-                          fontWeight: '600'
+                          position: 'absolute', 
+                          bottom: 0, 
+                          width: '100%', 
+                          backgroundColor: 'rgba(0, 0, 0, 0.65)', 
+                          color: 'white', 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          justifyContent: 'center', 
+                          gap: '0.25rem', 
+                          padding: '0.15rem 0', 
+                          fontSize: '1rem', 
+                          fontWeight: '600' 
                         }}>
                           <Trash2 size={18} />
                         </div>
@@ -214,56 +225,56 @@ const ModifyListingPage = ({
             </div>
 
             <Input 
-              id="product-name" 
-              label="Name" 
-              required={true}
-              value={productName}
-              onChange={(e) => setProductName(e.target.value)}
+              id="product-name"  
+              label="Name"  
+              required={true} 
+              value={productName} 
+              onChange={(e) => setProductName(e.target.value)} 
             />
 
             <Input 
-              id="product-price" 
-              label="Base Price"
-              type='number' 
-              required={true}
-              value={productPrice}
-              onChange={(e) => setProductPrice(e.target.value)}
+              id="product-price"  
+              label="Base Price" 
+              type='number'  
+              required={true} 
+              value={productPrice} 
+              onChange={(e) => setProductPrice(e.target.value)} 
             />
 
             <Input 
-              id="amount-available" 
-              label="Amount available" 
-              type="number" 
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
+              id="amount-available"  
+              label="Amount available"  
+              type="number"  
+              value={amount} 
+              onChange={(e) => setAmount(e.target.value)} 
             />
 
             <Input 
-              id="description" 
-              label="Description" 
-              type="textarea"
-              required={false}
-              rows={4} 
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              id="description"  
+              label="Description"  
+              type="textarea" 
+              required={false} 
+              rows={4}  
+              value={description} 
+              onChange={(e) => setDescription(e.target.value)} 
             />
 
             <div className="divider"></div>
 
             {customizations.map((cust) => (
               <CustomizationInputGroup 
-                key={cust.id} 
-                customization={cust}
-                onChange={(updatedFields) => handleCustomizationChange(cust.id, updatedFields)}
-                onDelete={() => handleDeleteCustomization(cust.id)} 
+                key={cust.id}  
+                customization={cust} 
+                onChange={(updatedFields) => handleCustomizationChange(cust.id, updatedFields)} 
+                onDelete={() => handleDeleteCustomization(cust.id)}  
               />
             ))}
 
             <div className="customization-header-row flex-center" style={{ padding: '0.5rem 0', justifyContent: 'center' }}>
               <button 
-                type="button" 
-                className="text-action-link bold-link" 
-                onClick={handleAddCustomization}
+                type="button"  
+                className="text-action-link bold-link"  
+                onClick={handleAddCustomization} 
               >
                 + Customization
               </button>

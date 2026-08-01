@@ -1,91 +1,42 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import CardListPage from '../components/pages/CardListPage';
 import NavBar from '../components/NavBar';
-import { supabase } from '../client'; // Adjust path according to your project setup
+import { useListings } from '../hooks/useListings'; // 1. Import the custom hook
 
 const Listings = () => {
   const navigate = useNavigate();
   const { username } = useParams();
   
-  const [listings, setListings] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  // 2. Destructure the data, loading state, and error from TanStack Query
+  // We default 'listings' to an empty array to prevent undefined mapping before load
+  const { data: listings = [], isLoading, error } = useListings();
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    fetchListings();
   }, []);
-
-  const fetchListings = async () => {
-    try {
-      setLoading(true);
-      
-      // 1. Authenticate and get user
-      const { data: { user }, error: authError } = await supabase.auth.getUser();
-      if (authError || !user) throw authError || new Error('No user authenticated');
-
-      // 2. Fetch the store ID associated with this seller
-      const { data: storeData, error: storeError } = await supabase
-        .from('store')
-        .select('id')
-        .eq('seller_id', user.id)
-        .single();
-
-      if (storeError || !storeData) throw storeError || new Error('Store not found');
-
-      // 3. Fetch products and their primary image from the database
-      const { data: productsData, error: productsError } = await supabase
-        .from('product')
-        .select(`
-          id,
-          name,
-          base_price,
-          stock_quantity,
-          product_image (
-            image_url
-          )
-        `)
-        .eq('store_id', storeData.id)
-        .order('created_at', { ascending: false });
-
-      if (productsError) throw productsError;
-
-      // 4. Map the relational database fields to match CardListPage's expected prop structure
-      const formattedListings = (productsData || []).map((listing) => ({
-        id: listing.id,
-        name: listing.name,
-        price: parseFloat(listing.base_price) || 0,
-        amountAvailable: listing.stock_quantity,
-        image: listing.product_image?.[0]?.image_url || null, 
-      }));
-
-      setListings(formattedListings);
-    } catch (err) {
-      console.error("Error fetching listings:", err);
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleItemClick = (id) => {
     navigate(`/${username}/listing/${id}`);
   };
 
-  if (loading) {
+  // 3. Update 'loading' to TanStack's 'isLoading'
+  if (isLoading) {
     return (
-      <div className='list-page-layout' style={{ display: 'flex', justifyContent: 'center', paddingTop: '3rem' }}> 
-        <p>Loading your catalog...</p>
-        <NavBar />
-      </div>
+      <>
+      </>
+      // <div className='list-page-layout' style={{ display: 'flex', justifyContent: 'center', paddingTop: '3rem' }}> 
+      //   <p>Loading your catalog...</p>
+      //   <NavBar />
+      // </div>
     );
   }
 
+  // 4. TanStack Query returns an Error object, so we render error.message
   if (error) {
     return (
       <div className='list-page-layout' style={{ display: 'flex', justifyContent: 'center', paddingTop: '3rem', color: 'red' }}> 
-        <p>Error loading listings: {error}</p>
+        <p>Error loading listings: {error.message}</p>
         <NavBar />
       </div>
     );

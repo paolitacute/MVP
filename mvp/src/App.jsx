@@ -94,7 +94,7 @@ const AuthGuard = ({ children }) => {
 
   // Show a loading screen while verifying the database state for sellers
   if (authStatus === 'loading') {
-    return <div className="page-container flex-center">Loading...</div>; 
+    return <div className="page-container flex-center"></div>; 
   }
 
   const isPublicRoute = path === '/login' || path === '/create-seller';

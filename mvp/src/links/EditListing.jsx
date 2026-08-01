@@ -1,157 +1,103 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import ModifyListingPage from '../components/pages/ModifyListingPage'; 
 import NavBar from '../components/NavBar';
-import { supabase } from '../client'; 
-
-// Helper to check if the ID is a valid Postgres UUID
-const isValidUUID = (id) => {
-  if (!id) return false;
-  const regex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-  return regex.test(id.toString());
-};
+import { useListingDataForEdit, useUpdateListing } from '../hooks/useEditListing'; 
+import { 
+  uploadProductPhoto, 
+  saveProductImageRow, 
+  uploadOptionPhoto, 
+  saveOptionImageUrl 
+} from '../utils/productImages';
 
 const EditListing = () => {
   const navigate = useNavigate();
   const { username, id } = useParams();
 
-  const [existingProductData, setExistingProductData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const { data: existingProductData, isLoading, error } = useListingDataForEdit(id);
+  const updateListingMutation = useUpdateListing(id);
 
   useEffect(() => {
-    window.scrollTo(0, 0);
-    fetchListingData();
-  }, [id]);
-
-  const fetchListingData = async () => {
-    try {
-      setLoading(true);
-      
-      const { data, error: fetchError } = await supabase
-        .from('product')
-        .select(`
-          id,
-          name,
-          base_price,
-          stock_quantity,
-          description,
-          product_image (
-            image_url
-          ),
-          customization_category (
-            id,
-            name,
-            is_required,
-            customization_option (
-              id,
-              value,
-              price_modifier,
-              image_url
-            )
-          )
-        `)
-        .eq('id', id)
-        .single();
-
-      if (fetchError) throw fetchError;
-
-      if (data) {
-        const mappedListing = {
-          name: data.name,
-          price: parseFloat(data.base_price) || 0,
-          description: data.description || "",
-          amount: data.stock_quantity || "",
-          image: data.product_image?.map(img => img.image_url) || [],
-          customizations: data.customization_category?.map(cat => ({
-            id: cat.id,
-            field: cat.name,
-            required: cat.is_required,
-            options: cat.customization_option?.map(opt => ({
-              id: opt.id,
-              name: opt.value,
-              price: parseFloat(opt.price_modifier) || 0,
-              image: opt.image_url || ""
-            })) || []
-          })) || []
-        };
-        
-        setExistingProductData(mappedListing);
-      }
-    } catch (err) {
-      console.error("Error fetching listing detail:", err);
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+    window.scrollTo(0, 0); 
+  }, [id]); 
 
   const handleUpdate = async (formData) => {
     try {
-      // 1. Format the customizations into the exact JSONB structure the RPC expects, stripping temporary frontend IDs
-      const formattedCustomizations = (formData.customizations || []).map(cat => ({
-        id: isValidUUID(cat.id) ? cat.id : null, 
-        field: cat.field,
-        required: Boolean(cat.required),
-        options: (cat.options || []).map(opt => ({
-          id: isValidUUID(opt.id) ? opt.id : null, 
-          name: opt.name,
-          price: parseFloat(opt.price) || 0,
-          image: opt.image || null
-        }))
-      }));
+      // Separate images from the form data so they aren't sent to the RPC
+      const { productImages, customizations, storeId, ...restData } = formData;
+      
+      // Clean customizations to remove image Files before sending to DB
+      const cleanCustomizations = customizations?.map(cust => ({
+        ...cust,
+        options: cust.options.map(opt => {
+          const { image, ...restOpt } = opt; 
+          return restOpt;
+        })
+      })) || [];
 
-      // 2. Execute the selective upsert RPC function
-      const { error: rpcError } = await supabase.rpc('updateproductfull', {
-        p_productid: id,
-        p_name: formData.name,
-        p_baseprice: parseFloat(formData.price) || 0,
-        p_description: formData.description || null,
-        p_stockquantity: parseInt(formData.amount, 10) || 0,
-        p_customizations: formattedCustomizations
-      });
+      const dbFormData = {
+        ...restData,
+        storeId,
+        customizations: cleanCustomizations
+      };
 
-      if (rpcError) throw rpcError;
+      // Call updateproductfull via mutation and get the IDs
+      const result = await updateListingMutation.mutateAsync(dbFormData);
+      
+      // We expect the RPC to return { productid, categories: [{ categoryid, optionids }] }
+      const { productid, categories } = result;
 
-      // 3. Handle primary product images
-      if (formData.image) {
-        await supabase.from('product_image').delete().eq('product_id', id);
-        
-        if (formData.image.length > 0) {
-          const imageInserts = formData.image.map(imgUrl => ({
-            product_id: id,
-            image_url: imgUrl
-          }));
-          
-          const { error: imageError } = await supabase.from('product_image').insert(imageInserts);
-          if (imageError) throw imageError;
+      // Upload new product images and save their URLs
+      if (productImages && productImages.length > 0) {
+        for (const file of productImages) {
+          if (file instanceof File) {
+            const { publicUrl } = await uploadProductPhoto(file, storeId, productid);
+            await saveProductImageRow(productid, publicUrl);
+          }
         }
       }
 
-      // Navigate back to the listing detail page upon successful database update
-      navigate(`/${username}/listing/${id}`);
-
+      // Upload new customization option images and save their URLs matching by index position
+      if (customizations && categories) {
+        for (let i = 0; i < customizations.length; i++) {
+          const cust = customizations[i];
+          const dbCategory = categories[i];
+          
+          if (cust.options && dbCategory.optionids) {
+            for (let j = 0; j < cust.options.length; j++) {
+              const opt = cust.options[j];
+              const dbOptionId = dbCategory.optionids[j];
+              
+              if (opt.image instanceof File) {
+                const { publicUrl } = await uploadOptionPhoto(opt.image, storeId, productid);
+                await saveOptionImageUrl(dbOptionId, publicUrl);
+              }
+            }
+          }
+        }
+      }
+      
+      navigate(`/${username}/listing/${id}`); 
     } catch (err) {
-      console.error("Error updating listing:", err);
-      alert("Failed to update listing. Please check the console for details.");
+      console.error("Error updating listing:", err); 
+      alert("Failed to update listing. Please check the console for details."); 
     }
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-        <p>Loading listing details...</p>
-      </div>
-    );
+      <>
+      </>
+    ); 
   }
 
   if (error || !existingProductData) {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100vh', gap: '1rem' }}>
-        <p style={{ color: 'red' }}>Error loading listing: {error || 'Not found'}</p>
+        <p style={{ color: 'red' }}>Error loading listing: {error?.message || 'Not found'}</p>
         <button onClick={() => navigate(`/${username}/listings`)}>Go Back</button>
       </div>
-    );
+    ); 
   }
 
   return (
@@ -166,7 +112,7 @@ const EditListing = () => {
 
       <NavBar />
     </>
-  );
+  ); 
 };
 
 export default EditListing;

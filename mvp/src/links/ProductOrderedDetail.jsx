@@ -8,13 +8,13 @@ const ProductOrderedDetail = () => {
   const { orderId, productId } = useParams();
   
   const [product, setProduct] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchProductData = async () => {
       try {
-        setLoading(true);
+        setIsLoading(true);
 
         // 1. Fetch the specific order item and its customizations
         const { data: itemData, error: itemError } = await supabase
@@ -70,7 +70,7 @@ const ProductOrderedDetail = () => {
         console.error('Error fetching ordered product:', err);
         setError('Failed to load product details.');
       } finally {
-        setLoading(false);
+        setIsLoading(false);
       }
     };
 
@@ -79,12 +79,14 @@ const ProductOrderedDetail = () => {
     }
   }, [productId, orderId]);
 
-  if (loading) {
+  if (isLoading) {
     return (
-      <div style={{ padding: '2rem', textAlign: 'center' }}>
-        <p>Loading product details...</p>
-        <NavBar />
-      </div>
+      <>
+      </>
+      // <div style={{ padding: '2rem', textAlign: 'center' }}>
+      //   <p>Loading product details...</p>
+      //   <NavBar />
+      // </div>
     );
   }
 
