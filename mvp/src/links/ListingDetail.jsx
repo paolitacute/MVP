@@ -24,7 +24,6 @@ const ListingDetail = () => {
             id,
             name,
             base_price,
-            delivery,
             stock_quantity,
             description,
             product_image (
@@ -53,7 +52,6 @@ const ListingDetail = () => {
             id: data.id,
             name: data.name,
             price: parseFloat(data.base_price) || 0,
-            delivery: data.delivery,
             amountAvailable: data.stock_quantity,
             description: data.description,
             image: data.product_image?.map(img => img.image_url) || [],

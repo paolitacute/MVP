@@ -42,7 +42,7 @@ const AccountSettings = () => {
       // 3. Fetch store information
       const { data: storeData, error: storeError } = await supabase
         .from('store')
-        .select('name, slug, phone, email, instagram, address, description')
+        .select('name, slug, phone, email, instagram, address, description, delivery')
         .eq('seller_id', user.id)
         .single();
 
@@ -137,6 +137,7 @@ const AccountSettings = () => {
               <CategoryDetail category="Email" option={store.email || 'N/A'} />
               <CategoryDetail category="Instagram" option={store.instagram || 'N/A'} />
               <CategoryDetail category="Address" option={store.address || 'N/A'} />
+              <CategoryDetail category="Delivery Availability" option={store.delivery ? 'Yes' : 'No'|| 'N/A'} />
               
               {/* Multi-line read-only fields utilizing listing-detail typography */}
               <div style={{ marginTop: '0.5rem' }}>

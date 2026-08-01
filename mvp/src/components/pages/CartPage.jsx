@@ -1,55 +1,36 @@
 import React, { useState, useEffect } from 'react';
 import { ShoppingCart } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 import HeaderText from '../HeaderText';
 import CartProduct from '../CartProduct';
 import CartBuyerInfo from '../CartBuyerInfo'; 
 import ActionButton from '../ActionButton';
 import BackButton from '../BackButton';
-import { MOCK_CART } from '../../data/MockData'; 
 
-const CartPage = () => {
-  const navigate = useNavigate();
+const CartPage = ({ 
+  cartItems, 
+  removeFromCart, 
+  updateQuantity, 
+  handleCheckout, 
+  buyerInfo, 
+  setBuyerInfo 
+}) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  
-  const [cartItems, setCartItems] = useState(
-    MOCK_CART.map(item => ({
-      id: item.id,
-      name: item.name,
-      price: typeof item.price === 'string' ? parseFloat(item.price.replace('$', '')) : item.price,
-      image: item.image || 'https://via.placeholder.com/150', 
-      quantity: 1, 
-      customizations: item.customizations?.map(cust => ({
-        label: cust.category,
-        value: cust.option,
-        modifierPrice: cust.price ? parseFloat(cust.price) : 0
-      })) || []
-    }))
-  );
-
-  const handleQuantityChange = (id, newQuantity) => {
-    const validQuantity = Math.max(1, parseInt(newQuantity) || 1);
-    setCartItems(prev => prev.map(item => item.id === id ? { ...item, quantity: validQuantity } : item)); 
-  };
-
-  const handleDelete = (id) => {
-    setCartItems(prev => prev.filter(item => item.id !== id)); 
-  };
-
-  const handleOrderConfirm = (buyerData) => {
-    setIsModalOpen(false); 
-    navigate('/order-success'); 
-  };
 
   // Calculate the subtotal by summing base prices and customization modifier prices, multiplied by quantity
   const subtotal = cartItems.reduce((total, item) => {
-    const customizationsTotal = item.customizations.reduce((sum, cust) => sum + cust.modifierPrice, 0);
-    return total + ((item.price + customizationsTotal) * item.quantity);
+    const itemPrice = item.price || 0; // Ensures fallback if price is missing
+    const customizationsTotal = item.customizations?.reduce((sum, cust) => sum + (cust.modifierPrice || 0), 0) || 0;
+    return total + ((itemPrice + customizationsTotal) * item.quantity);
   }, 0);
 
   useEffect(() => {
-        window.scrollTo(0, 0);
-      }, []);
+    window.scrollTo(0, 0);
+  }, []);
+
+  const onConfirmOrder = async (formData) => {
+    setIsModalOpen(false); 
+    await handleCheckout(formData); // Triggers the Supabase RPC call from Cart.jsx
+  };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', padding: '1.5rem', paddingBottom: '3rem' }}>
@@ -62,13 +43,13 @@ const CartPage = () => {
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', flex: 1, marginBottom: '1.5rem' }}>
         {cartItems.length > 0 ? (
-          cartItems.map(item => (
+          cartItems.map((item, index) => (
             <CartProduct 
-              key={item.id} 
+              key={`${item.productId}-${index}`} 
               product={item} 
-              onQuantityChange={handleQuantityChange}
+              onQuantityChange={(_, newQuantity) => updateQuantity(item.productId, item.selectedOptionIds, newQuantity)}
               onEdit={() => console.log('Navigate to edit item')}
-              onDelete={() => handleDelete(item.id)}
+              onDelete={() => removeFromCart(item.productId, item.selectedOptionIds)}
             />
           ))
         ) : (
@@ -111,7 +92,12 @@ const CartPage = () => {
           display: 'flex', alignItems: 'center', justifyContent: 'center', 
           zIndex: 2000, padding: '1.5rem'
         }}>
-          <CartBuyerInfo onSubmit={handleOrderConfirm} onCancel={() => setIsModalOpen(false)} />
+          <CartBuyerInfo 
+            buyerInfo={buyerInfo}
+            setBuyerInfo={setBuyerInfo}
+            onSubmit={onConfirmOrder} 
+            onCancel={() => setIsModalOpen(false)} 
+          />
         </div>
       )}
     </div>

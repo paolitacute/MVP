@@ -61,10 +61,6 @@ const ListingDetailPage = ({ listing, onEdit, onBack }) => {
         
         <div className="listing-meta-row">
           <div className="meta-item">
-            <span className="meta-label">Delivery</span>
-            <span className="meta-value">{listing.delivery ? 'Yes' : 'No'}</span>
-          </div>
-          <div className="meta-item">
             <span className="meta-label">Amount available</span>
             <span className="meta-value">{listing.amountAvailable !== null ? listing.amountAvailable : 'Unlimited'}</span>
           </div>

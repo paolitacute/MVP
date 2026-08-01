@@ -9,7 +9,6 @@ import ImageCarousel from '../ImageCarousel';
 const ProductPage = ({ product, onAddToCart, onBack }) => {
   const [customizations, setCustomizations] = useState({});
   const [customMessage, setCustomMessage] = useState('');
-  const [neededBy, setNeededBy] = useState('');
   const [activeImageIndex, setActiveImageIndex] = useState(0);
 
   let baseImages = [];
@@ -62,7 +61,6 @@ const ProductPage = ({ product, onAddToCart, onBack }) => {
       product,
       customizations,
       customMessage,
-      neededBy,
       totalPrice
     });
   };
@@ -165,15 +163,6 @@ const ProductPage = ({ product, onAddToCart, onBack }) => {
                 />
               );
             })}
-
-            <Input
-              type="datepicker"
-              id="needed-by"
-              label="Needed by"
-              required={true}
-              value={neededBy}
-              onChange={(e) => setNeededBy(e.target.value)}
-            />
 
             <Input
               type="textarea"

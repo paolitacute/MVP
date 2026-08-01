@@ -30,9 +30,9 @@ const AuthGuard = ({ children }) => {
 
   // Determine if the current path is intended for a buyer
   const isBuyerRoute = 
-    path.startsWith('/product/') || 
-    path === '/cart' || 
-    path === '/order-success' || 
+    path.split('/')[2] === 'product' || 
+    path.endsWith('/cart') || 
+    path.endsWith('/order-success') ||
     (path.split('/').length === 2 && !['', 'login', 'create-seller', 'create-store'].includes(path.split('/')[1]));
 
   const [authStatus, setAuthStatus] = useState('loading'); 
@@ -169,9 +169,9 @@ const App = () => {
 
           {/* --- BUYER FLOWS --- */}
           <Route path="/:slug" element={<StoreFront />} />
-          <Route path="/product/:id" element={<Product />} />
-          <Route path="/cart" element={<Cart />} />
-          <Route path="/order-success" element={<OrderSuccess />} />
+          <Route path=":slug/product/:id" element={<Product />} />
+          <Route path=":slug/cart" element={<Cart />} />
+          <Route path=":slug/order-success" element={<OrderSuccess />} />
           
           {/* Fallback Route */}
           <Route path="*" element={<Navigate to="/login" replace />} />

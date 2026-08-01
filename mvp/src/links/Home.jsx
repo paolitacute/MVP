@@ -47,7 +47,7 @@ const Home = () => {
 
       const storeId = storeData.id;
 
-      // 3. Fetch Orders (with status, line items, and product thumbnails)
+      // 3. Fetch Orders (avoiding deep nested joins on nullable product_id)
       const { data: ordersData, error: ordersError } = await supabase
         .from('orders')
         .select(`
@@ -60,12 +60,7 @@ const Home = () => {
           ),
           order_item (
             product_name,
-            product_id,
-            product (
-              product_image (
-                image_url
-              )
-            )
+            product_id
           )
         `)
         .eq('store_id', storeId)
@@ -73,7 +68,31 @@ const Home = () => {
 
       if (ordersError) throw ordersError;
 
-      // 4. Fetch Product Listings (with product images)
+      // 4. Extract unique product IDs to fetch order thumbnails safely
+      const productIds = [
+        ...new Set(
+          (ordersData || []).flatMap((order) =>
+            order.order_item.map((item) => item.product_id).filter(Boolean)
+          )
+        )
+      ];
+
+      let imagesMap = {};
+      if (productIds.length > 0) {
+        const { data: imagesData, error: imagesError } = await supabase
+          .from('product_image')
+          .select('product_id, image_url')
+          .in('product_id', productIds);
+
+        if (!imagesError && imagesData) {
+          imagesMap = imagesData.reduce((acc, img) => {
+            if (!acc[img.product_id]) acc[img.product_id] = img.image_url;
+            return acc;
+          }, {});
+        }
+      }
+
+      // 5. Fetch Product Listings (Safe nested query because product_id is NOT NULL in product_image)
       const { data: productsData, error: productsError } = await supabase
         .from('product')
         .select(`
@@ -95,7 +114,9 @@ const Home = () => {
       // Map raw SQL orders into card structures
       const formattedOrders = (ordersData || []).map((order) => {
         const firstItem = order.order_item?.[0];
-        const itemImage = firstItem?.product?.product_image?.[0]?.image_url || null;
+        
+        // Attach image from the secondary mapped query
+        const itemImage = firstItem?.product_id ? (imagesMap[firstItem.product_id] || null) : null;
         const totalAmount = parseFloat(order.total) || 0;
 
         return {
@@ -109,9 +130,9 @@ const Home = () => {
         };
       });
 
-      // Filter "New" orders specifically
+      // Filter "New" orders specifically by matching the exact Spanish database status
       const formattedNewOrders = formattedOrders.filter(
-        (order) => order.status?.toLowerCase() === 'new'
+        (order) => order.status?.toLowerCase() === 'nueva'
       );
 
       // Map product listings into card structures

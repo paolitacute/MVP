@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { supabase } from '../client';
 import HeaderText from '../components/HeaderText';
 import Input from '../components/Input';
 import Checkbox from '../components/Checkbox';
 import ActionButton from '../components/ActionButton';
+import Badge from '../components/Badge';
 
 const CreateStore = () => {
   const navigate = useNavigate();
+  const { username } = useParams();
 
   // State to hold the securely fetched seller details
   const [sellerDetails, setSellerDetails] = useState({
@@ -24,6 +26,7 @@ const CreateStore = () => {
     instagram: '',
     address: '',
     description: '',
+    delivery: false, 
   });
   
   const [error, setError] = useState(null);
@@ -63,6 +66,7 @@ const CreateStore = () => {
         p_storeinstagram: formData.instagram,
         p_storeaddress: formData.address, 
         p_storedescription: formData.description,
+        p_storedelivery: formData.delivery,
       });
 
       if (error) {
@@ -77,7 +81,7 @@ const CreateStore = () => {
       
       
       setTimeout(() => {
-        window.location.href = '/home'; 
+        navigate(`/${username}/home`); 
       }, 1000);
 
     } catch (err) {
@@ -148,6 +152,24 @@ const CreateStore = () => {
           <Input label="Instagram" id="instagram" value={formData.instagram} onChange={handleChange} prefix="@" pattern="[\w.]+" customErrorMessage="Only include letters and digits"/>
           <Input label="Store address" id="address" value={formData.address} onChange={handleChange} />
           <Input label="Store description" id="description" value={formData.description} onChange={handleChange} type='textarea' rows={5} />
+          
+          <div className="input-group" style={{ padding: '0.5rem 0' }}>
+            <span className="input-label">Delivery?</span>
+            <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.25rem' }}>
+              <Badge 
+                text="Yes" 
+                active={formData.delivery === true} 
+                onClick={() => setFormData((prev) => ({ ...prev, delivery: true }))} 
+                type="filter"
+              />
+              <Badge 
+                text="No" 
+                active={formData.delivery === false} 
+                onClick={() => setFormData((prev) => ({ ...prev, delivery: false }))} 
+                type="filter"
+              />
+            </div>
+          </div>
         </div>
 
         <ActionButton text={loading ? "Creating Store..." : "Create Store"} type="submit" disabled={loading} />

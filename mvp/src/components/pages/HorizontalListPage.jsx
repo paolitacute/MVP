@@ -53,7 +53,7 @@ const HorizontalListPage = ({ title, filters, data, onClick }) => {
   const [sortOrder, setSortOrder] = useState('newest');
 
   const filteredData = data.filter((item) => {
-    const matchesFilter = activeFilter === 'All' || item.status === activeFilter;
+    const matchesFilter = activeFilter === 'Todo' || item.status === activeFilter;
 
     const searchLower = searchQuery.toLowerCase();
     

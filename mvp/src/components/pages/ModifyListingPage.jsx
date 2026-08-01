@@ -18,7 +18,7 @@ const ModifyListingPage = ({
   initialData = {}, 
   onSubmitSuccess, 
   successMessage,
-  onSave // <--- NEW PROP
+  onSave 
 }) => {
   const navigate = useNavigate();
 
@@ -32,10 +32,9 @@ const ModifyListingPage = ({
   const [productPrice, setProductPrice] = useState(initialData.price || '');
   const [description, setDescription] = useState(initialData.description || '');
   const [amount, setAmount] = useState(initialData.amount || '');
-  const [haveDelivery, setHaveDelivery] = useState(initialData.delivery || false);
   const [customizations, setCustomizations] = useState(initialData.customizations || []);
   const [showToast, setShowToast] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false); // Prevent double submissions
+  const [isSubmitting, setIsSubmitting] = useState(false); 
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -46,8 +45,8 @@ const ModifyListingPage = ({
       ...customizations, 
       { 
         id: Date.now(), 
-        field: '',         // Explicitly initialize the field name
-        required: true,    // Explicitly initialize as required
+        field: '',         
+        required: true,    
         options: [{ id: Date.now() + 1, name: '', price: '', image: null }] 
       }
     ]);
@@ -69,24 +68,21 @@ const ModifyListingPage = ({
 
     const formData = {
       name: productName,
-      price: productPrice, // Passed to RPC
+      price: productPrice, 
       description,
-      amount,              // Mapped to p_stockquantity in parent
-      delivery: haveDelivery,
+      amount,              
       customizations,
       image: images 
     };
 
     let isSuccess = true;
     
-    // Execute the database call if the prop is provided
     if (onSave) {
       isSuccess = await onSave(formData);
     }
 
     setIsSubmitting(false);
 
-    // Only show toast and navigate if the database insert didn't fail
     if (isSuccess) {
       setShowToast(true);
       setTimeout(() => {
@@ -252,24 +248,6 @@ const ModifyListingPage = ({
               onChange={(e) => setDescription(e.target.value)}
             />
 
-            <div className="input-group" style={{ padding: '0.5rem 0' }}>
-              <span className="input-label">Delivery?</span>
-              <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.25rem' }}>
-                <Badge 
-                  text="Yes" 
-                  active={haveDelivery === true} 
-                  onClick={() => setHaveDelivery(true)} 
-                  type="filter"
-                />
-                <Badge 
-                  text="No" 
-                  active={haveDelivery === false} 
-                  onClick={() => setHaveDelivery(false)} 
-                  type="filter"
-                />
-              </div>
-            </div>
-
             <div className="divider"></div>
 
             {customizations.map((cust) => (
@@ -294,7 +272,6 @@ const ModifyListingPage = ({
           </div>
 
           <div className="footer-action">
-            {/* Disable button while network request is pending */}
             <ActionButton text={isSubmitting ? 'Saving...' : buttonText} type="submit" disabled={isSubmitting} />
           </div>
        </form>

@@ -86,8 +86,8 @@ const StoreFront = () => {
     );
   }
 
-  // 4. Pass the formatted data as props to the presentation component
-  return <StoreFrontPage storeData={storeData} listings={listings} />;
+  // 4. Pass the formatted data and the slug as props to the presentation component
+  return <StoreFrontPage storeData={storeData} listings={listings} slug={slug} />; /*[cite: 11] */
 };
 
 export default StoreFront;

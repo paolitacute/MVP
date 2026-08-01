@@ -5,7 +5,7 @@ import CartButton from '../CartButton';
 import SearchBar from '../SearchBar';
 import VerticalCard from '../VerticalCard';
 
-const StoreFrontPage = ({ storeData, listings }) => {
+const StoreFrontPage = ({ storeData, listings, slug }) => { /*[cite: 12] */
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -14,7 +14,8 @@ const StoreFrontPage = ({ storeData, listings }) => {
   }, []);
 
   const handleProductClick = (id) => {
-    navigate(`/product/${id}`);
+    // Navigate with the slug prepended to the URL
+    navigate(`/${slug}/product/${id}`); /*[cite: 12] */
   };
 
   // Filters the dynamic listings based on the search bar input

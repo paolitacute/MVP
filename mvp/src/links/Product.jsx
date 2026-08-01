@@ -1,17 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import ProductPage from '../components/pages/ProductPage';
-import { supabase } from '../client'; // Adjust path according to your project setup
+import { supabase } from '../client'; 
+import { useCart } from '../hooks/useCart'; 
 
 const Product = () => {
-  const { id } = useParams();
+  // 1. Extract both 'slug' and 'id' from the URL parameters[cite: 14]
+  const { slug, id } = useParams(); 
   const navigate = useNavigate();
+  const { addToCart } = useCart(); 
 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Added useEffect to instantly scroll to top on route entry
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [id]);
@@ -21,7 +23,6 @@ const Product = () => {
       try {
         setLoading(true);
 
-        // Fetch the product and its nested customization/image relationships
         const { data, error: fetchError } = await supabase
           .from('product')
           .select(`
@@ -29,7 +30,6 @@ const Product = () => {
             name,
             base_price,
             description,
-            delivery,
             stock_quantity,
             store_id,
             product_image (
@@ -53,17 +53,13 @@ const Product = () => {
         if (fetchError) throw fetchError;
 
         if (data) {
-          // Map the database structure to match the UI prop structure
           const mappedProduct = {
             id: data.id,
             name: data.name,
             price: parseFloat(data.base_price) || 0,
             description: data.description,
-            delivery: data.delivery,
             amountAvailable: data.stock_quantity,
-            // Extract base product image URLs into an array
             image: data.product_image?.map(img => img.image_url) || [],
-            // Map customizations
             customizations: data.customization_category?.map(cat => ({
               id: cat.id,
               field: cat.name,
@@ -93,9 +89,41 @@ const Product = () => {
   }, [id]);
 
   const handleAddToCart = (orderData) => {
-    // In a real app, you would dispatch to a Cart Context or Redux here.
-    console.log("Added to cart:", orderData);
-    navigate('/cart');
+    const formattedCustomizations = [];
+    const selectedOptionIds = [];
+
+    if (orderData.product.customizations) {
+      orderData.product.customizations.forEach(cat => {
+        const selectedOptionId = orderData.customizations[cat.field];
+        if (selectedOptionId) {
+          const selectedOption = cat.options.find(opt => String(opt.id) === String(selectedOptionId));
+          if (selectedOption) {
+            formattedCustomizations.push({
+              label: cat.field,
+              value: selectedOption.name,
+              modifierPrice: selectedOption.price || 0
+            });
+            selectedOptionIds.push(selectedOptionId);
+          }
+        }
+      });
+    }
+
+    const cartItem = {
+      productId: orderData.product.id,
+      name: orderData.product.name,
+      price: orderData.product.price,
+      image: orderData.product.image.length > 0 ? orderData.product.image[0] : 'https://via.placeholder.com/150',
+      quantity: 1, 
+      customizations: formattedCustomizations,
+      selectedOptionIds: selectedOptionIds,
+      customMessage: orderData.customMessage,
+    };
+
+    addToCart(cartItem);
+    
+    // 2. Navigate dynamically using the captured slug[cite: 14]
+    navigate(`/${slug}/cart`);
   };
 
   if (loading) {

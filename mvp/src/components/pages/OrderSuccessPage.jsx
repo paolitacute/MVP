@@ -1,10 +1,13 @@
 import React from 'react';
 import { Check } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom'; // Imported useParams here
 import ActionButton from '../ActionButton';
 
 const OrderSuccessPage = () => {
   const navigate = useNavigate();
+  const { slug } = useParams(); // Extract the store slug from the URL
+
+  console.log(slug);
 
   return (
     <div className="page-container flex-center" style={{ flexDirection: 'column', textAlign: 'center', gap: '2rem', height: '100vh' }}>
@@ -36,7 +39,8 @@ const OrderSuccessPage = () => {
 
       {/* Return Action */}
       <div style={{ marginTop: '1.5rem', width: '100%', maxWidth: '300px' }}>
-        <ActionButton text="Back to Storefront" onClick={() => navigate('/storefront')} />
+        {/* Updated onClick to use the dynamic slug instead of the hardcoded '/storefront' */}
+        <ActionButton text="Back to Storefront" onClick={() => navigate(`/${slug}`)} /> 
       </div>
       
     </div>
