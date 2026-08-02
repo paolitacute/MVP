@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Trash2 } from 'lucide-react'; // Added Trash2 import
 import { useNavigate, useParams } from 'react-router-dom';
 import HeaderText from '../HeaderText';
 import DetailsLine from '../DetailsLine';
@@ -7,6 +7,7 @@ import HorizontalCardLeft from '../HorizontalCardLeft';
 import Dropdown from '../Dropdown';
 import BuyerInfo from '../BuyerInfo';
 import BackButton from '../BackButton';
+import ActionsMenu from '../ActionsMenu'; // Updated to import ActionsMenu
 
 // formatDisplayDate is now a pure helper function without any hooks
 const formatDisplayDate = (dateString) => {
@@ -56,6 +57,16 @@ const OrderDetailPage = ({
     window.scrollTo(0, 0);
   }, []);
 
+  // Configure ActionsMenu options with the Trash icon and red color
+  const menuOptions = [
+    {
+      label: 'Delete order',
+      icon: <Trash2 size={16} />,
+      color: '#ef4444', // Red text and icon color
+      onClick: () => console.log(`Order ${orderId} deleted`)
+    }
+  ];
+
   const renderDynamicStatusHeader = () => {
     switch (status) {
       case 'completed':
@@ -82,6 +93,9 @@ const OrderDetailPage = ({
 
   return (
     <div className="order-detail-layout">
+      {/* Meatballs Actions Menu */}
+      <ActionsMenu options={menuOptions} />
+
       <BackButton />
 
       {renderDynamicStatusHeader()}

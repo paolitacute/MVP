@@ -1,9 +1,10 @@
 import React, { useEffect } from 'react';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Trash2 } from 'lucide-react'; // Added Trash2
 import { useNavigate } from 'react-router-dom';
 import Image from '../Image';
 import CategoryDetail from '../CategoryDetail';
 import BackButton from '../BackButton';
+import ActionsMenu from '../ActionsMenu'; // Added ActionsMenu
 
 // Helper to calculate a single product's total price including customizations
 const calculateProductPrice = (product) => {
@@ -24,6 +25,16 @@ const ProductOrderedDetailPage = ({ product }) => {
     window.scrollTo(0, 0);
   }, []);
 
+  // Configure menu options
+  const menuOptions = [
+    {
+      label: 'Delete item',
+      icon: <Trash2 size={16} />,
+      color: '#ef4444', // Red text and icon color
+      onClick: () => console.log(`Product ${product?.id || 'deleted'} deleted`)
+    }
+  ];
+
   if (!product) {
     return (
       <div className="page-container">
@@ -38,7 +49,10 @@ const ProductOrderedDetailPage = ({ product }) => {
   return (
     <div className="hero-page-layout" style={{ position: 'relative' }}>
       
-     <BackButton pushElementsDown={false} showBackground={true}/>
+      {/* Implemented ActionsMenu with the white circle background prop */}
+      {/* <ActionsMenu options={menuOptions} withBackground={true} /> */}
+      
+      <BackButton pushElementsDown={false} showBackground={true}/>
       
       <div className="hero-image-container">
         <Image src={product.image} alt={product.name} containerClass="hero-image-wrapper" imgClass="hero-image" />

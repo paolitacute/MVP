@@ -1,9 +1,7 @@
 # NEW
 
-- Change the price in the detailsLine of a card in HorizontalListPage to be down, because you can never see it: there is no space.
 - When a seller receives an order, they should get an email of new order.
 - Create screens so the buyer can track an order (token)
-- Delete an order
 - Desactivar a Listing
 - Delete a Listing
 - Set if a customization is available

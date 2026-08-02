@@ -1690,3 +1690,89 @@ input[type="date"].input-field {
   font-family: inherit;
   cursor: text;
 }
+
+/* --- ACTIONS MENU --- */
+
+.transparent-actions-menu {
+  display: flex;
+  justify-content: flex-end; 
+  align-items: center;
+  padding: 1rem 1.5rem;
+  background: transparent; 
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
+  z-index: 100; /* Ensures it sits above other content */
+}
+
+/* Wrapper to anchor the absolute position of the dialog */
+.actions-menu-right {
+  position: relative;
+}
+
+/* Clean SVG button styling */
+.meatballs-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--text-main, #2d3748);
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.meatballs-btn:hover,
+.meatballs-btn[aria-expanded="true"] {
+  background-color: #f8fafc; /* Matches your light input backgrounds */
+  color: var(--primary-purple, #6b46c1);
+}
+
+/* The dialog box containing the mapped options */
+.meatballs-dialog {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 0.25rem;
+  background-color: var(--surface-color, #ffffff);
+  border: 1px solid var(--border-light, #e2e8f0);
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08); /* Matches your shadow tokens */
+  min-width: 160px;
+  display: flex;
+  flex-direction: column;
+  z-index: 1000;
+  overflow: hidden;
+}
+
+/* Individual options passed via props */
+.dialog-option {
+  padding: 0.875rem 1rem;
+  background: transparent;
+  border: none;
+  text-align: left;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-main, #2d3748);
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* Added a border line between items except the last one */
+.dialog-option:not(:last-child) {
+  border-bottom: 1px solid var(--border-light, #e2e8f0);
+}
+
+.dialog-option:hover {
+  background-color: #f8fafc; 
+  color: var(--primary-purple, #6b46c1);
+}
+
+.dialog-empty {
+  padding: 0.875rem 1rem;
+  font-size: 0.875rem;
+  color: var(--text-secondary, #718096);
+  text-align: center;
+}
