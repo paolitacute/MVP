@@ -30,7 +30,7 @@ const OrderSuccessPage = () => {
       {/* Text Group */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
         <h1 style={{ fontSize: '2.25rem', fontWeight: '800', color: 'var(--text-main)', margin: 0, lineHeight: 1.2, letterSpacing: '-0.02em' }}>
-          Orden Confirmada!
+          ¡Orden Confirmada!
         </h1>
         <p style={{ fontSize: '1.15rem', color: 'var(--text-secondary)', fontWeight: '500', maxWidth: '280px', margin: '0 auto' }}>
           El vendedor pronto se comunicará contigo a través de tu número de teléfono
