@@ -38,7 +38,7 @@ const AccountSettings = () => {
       <>
       </>
       // <div className="page-container flex-center" style={{ paddingBottom: '6rem' }}>
-      //   <p>Loading account details...</p>
+      //   <p>Cargando detalles de la cuenta...</p>
       //   <NavBar />
       // </div>
     );
@@ -48,7 +48,7 @@ const AccountSettings = () => {
   if (error) {
     return (
       <div className="page-container flex-center" style={{ paddingBottom: '6rem', color: 'red' }}>
-        <p>Error loading account: {error.message}</p>
+        <p>Error al cargar la cuenta: {error.message}</p>
         <NavBar />
       </div>
     );
@@ -64,7 +64,7 @@ const AccountSettings = () => {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
             <BackButton goTo={`/${username}/home`}/>
-            <HeaderText text="Account Settings" />
+            <HeaderText text="Configuración de la cuenta" />
           </div>
           
           {/* Navigation to the edit screen */}
@@ -76,32 +76,32 @@ const AccountSettings = () => {
           {/* Section 1: Seller Information */}
           <div className="form-container" style={{ gap: '1rem', padding: '1.5rem', width: '100%', maxWidth: '100%' }}>
             <h3 className="section-subtitle" style={{ color: 'var(--text-main)', marginBottom: '0.5rem' }}>
-                Seller Information
+                Información del vendedor
             </h3>
-            <CategoryDetail category="Name" option={seller?.name || 'N/A'} />
-            <CategoryDetail category="Email" option={seller?.email || 'N/A'} />
-            <CategoryDetail category="Phone" option={seller?.phone || 'N/A'} />
-            <CategoryDetail category="Password" option="********" />
+            <CategoryDetail category="Nombre" option={seller?.name || 'N/A'} />
+            <CategoryDetail category="Correo electrónico" option={seller?.email || 'N/A'} />
+            <CategoryDetail category="Teléfono" option={seller?.phone || 'N/A'} />
+            <CategoryDetail category="Contraseña" option="********" />
           </div>
 
           {/* Section 2: Store Information */}
           {store && (
             <div className="form-container" style={{ gap: '1rem', padding: '1.5rem', width: '100%', maxWidth: '100%', marginBottom: '2rem' }}>
               <h3 className="section-subtitle" style={{ color: 'var(--text-main)', marginBottom: '0.5rem' }}>
-                  Store Information
+                  Información de la tienda
               </h3>
-              <CategoryDetail category="Store Name" option={store.name || 'N/A'} />
-              <CategoryDetail category="Store Slug" option={store.slug || 'N/A'} />
-              <CategoryDetail category="Phone" option={store.phone || 'N/A'} />
-              <CategoryDetail category="Email" option={store.email || 'N/A'} />
+              <CategoryDetail category="Nombre de la tienda" option={store.name || 'N/A'} />
+              <CategoryDetail category="Slug de la tienda" option={store.slug || 'N/A'} />
+              <CategoryDetail category="Teléfono" option={store.phone || 'N/A'} />
+              <CategoryDetail category="Correo electrónico" option={store.email || 'N/A'} />
               <CategoryDetail category="Instagram" option={store.instagram || 'N/A'} />
-              <CategoryDetail category="Address" option={store.address || 'N/A'} />
-              <CategoryDetail category="Delivery Availability" option={store.delivery ? 'Yes' : 'No'|| 'N/A'} />
+              <CategoryDetail category="Dirección" option={store.address || 'N/A'} />
+              <CategoryDetail category="Delivery" option={store.delivery ? 'Sí' : 'No'|| 'N/A'} />
               
               {/* Multi-line read-only fields utilizing listing-detail typography */}
               <div style={{ marginTop: '0.5rem' }}>
-                  <span className="meta-label">Store Description</span>
-                  <p className="listing-description">{store.description || 'No description provided.'}</p>
+                  <span className="meta-label">Descripción de la tienda</span>
+                  <p className="listing-description">{store.description || 'No se proporcionó descripción.'}</p>
               </div>
             </div>
           )}
@@ -109,7 +109,7 @@ const AccountSettings = () => {
           {/* Logout Button */}
           <div style={{ marginTop: '1rem' }}>
             <ActionButton 
-              text={logoutMutation.isPending ? "Logging out..." : "Log Out"} 
+              text={logoutMutation.isPending ? "Cerrando sesión..." : "Cerrar sesión"} 
               onClick={handleLogout} 
             />
           </div>

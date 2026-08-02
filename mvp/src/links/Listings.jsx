@@ -36,7 +36,7 @@ const Listings = () => {
   if (error) {
     return (
       <div className='list-page-layout' style={{ display: 'flex', justifyContent: 'center', paddingTop: '3rem', color: 'red' }}> 
-        <p>Error loading listings: {error.message}</p>
+        <p>Error cargando las publicaciones: {error.message}</p>
         <NavBar />
       </div>
     );
@@ -47,7 +47,7 @@ const Listings = () => {
     
     <div className='list-page-layout'> 
       <CardListPage
-        title="Listings"
+        title="Publicaciones"
         data={listings}
         onItemClick={handleItemClick}
         onBack={`/${username}/home`}

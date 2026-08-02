@@ -85,7 +85,7 @@ const CreateListing = () => {
       return true; 
     } catch (err) {
       console.error('Error creating listing:', err); 
-      alert('Failed to create listing. Please try again.'); 
+      alert('Error al crear la publicación. Por favor, inténtalo de nuevo.'); 
       return false; 
     }
   };
@@ -93,9 +93,9 @@ const CreateListing = () => {
   return (
     <>
       <ModifyListingPage 
-        pageTitle="Add a product" 
-        buttonText="Create Listing" 
-        successMessage="Listing created successfully!" 
+        pageTitle="Agregar un producto" 
+        buttonText="Crear publicación" 
+        successMessage="¡Publicación creada con éxito!" 
         onSave={handleCreateProduct} 
         onSubmitSuccess={() => navigate(`/${username}/home`)} 
       />

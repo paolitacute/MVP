@@ -137,7 +137,7 @@ const OrderSummary = () => {
 
       } catch (err) {
         console.error('Error fetching order summary:', err);
-        setError('Failed to load order data.');
+        setError('No se pudo cargar la información del pedido.');
       } finally {
         setLoading(false);
       }
@@ -158,7 +158,7 @@ const OrderSummary = () => {
     const deliveryNum = parseFloat(cleanInput);
 
     if (isNaN(deliveryNum)) {
-      setDeliveryError('Please enter a valid number.');
+      setDeliveryError('Por favor ingresa un número válido.');
       return;
     }
 
@@ -209,7 +209,7 @@ Confirma para enviarte método de pago.`;
   if (loading) {
     return (
       <div className="order-summary-layout" style={{ padding: '2rem', textAlign: 'center' }}>
-        <p>Loading order summary...</p>
+        <p>Cargando resumen del pedido...</p>
       </div>
     );
   }
@@ -217,7 +217,7 @@ Confirma para enviarte método de pago.`;
   if (error || !orderInfo) {
     return (
       <div className="order-summary-layout" style={{ padding: '2rem', textAlign: 'center' }}>
-        <p>{error || 'Order not found.'}</p>
+        <p>{error || 'Pedido no encontrado.'}</p>
         <BackButton />
       </div>
     );
@@ -228,7 +228,7 @@ Confirma para enviarte método de pago.`;
       <BackButton />
       
       <div className="summary-content">
-        <HeaderText text="Message" />
+        <HeaderText text="Mensaje" />
         
         <Input 
           id="order-message"
@@ -241,7 +241,7 @@ Confirma para enviarte método de pago.`;
       </div>
       
       <div className="footer-action">
-         <ActionButton text="Copy" onClick={handleCopy} /> 
+         <ActionButton text="Copiar" onClick={handleCopy} /> 
       </div>
 
       {showDeliveryModal && (
@@ -271,12 +271,12 @@ Confirma para enviarte método de pago.`;
             textAlign: 'center'
           }}>
             <h3 style={{ fontSize: '1.25rem', fontWeight: '700', color: 'var(--text-main, #333)', margin: 0 }}>
-              Delivery Details
+              Detalles de delivery
             </h3>
             
             <div style={{ textAlign: 'left', backgroundColor: '#f8fafc', padding: '1rem', borderRadius: '8px' }}>
               <p style={{ margin: '0 0 0.5rem 0', fontSize: '0.875rem', color: 'var(--text-secondary, #666)' }}>
-                Delivery Address:
+                Dirección de entrega:
               </p>
               <p style={{ margin: 0, fontWeight: '500', color: 'var(--text-main, #333)' }}>
                 {orderInfo.buyer_address || '[Dirección no disponible]'}
@@ -286,7 +286,7 @@ Confirma para enviarte método de pago.`;
             <div style={{ textAlign: 'left' }}>
               <Input 
                 id="delivery-amount"
-                label="Enter Delivery Amount ($)"
+                label="Ingresa el monto de delivery ($)"
                 value={deliveryInput}
                 onChange={(e) => {
                   setDeliveryInput(e.target.value);
@@ -307,14 +307,14 @@ Confirma para enviarte método de pago.`;
                 style={{ width: '100%' }}
                 onClick={() => navigate(-1)}
               >
-                Cancel
+                Cancelar
               </button>
               <button
                 className="secondary-action-btn"
                 style={{ width: '100%' }}
                 onClick={handleDeliverySubmit}
               >
-                Generate Message
+                Generar mensaje
               </button>
             </div>
           </div>
@@ -323,7 +323,7 @@ Confirma para enviarte método de pago.`;
       
       <Toast 
         show={showToast} 
-        message="Message copied to clipboard!" 
+        message="¡Mensaje copiado al portapapeles!" 
       />
     </div>
   );

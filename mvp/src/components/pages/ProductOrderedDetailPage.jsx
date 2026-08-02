@@ -28,7 +28,7 @@ const ProductOrderedDetailPage = ({ product }) => {
   // Configure menu options
   const menuOptions = [
     {
-      label: 'Delete item',
+      label: 'Eliminar artículo',
       icon: <Trash2 size={16} />,
       color: '#ef4444', // Red text and icon color
       onClick: () => console.log(`Product ${product?.id || 'deleted'} deleted`)
@@ -38,7 +38,7 @@ const ProductOrderedDetailPage = ({ product }) => {
   if (!product) {
     return (
       <div className="page-container">
-        <h2 className="header-text-center">Product not found</h2>
+        <h2 className="header-text-center">Producto no encontrado</h2>
       </div>
     );
   }
@@ -64,9 +64,9 @@ const ProductOrderedDetailPage = ({ product }) => {
           <span className="hero-product-price">{calculatedPrice}</span>
           
           {/* Buyer Message Displayed Here */}
-          {product.message && (
+          {product.customMessage && (
             <div style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', marginTop: '0.25rem', fontStyle: 'italic' }}>
-              Mensaje del Cliente: "{product.message}"
+              Mensaje personalizado: "{product.customMessage}"
             </div>
           )}
         </div>

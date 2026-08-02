@@ -102,15 +102,15 @@ const ModifyListingPage = ({
     // 1. Validate Base Inputs
     const validationErrors = {};
     if (productPrice !== '' && parseFloat(productPrice) < 0) {
-      validationErrors.price = 'The numbers must be at least 0';
+      validationErrors.price = 'Los números deben ser de al menos 0';
     }
 
     if (amount !== '') {
       const numAmount = Number(amount);
       if (parseFloat(amount) < 0) {
-        validationErrors.amount = 'The numbers must be at least 0';
+        validationErrors.amount = 'Los números deben ser de al menos 0';
       } else if (!Number.isInteger(numAmount)) {
-        validationErrors.amount = 'Amount available must be a whole number';
+        validationErrors.amount = 'La cantidad disponible debe ser un número entero';
       }
     }
 
@@ -120,7 +120,7 @@ const ModifyListingPage = ({
       const optionErrors = {};
       cust.options.forEach(opt => {
         if (opt.price !== '' && parseFloat(opt.price) < 0) {
-          optionErrors[opt.id] = 'The numbers must be at least 0';
+          optionErrors[opt.id] = 'Los números deben ser de al menos 0';
         }
       });
       // If any options in this block had errors, map them to the block ID
@@ -206,13 +206,13 @@ const ModifyListingPage = ({
                       cursor: 'pointer', 
                       border: '1px solid var(--border-light)' 
                     }}
-                    title="Edit Images"
+                    title="Editar imágenes"
                   >
                     {images.length === 1 ? (
                       <div style={{ width: '100%', height: '100%' }}>
                         <Image 
                           src={displayImages[0]} 
-                          alt="Product view"  
+                          alt="Vista del producto"  
                           containerClass="carousel-image-wrapper"  
                           imgClass="carousel-image"  
                         />
@@ -258,7 +258,7 @@ const ModifyListingPage = ({
                       >
                         <Image 
                           src={imgSrc} 
-                          alt={`Thumbnail ${index + 1}`} 
+                          alt={`Miniatura ${index + 1}`} 
                           containerClass="carousel-image-wrapper"  
                           imgClass="carousel-image"  
                         />
@@ -289,7 +289,7 @@ const ModifyListingPage = ({
 
             <Input 
               id="product-name"  
-              label="Name"  
+              label="Nombre"  
               required={true} 
               value={productName} 
               onChange={(e) => setProductName(e.target.value)} 
@@ -298,7 +298,7 @@ const ModifyListingPage = ({
             <div>
               <Input 
                 id="product-price"  
-                label="Base Price" 
+                label="Precio base" 
                 type='number'  
                 required={true} 
                 value={productPrice} 
@@ -317,7 +317,7 @@ const ModifyListingPage = ({
             <div>
               <Input 
                 id="amount-available"  
-                label="Amount available"  
+                label="Cantidad disponible"  
                 type="number"  
                 value={amount} 
                 onChange={(e) => {
@@ -334,7 +334,7 @@ const ModifyListingPage = ({
 
             <Input 
               id="description"  
-              label="Description"  
+              label="Descripción"  
               type="textarea" 
               required={false} 
               rows={4}  
@@ -360,14 +360,14 @@ const ModifyListingPage = ({
                 className="text-action-link bold-link"  
                 onClick={handleAddCustomization} 
               >
-                + Customization
+                + Personalización
               </button>
             </div>
             <div className="divider"></div>
           </div>
 
           <div className="footer-action">
-            <ActionButton text={isSubmitting ? 'Saving...' : buttonText} type="submit" disabled={isSubmitting} />
+            <ActionButton text={isSubmitting ? 'Guardando...' : buttonText} type="submit" disabled={isSubmitting} />
           </div>
        </form>
 

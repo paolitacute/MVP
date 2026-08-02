@@ -59,7 +59,7 @@ const Product = () => {
   if (isLoading) {
     return (
       <div className="page-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-        Loading product...
+        Cargando producto...
       </div>
     ); 
   }
@@ -76,7 +76,7 @@ const Product = () => {
   if (!product) {
     return (
       <div className="page-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-        Product not found.
+        Producto no encontrado.
       </div>
     ); 
   }

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Search } from 'lucide-react';
 
-const SearchBar = ({ placeholder = "Search", value, onChange }) => {
+const SearchBar = ({ placeholder = "Buscar", value, onChange }) => {
   return (
     <div className="search-container">
       <Search className="search-icon" size={20} />

@@ -6,7 +6,7 @@ const SectionWithCards = ({
   title, 
   viewAllRoute, 
   cards, 
-  emptyMessage = "Nothing to see here yet." 
+  emptyMessage = "No hay nada para ver aquí todavía." 
 }) => {
   const navigate = useNavigate();
   const { username } = useParams();
@@ -44,9 +44,9 @@ const SectionWithCards = ({
         <button 
           className="view-all-link" 
           onClick={() => navigate(safeViewAllRoute)}
-          aria-label={`View all ${title}`}
+          aria-label={`Ver todo ${title}`}
         >
-          View all
+          Ver todo
         </button>
       </div>
       
@@ -59,7 +59,7 @@ const SectionWithCards = ({
             type="button"
             className="scroll-arrow left-arrow" 
             onClick={() => handleScroll('left')}
-            aria-label="Scroll left"
+            aria-label="Desplazar a la izquierda"
           >
             &#8592;
           </button>
@@ -92,7 +92,7 @@ const SectionWithCards = ({
             type="button"
             className="scroll-arrow right-arrow" 
             onClick={() => handleScroll('right')}
-            aria-label="Scroll right"
+            aria-label="Desplazar a la derecha"
           >
             &#8594;
           </button>

@@ -121,7 +121,7 @@ const ProductPage = ({ product, onAddToCart, onBack }) => {
             <HeaderText text={product.name} />
             <span className="product-price-text">${totalPrice.toFixed(2)}</span>
             <span className="product-delivery-text">
-              {product.delivery ? 'Delivery available' : 'Pick-up only'}
+              {product.delivery ? 'Delivery disponible' : 'Solo para recoger'}
             </span>
           </div>
 
@@ -147,7 +147,7 @@ const ProductPage = ({ product, onAddToCart, onBack }) => {
               // 2. Conditionally prepend the "None" option if the field is not required
               const formattedOptions = customization.required 
                 ? mappedOptions 
-                : [{ label: 'None', value: '' }, ...mappedOptions];
+                : [{ label: 'Ninguno', value: '' }, ...mappedOptions];
 
               return (
                 <Input
@@ -167,7 +167,7 @@ const ProductPage = ({ product, onAddToCart, onBack }) => {
             <Input
               type="textarea"
               id="custom-message"
-              label="Custom message"
+              label="Mensaje personalizado"
               rows={4}
               value={customMessage}
               onChange={(e) => setCustomMessage(e.target.value)}
@@ -176,7 +176,7 @@ const ProductPage = ({ product, onAddToCart, onBack }) => {
           </div>
 
           <div style={{ marginTop: '1rem' }}>
-            <ActionButton text="Add to cart" onClick={handleAddToCart} />
+            <ActionButton text="Añadir al carrito" onClick={handleAddToCart} />
           </div>
         </div>
       </div>

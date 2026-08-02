@@ -10,7 +10,7 @@ const BackButton = ({ goTo = -1 }) => {
       <button 
         onClick={() => navigate(goTo)} 
         className="back-button"
-        aria-label="Go back"
+        aria-label="Ir atrás"
       >
         <ArrowLeft className='back-button-arrow' size={24} />
       </button>

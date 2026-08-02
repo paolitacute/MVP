@@ -26,6 +26,13 @@ const CartProduct = ({ product, onQuantityChange, onEdit, onDelete }) => {
               )}
             </div>
           ))}
+          
+          {/* Display custom message if it exists */}
+          {product.customMessage && (
+            <div style={{ fontSize: '0.875rem', marginTop: '0.25rem', color: 'var(--text-secondary)', fontStyle: 'italic', textAlign: 'left' }}>
+              Mensaje: "{product.customMessage}"
+            </div>
+          )}
         </div>
       </div>
       

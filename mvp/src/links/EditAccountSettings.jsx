@@ -7,6 +7,7 @@ import Input from '../components/Input';
 import ActionButton from '../components/ActionButton';
 import NavBar from '../components/NavBar';
 import Toast from '../components/Toast';
+import Badge from '../components/Badge';
 
 const EditAccountSettings = () => {
   const navigate = useNavigate();
@@ -43,10 +44,10 @@ const EditAccountSettings = () => {
 
       if (sellerError) throw sellerError;
 
-      // 3. Fetch store information
+      // 3. Fetch store information (Including delivery field)
       const { data: storeData, error: storeError } = await supabase
         .from('store')
-        .select('name, slug, phone, email, instagram, address, description')
+        .select('name, slug, phone, email, instagram, address, description, delivery')
         .eq('seller_id', user.id)
         .single();
 
@@ -66,25 +67,64 @@ const EditAccountSettings = () => {
     }
   };
 
-  const handleSave = (e) => {
+  const handleSave = async (e) => {
     e.preventDefault();
     
     if (isSaving) return; // Prevent double-clicking
     setIsSaving(true);
 
-    // 1. Trigger the toast animation
-    setShowToast(true);
+    try {
+      // 1. Get authenticated user
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      if (authError || !user) throw authError || new Error('No user authenticated');
 
-    // 2. Wait exactly 2 seconds, then hide the toast and navigate
-    setTimeout(() => {
-      setShowToast(false);
-      
-      // Wait a tiny bit for the hide animation to finish before navigating
+      // 2. Update seller table
+      const { error: sellerUpdateError } = await supabase
+        .from('seller')
+        .update({
+          name: sellerForm.name,
+          email: sellerForm.email,
+          phone: sellerForm.phone,
+        })
+        .eq('id', user.id);
+
+      if (sellerUpdateError) throw sellerUpdateError;
+
+      // 3. Update store table including delivery field
+      const { error: storeUpdateError } = await supabase
+        .from('store')
+        .update({
+          name: storeForm.name,
+          slug: storeForm.slug,
+          phone: storeForm.phone,
+          email: storeForm.email,
+          instagram: storeForm.instagram,
+          address: storeForm.address,
+          delivery: storeForm.delivery,
+          description: storeForm.description,
+        })
+        .eq('seller_id', user.id);
+
+      if (storeUpdateError) throw storeUpdateError;
+
+      // 4. Trigger the toast animation
+      setShowToast(true);
+
+      // 5. Wait 2 seconds, hide toast, and navigate back
       setTimeout(() => {
-        navigate(`/${username}/profile`);
-      }, 300);
-      
-    }, 2000);
+        setShowToast(false);
+        
+        setTimeout(() => {
+          navigate(`/${username}/profile`);
+        }, 300);
+        
+      }, 2000);
+
+    } catch (err) {
+      console.error("Error saving account settings:", err);
+      alert('Error al guardar los cambios: ' + err.message);
+      setIsSaving(false);
+    }
   };
 
   if (loading) {
@@ -92,7 +132,7 @@ const EditAccountSettings = () => {
       <>
       </>
       // <div className="page-container flex-center" style={{ paddingBottom: '6rem' }}>
-      //   <p>Loading editable details...</p>
+      //   <p>Cargando detalles editables...</p>
       //   <NavBar />
       // </div>
     );
@@ -101,7 +141,7 @@ const EditAccountSettings = () => {
   if (error) {
     return (
       <div className="page-container flex-center" style={{ paddingBottom: '6rem', color: 'red' }}>
-        <p>Error loading details: {error}</p>
+        <p>Error al cargar los detalles: {error}</p>
         <NavBar />
       </div>
     );
@@ -114,7 +154,7 @@ const EditAccountSettings = () => {
         {/* Header Area */}
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: '2rem', gap: '1rem' }}>
           <BackButton />
-          <HeaderText text="Edit Settings" />
+          <HeaderText text="Editar configuración" />
         </div>
 
         <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
@@ -122,29 +162,29 @@ const EditAccountSettings = () => {
           {/* Section 1: Seller Information */}
           <div className="form-container" style={{ gap: '1rem', padding: '1.5rem', width: '100%', maxWidth: '100%' }}>
             <h3 className="section-subtitle" style={{ color: 'var(--text-main)', marginBottom: '0.5rem' }}>
-              Seller Information
+              Información del vendedor
             </h3>
             <Input 
-              label="Name" 
+              label="Nombre" 
               value={sellerForm.name || ''} 
               onChange={(e) => setSellerForm({ ...sellerForm, name: e.target.value })}
               required 
             />
             <Input 
-              label="Email" 
+              label="Correo electrónico" 
               type="email"
               value={sellerForm.email || ''} 
               onChange={(e) => setSellerForm({ ...sellerForm, email: e.target.value })}
               required 
             />
             <Input 
-              label="Phone" 
+              label="Teléfono" 
               value={sellerForm.phone || ''} 
               onChange={(e) => setSellerForm({ ...sellerForm, phone: e.target.value })}
               required 
             />
             <Input 
-              label="Password" 
+              label="Contraseña" 
               type="password"
               value="********" 
               onChange={(e) => setSellerForm({ ...sellerForm, password: e.target.value })}
@@ -155,28 +195,28 @@ const EditAccountSettings = () => {
           {/* Section 2: Store Information */}
           <div className="form-container" style={{ gap: '1rem', padding: '1.5rem', width: '100%', maxWidth: '100%', marginBottom: '1rem' }}>
             <h3 className="section-subtitle" style={{ color: 'var(--text-main)', marginBottom: '0.5rem' }}>
-              Store Information
+              Información de la tienda
             </h3>
             <Input 
-              label="Store Name" 
+              label="Nombre de la tienda" 
               value={storeForm.name || ''} 
               onChange={(e) => setStoreForm({ ...storeForm, name: e.target.value })}
               required 
             />
             <Input 
-              label="Store Slug" 
+              label="Slug de la tienda" 
               value={storeForm.slug || ''} 
               onChange={(e) => setStoreForm({ ...storeForm, slug: e.target.value })}
               required 
             />
             <Input 
-              label="Phone" 
+              label="Teléfono" 
               value={storeForm.phone || ''} 
               onChange={(e) => setStoreForm({ ...storeForm, phone: e.target.value })}
               required 
             />
             <Input 
-              label="Email" 
+              label="Correo electrónico" 
               type="email"
               value={storeForm.email || ''} 
               onChange={(e) => setStoreForm({ ...storeForm, email: e.target.value })}
@@ -188,12 +228,31 @@ const EditAccountSettings = () => {
               onChange={(e) => setStoreForm({ ...storeForm, instagram: e.target.value })}
             />
             <Input 
-              label="Address" 
+              label="Dirección" 
               value={storeForm.address || ''} 
               onChange={(e) => setStoreForm({ ...storeForm, address: e.target.value })}
             />
+
+            <div className="input-group" style={{ padding: '0.5rem 0' }}>
+              <span className="input-label">¿Ofrece Delivery?</span>
+              <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.25rem' }}>
+                <Badge 
+                  text="Sí" 
+                  active={storeForm.delivery === true} 
+                  onClick={() => setStoreForm((prev) => ({ ...prev, delivery: true }))} 
+                  type="filter"
+                />
+                <Badge 
+                  text="No" 
+                  active={storeForm.delivery === false} 
+                  onClick={() => setStoreForm((prev) => ({ ...prev, delivery: false }))} 
+                  type="filter"
+                />
+              </div>
+            </div>
+
             <Input 
-              label="Store Description" 
+              label="Descripción de la tienda" 
               type='textarea'
               value={storeForm.description || ''} 
               onChange={(e) => setStoreForm({ ...storeForm, description: e.target.value })}
@@ -204,7 +263,7 @@ const EditAccountSettings = () => {
           {/* Action Footer */}
           <div style={{ paddingBottom: '2rem' }}>
               <ActionButton 
-                text={isSaving ? "Saving..." : "Save Changes"} 
+                text={isSaving ? "Guardando..." : "Guardar cambios"} 
                 type="submit" 
               />
           </div>
@@ -212,7 +271,7 @@ const EditAccountSettings = () => {
 
         <Toast 
           show={showToast} 
-          message="Changes saved successfully!" 
+          message="¡Cambios guardados con éxito!" 
         />
       </div>
       

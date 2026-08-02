@@ -99,8 +99,8 @@ const EditListing = () => {
   if (error || !existingProductData) {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100vh', gap: '1rem' }}>
-        <p style={{ color: 'red' }}>Error loading listing: {error?.message || 'Not found'}</p>
-        <button onClick={() => navigate(`/${username}/listings`)}>Go Back</button>
+        <p style={{ color: 'red' }}>Error al cargar el producto: {error?.message || 'No encontrado'}</p>
+        <button onClick={() => navigate(`/${username}/listings`)}>Volver</button>
       </div>
     ); 
   }
@@ -108,9 +108,9 @@ const EditListing = () => {
   return (
     <>
       <ModifyListingPage 
-        pageTitle="Edit product"
-        buttonText="Save Changes"
-        successMessage="Listing updated successfully!"
+        pageTitle="Editar producto"
+        buttonText="Guardar cambios"
+        successMessage="¡Listado actualizado con éxito!"
         initialData={existingProductData}
         onSave={handleUpdate} 
         onSubmitSuccess={() => navigate(`/${username}/listing/${id}`)}

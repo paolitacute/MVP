@@ -24,6 +24,7 @@ const ProductOrderedDetail = () => {
             product_id,
             product_name,
             unit_price,
+            custom_message, 
             order_item_option (
               category_name,
               option_name,
@@ -35,7 +36,7 @@ const ProductOrderedDetail = () => {
           .single();
 
         if (itemError) throw itemError;
-        if (!itemData) throw new Error('Product not found in this order');
+        if (!itemData) throw new Error('Producto no encontrado en este pedido');
 
         // 2. Safely fetch the product image if the product_id exists
         let imageUrl = '';
@@ -58,6 +59,7 @@ const ProductOrderedDetail = () => {
           name: itemData.product_name,
           price: `$${Number(itemData.unit_price).toFixed(2)}`,
           image: imageUrl,
+          customMessage: itemData.custom_message,
           customizations: (itemData.order_item_option || []).map(opt => ({
             category: opt.category_name,
             option: opt.option_name,
@@ -68,7 +70,7 @@ const ProductOrderedDetail = () => {
         setProduct(formattedProduct);
       } catch (err) {
         console.error('Error fetching ordered product:', err);
-        setError('Failed to load product details.');
+        setError('Error al cargar los detalles del producto.');
       } finally {
         setIsLoading(false);
       }
@@ -84,7 +86,7 @@ const ProductOrderedDetail = () => {
       <>
       </>
       // <div style={{ padding: '2rem', textAlign: 'center' }}>
-      //   <p>Loading product details...</p>
+      //   <p>Cargando detalles del producto...</p>
       //   <NavBar />
       // </div>
     );
@@ -93,7 +95,7 @@ const ProductOrderedDetail = () => {
   if (error || !product) {
     return (
       <div style={{ padding: '2rem', textAlign: 'center' }}>
-        <p>{error || 'Product not found.'}</p>
+        <p>{error || 'Producto no encontrado.'}</p>
         <NavBar />
       </div>
     );

@@ -42,7 +42,7 @@ const Input = ({ label, type = 'text', value, onChange, id, required = false, pr
           aria-required={required}
           style={{ width: '100%', paddingLeft: prefix ? '0.2rem' : '' }}
         >
-          <option value="" disabled hidden>Select an option</option>
+          <option value="" disabled hidden>Selecciona una opción</option>
           {options.map((opt, index) => (
             <option key={index} value={opt.value}>
               {opt.label}
@@ -89,6 +89,7 @@ const Input = ({ label, type = 'text', value, onChange, id, required = false, pr
         aria-required={required}
         pattern={pattern}
         title={customErrorMessage}
+        lang={isDatePicker ? "es" : undefined}
         style={{ width: '100%', paddingLeft: prefix ? '0.2rem' : '' }}
       />
     );
@@ -100,7 +101,7 @@ const Input = ({ label, type = 'text', value, onChange, id, required = false, pr
         <label htmlFor={id} className="input-label" style={{ width: '100%', textAlign: 'left' }}>
           {label} 
           {required && <span style={{ color: '#e53e3e', marginLeft: '0.25rem' }}>*</span>}
-          {!required && <span style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginLeft: '0.25rem' }}>(optional)</span>}
+          {!required && <span style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginLeft: '0.25rem' }}>(opcional)</span>}
         </label>
       )}
       

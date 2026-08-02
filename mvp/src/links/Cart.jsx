@@ -22,7 +22,7 @@ const Cart = () => {
   // 3. Define the checkout function using your Supabase RPC logic
   const handleCheckout = async (formData) => {
     if (cartItems.length === 0) {
-      alert("Your cart is empty!");
+      alert("¡Tu carrito está vacío!");
       return;
     }
 
@@ -41,13 +41,14 @@ const Cart = () => {
           productid: ci.productId,
           quantity: ci.quantity,
           optionids: ci.selectedOptionIds,
+          custommessage: ci.customMessage,
         })),
       },
     });
 
     if (error) {
       console.error("Error during checkout:", error);
-      alert("There was an issue processing your order. Please try again.");
+      alert("Hubo un problema al procesar tu pedido. Por favor, inténtalo de nuevo.");
     } else {
       clearCart();
       // Redirect to the store-specific success page using the slug
@@ -65,7 +66,7 @@ const Cart = () => {
       buyerInfo={{ buyerName, buyerPhone, buyerEmail, buyerAddress }}
       setBuyerInfo={{ setBuyerName, setBuyerPhone, setBuyerEmail, setBuyerAddress }}
     />
-  ); //
+  );
 };
 
 export default Cart;

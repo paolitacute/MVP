@@ -38,7 +38,7 @@ const ImageCarousel = ({
     return (
       <Image 
         src={null} 
-        alt="No images available" 
+        alt="No hay imágenes disponibles" 
         containerClass={containerClass} 
         imgClass={imgClass} 
       />
@@ -114,7 +114,7 @@ const ImageCarousel = ({
               e.stopPropagation(); 
               goToPrevious();
             }}
-            aria-label="Previous image"
+            aria-label="Imagen anterior"
           >
             <ArrowLeft size={24} color="var(--text-main, #333)" />
           </button>
@@ -125,7 +125,7 @@ const ImageCarousel = ({
               e.stopPropagation(); 
               goToNext();
             }}
-            aria-label="Next image"
+            aria-label="Imagen siguiente"
           >
             <ArrowRight size={24} color="var(--text-main, #333)" />
           </button>

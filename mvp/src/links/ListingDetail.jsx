@@ -30,7 +30,7 @@ const ListingDetail = () => {
   if (error) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', color: 'red' }}>
-        <p>Error loading listing: {error.message}</p>
+        <p>Error cargando la publicación: {error.message}</p>
       </div>
     );
   }
@@ -38,7 +38,7 @@ const ListingDetail = () => {
   if (!listing) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-        <p>Listing not found.</p>
+        <p>Publicación no encontrada.</p>
       </div>
     );
   }

@@ -34,7 +34,6 @@ const CardListPage = ({
       <SearchBar 
         value={searchTerm} 
         onChange={(e) => setSearchTerm(e.target.value)} 
-        placeholder="search" 
       />
       
       {/* Conditionally render the grid OR the empty message */}

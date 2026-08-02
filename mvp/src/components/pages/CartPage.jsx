@@ -37,7 +37,7 @@ const CartPage = ({
       <BackButton/>
       
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '2rem' }}>
-        <HeaderText text="Cart" />
+        <HeaderText text="Carrito" />
         <ShoppingCart color="var(--text-main)" size={28} />
       </div>
 
@@ -54,7 +54,7 @@ const CartPage = ({
           ))
         ) : (
           <p style={{ color: 'var(--text-secondary)', textAlign: 'center', marginTop: '2rem' }}>
-            Your cart is empty.
+            Tu carrito está vacío.
           </p>
         )}
       </div>
@@ -69,18 +69,18 @@ const CartPage = ({
           <div style={{ height: '1px', backgroundColor: 'var(--border-light)', margin: '0.5rem 0' }}></div>
           <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--text-secondary)' }}>
             <span>Delivery</span>
-            <span>Pending for calculation</span>
+            <span>Cálculo pendiente</span>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--text-secondary)' }}>
             <span>Total</span>
-            <span>Calculated by seller</span>
+            <span>Calculado por el vendedor</span>
           </div>
         </div>
       )}
 
       <div style={{ paddingBottom: '1rem' }}>
         <ActionButton 
-          text="Make an order" 
+          text="Realizar pedido" 
           onClick={() => setIsModalOpen(true)} 
         />
       </div>

@@ -63,7 +63,7 @@ const OrderDetail = () => {
       <>
       </>
       // <div style={{ padding: '2rem', textAlign: 'center' }}>
-      //   <p>Loading order details...</p>
+      //   <p>Cargando detalles del pedido...</p>
       //   <NavBar />
       // </div>
     );
@@ -73,8 +73,8 @@ const OrderDetail = () => {
   if (error || !data?.order) {
     return (
       <div style={{ padding: '2rem', textAlign: 'center' }}>
-        <p>{error?.message || 'Order not found.'}</p>
-        <button className="action-button" onClick={() => navigate(`/${username}/all-orders`)}>Go Back</button>
+        <p>{error?.message || 'Pedido no encontrado.'}</p>
+        <button className="action-button" onClick={() => navigate(`/${username}/all-orders`)}>Volver</button>
         <NavBar />
       </div>
     );
@@ -109,10 +109,10 @@ const OrderDetail = () => {
             flexDirection: 'column', gap: '1.5rem', textAlign: 'center'
           }}>
             <h3 style={{ fontSize: '1.25rem', fontWeight: '700', color: 'var(--text-main)', margin: 0 }}>
-              Confirm Completion
+              Confirmar finalización
             </h3>
             <p style={{ color: 'var(--text-secondary)', margin: 0, fontSize: '1rem' }}>
-              Are you sure you want to mark this order as completed?
+              ¿Estás seguro de que quieres marcar este pedido como completado?
             </p>
             <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem' }}>
               <button
@@ -121,14 +121,14 @@ const OrderDetail = () => {
                 onClick={cancelCompletion}
                 disabled={isUpdating}
               >
-                Cancel
+                Cancelar
               </button>
               <button
                 className="action-button"
                 onClick={confirmCompletion}
                 disabled={isUpdating}
               >
-                {isUpdating ? 'Updating...' : 'Confirm'}
+                {isUpdating ? 'Actualizando...' : 'Confirmar'}
               </button>
             </div>
           </div>

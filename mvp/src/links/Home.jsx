@@ -56,29 +56,29 @@ const Home = () => {
   return (
     <div className="home-layout">
       <nav className="topbar">
-        <p>Hello {data?.sellerName || 'Seller'}!</p>
+        <p>Hola {data?.sellerName || 'Vendedor'}!</p>
       </nav>
 
       <main className="home-content">
         <div style={{ backgroundColor: '#efe9f7', padding: '0.5rem 0 0 0' }}>
           <SectionWithCards 
-            title="New" 
+            title="Nuevos Pedidos" 
             viewAllRoute={`/${username}/new-orders`} 
             cards={newOrders} 
-            emptyMessage="When you get new orders, you'll see them here."
+            emptyMessage="Cuando tengas nuevos pedidos, los verás aquí."
           />
         </div>
         <SectionWithCards 
-          title="Orders" 
+          title="Todos los Pedidos" 
           viewAllRoute={`/${username}/all-orders`} 
           cards={allOrders} 
-          emptyMessage="When you get new orders, you'll see them here."
+          emptyMessage="Cuando tengas nuevos pedidos, los verás aquí."
         />
         <SectionWithCards 
-          title="Listings" 
+          title="Publicaciones" 
           viewAllRoute={`/${username}/listings`} 
           cards={listings} 
-          emptyMessage="When you create listings, you'll see them here."
+          emptyMessage="Cuando crees publicaciones, las verás aquí."
         />
       </main>
 

@@ -37,7 +37,7 @@ const ActionsMenu = ({ options = [], withBackground = false }) => {
         <button 
           className="meatballs-btn" 
           onClick={toggleMenu} 
-          aria-label="Menu"
+          aria-label="Menú"
           aria-expanded={isOpen}
           style={btnStyle}
         >
@@ -68,7 +68,7 @@ const ActionsMenu = ({ options = [], withBackground = false }) => {
                 </button>
               ))
             ) : (
-              <div className="dialog-empty">No options</div>
+              <div className="dialog-empty">Sin opciones</div>
             )}
           </div>
         )}

@@ -56,7 +56,7 @@ const CustomizationInputGroup = ({ customization, onChange, onDelete, errors = {
         <div style={{ flex: 1 }}>
           <Input 
             id={`field-name-${customization.id}`} 
-            label="Customization name" 
+            label="Nombre de personalización" 
             required={true} 
             value={name}
             onChange={handleNameChange}
@@ -77,7 +77,7 @@ const CustomizationInputGroup = ({ customization, onChange, onDelete, errors = {
           }}
           onMouseEnter={(e) => e.currentTarget.style.color = '#ef4444'}
           onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
-          aria-label="Delete Customization"
+          aria-label="Eliminar personalización"
         >
           <Trash2 size={24} />
         </button>
@@ -87,7 +87,7 @@ const CustomizationInputGroup = ({ customization, onChange, onDelete, errors = {
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '1.5rem' }}>
          <Checkbox  
            id={`required-checkbox-${customization.id}`} 
-           label="Required" 
+           label="Obligatorio" 
            checked={isRequired} 
            onChange={handleRequiredChange}
          />
@@ -129,14 +129,14 @@ const CustomizationInputGroup = ({ customization, onChange, onDelete, errors = {
                       e.currentTarget.style.backgroundColor = '#e2e8f0';
                       e.currentTarget.style.color = 'var(--text-secondary)';
                     }}
-                    aria-label="Delete Option"
+                    aria-label="Eliminar opción"
                   >
                     <Trash2 size={22} />
                   </button>
                 
                 <Input 
                     id={`option-name-${option.id}`} 
-                    label={`Option ${index + 1}`} 
+label={`Opción ${index + 1}`}
                     value={option.name}
                     onChange={(e) => handleOptionChange(option.id, 'name', e.target.value)}
                   />
@@ -148,7 +148,7 @@ const CustomizationInputGroup = ({ customization, onChange, onDelete, errors = {
                   <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
                     <Input 
                       id={`option-price-${option.id}`} 
-                      label="Price" 
+                      label="Precio" 
                       prefix="$" 
                       type="number"
                       value={option.price}
@@ -190,7 +190,7 @@ const CustomizationInputGroup = ({ customization, onChange, onDelete, errors = {
                     e.currentTarget.style.borderColor = 'var(--border-light)';
                   }
                 }}
-                title="Upload Image"
+                title="Subir imagen"
               >
                 <ImageUploader 
                   image={option.image}
@@ -213,14 +213,14 @@ const CustomizationInputGroup = ({ customization, onChange, onDelete, errors = {
             onClick={addOption}
             style={{ fontSize: '1rem' }}
           >
-            + Add another option
+            + Añadir otra opción
           </button>
         </div>
       </div>
 
       <Toast 
         show={showWarningToast} 
-        message="You must have at least one option." 
+        message="Debes tener al menos una opción." 
       />
       
     </div>

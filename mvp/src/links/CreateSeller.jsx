@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../client';
 import HeaderText from '../components/HeaderText';
 import Input from '../components/Input';
@@ -71,7 +71,7 @@ const CreateSeller = () => {
 
     } catch (err) {
       console.log(err);
-      setError("An unexpected error occurred.");
+      setError("Ocurrió un error inesperado.");
       setLoading(false);
     }
   };
@@ -79,7 +79,7 @@ const CreateSeller = () => {
   return (
     <main className="page-container flex-center">
       <form onSubmit={handleCreateAccount} className="form-container">
-        <HeaderText text="Create Seller Account" />
+        <HeaderText text="Crear cuenta de vendedor" />
         
         {error && (
           <div className="error-message" style={{ color: 'red', marginBottom: '1rem', textAlign: 'center' }}>
@@ -89,24 +89,24 @@ const CreateSeller = () => {
         
         <div className="form-inputs">
           <Input 
-            label="Full Name" 
+            label="Nombre completo" 
             id="name" 
             value={formData.name} 
             onChange={handleChange} 
             required 
           />
           <Input 
-            label="Email Address" 
+            label="Correo electrónico" 
             type="email" 
             id="createEmail" 
             value={formData.createEmail} 
             onChange={handleChange}
             pattern="[a-z0-9]+@[a-z]+\.[a-z]{2,}"
-            customErrorMessage="Please enter a valid lowercase email (e.g., name@domain.com)"
+            customErrorMessage="Por favor ingresa un correo válido en minúsculas (por ejemplo, nombre@dominio.com)"
             required 
           />
           <Input 
-            label="Phone Number" 
+            label="Número de teléfono" 
             type="tel" 
             id="phone" 
             value={formData.phone} 
@@ -116,7 +116,7 @@ const CreateSeller = () => {
             required 
           />
           <Input 
-            label="Password" 
+            label="Contraseña" 
             type="password" 
             id="password" 
             value={formData.password} 
@@ -125,11 +125,33 @@ const CreateSeller = () => {
           />
         </div>
 
-        <ActionButton 
-          text={loading ? "Creating Account..." : "Continue to Store Setup"} 
-          type="submit" 
-          disabled={loading} 
-        />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', width: '100%' }}>
+          <ActionButton 
+            text={loading ? "Creando cuenta..." : "Continuar a crear una tienda"} 
+            type="submit" 
+            disabled={loading} 
+          />
+
+          <div style={{ textAlign: 'center' }}>
+            <span style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
+              ¿Ya tienes una cuenta?{' '}
+            </span>
+            <button 
+            type="button" 
+            onClick={() => navigate('/login')}
+            style={{ 
+              background: 'none', 
+              border: 'none', 
+              color: 'var(--primary-purple)', 
+              fontWeight: '600', 
+              cursor: 'pointer',
+              fontSize: '0.875rem'
+            }}
+          >
+            Iniciar sesión
+          </button>
+          </div>
+        </div>
       </form>
     </main>
   );

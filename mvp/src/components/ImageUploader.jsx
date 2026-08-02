@@ -80,7 +80,7 @@ const ImageUploader = ({ onImageSelected, image, onDelete }) => {
         <>
           <img 
             src={previewUrl} 
-            alt="Product visual" 
+            alt="Visual del producto" 
             style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
           />
           
@@ -103,7 +103,7 @@ const ImageUploader = ({ onImageSelected, image, onDelete }) => {
                 cursor: 'pointer',
                 zIndex: 10
               }}
-              title="Remove image"
+              title="Eliminar imagen"
             >
               <Trash2 size={18} color="#dc2626" />
             </button>
@@ -131,7 +131,7 @@ const ImageUploader = ({ onImageSelected, image, onDelete }) => {
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
           <Plus color="var(--text-secondary, #6b7280)" size={32} />
           <span className="image-uploader-text" style={{ color: 'var(--text-secondary, #6b7280)', fontSize: '0.9rem' }}>
-            Product image(s)
+            Imagen del Producto
           </span>
         </div>
       )}

@@ -13,7 +13,7 @@ import ActionsMenu from '../ActionsMenu'; // Updated to import ActionsMenu
 const formatDisplayDate = (dateString) => {
   if (!dateString) return null;
   const [year, month, day] = dateString.split('-');
-  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const months = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
   
   return `${months[parseInt(month, 10) - 1]} ${parseInt(day, 10)}, ${year}`; 
 };
@@ -60,7 +60,7 @@ const OrderDetailPage = ({
   // Configure ActionsMenu options with the Trash icon and red color
   const menuOptions = [
     {
-      label: 'Delete order',
+      label: 'Eliminar pedido',
       icon: <Trash2 size={16} />,
       color: '#ef4444', // Red text and icon color
       onClick: () => console.log(`Order ${orderId} deleted`)
@@ -70,15 +70,15 @@ const OrderDetailPage = ({
   const renderDynamicStatusHeader = () => {
     switch (status) {
       case 'completed':
-        return <h1 className="dynamic-status-header status-completed">Completed on {formatDisplayDate(dateAction)}</h1>;
+        return <h1 className="dynamic-status-header status-completed">Completado el {formatDisplayDate(dateAction)}</h1>;
       case 'pending':
-        return <h1 className="dynamic-status-header status-send">Pending</h1>;
+        return <h1 className="dynamic-status-header status-send">Pendiente</h1>;
       case 'send_by':
-        return <h1 className="dynamic-status-header status-send">Send by {dateAction}</h1>;
+        return <h1 className="dynamic-status-header status-send">Entregar antes de {dateAction}</h1>;
       case 'new':
-        return <h1 className="dynamic-status-header status-new">New Order</h1>;
+        return <h1 className="dynamic-status-header status-new">Nuevo pedido</h1>;
       default:
-        return <h1 className="dynamic-status-header">Order Status</h1>;
+        return <h1 className="dynamic-status-header">Estado del pedido</h1>;
     }
   };
 
@@ -103,15 +103,15 @@ const OrderDetailPage = ({
       <div className="divider"></div>
 
       <div className="order-meta-row">
-        <DetailsLine items={[`Ordered on ${formatDisplayDate(dateOrdered)}`, calculatedTotal]} />
+        <DetailsLine items={[`Pedido realizado el ${formatDisplayDate(dateOrdered)}`, calculatedTotal]} />
         <Dropdown 
           value={status}
           onChange={onStatusChange}
           options={[
-            { label: 'New Order', value: 'new' },
-            { label: 'Pending', value: 'pending' },
-            { label: 'In Progress', value: 'send_by' },
-            { label: 'Completed', value: 'completed' },
+            { label: 'Nuevo pedido', value: 'new' },
+            { label: 'Pendiente', value: 'pending' },
+            { label: 'En progreso', value: 'send_by' },
+            { label: 'Completado', value: 'completed' },
           ]}
         />
       </div>
@@ -134,7 +134,7 @@ const OrderDetailPage = ({
 
       <div className="divider"></div>
 
-      <h3 className="items-header">{products.length} {products.length == 1 ? 'item' : 'items'}</h3>
+      <h3 className="items-header">{products.length} {products.length == 1 ? 'artículo' : 'artículos'}</h3>
       
       <div className="items-list">
         {products.map((product) => (

@@ -40,7 +40,6 @@ const StoreFrontPage = ({ storeData, listings, slug }) => {
         <SearchBar 
           value={searchTerm} 
           onChange={(e) => setSearchTerm(e.target.value)} 
-          placeholder="search" 
         />
 
         <div className="cards-grid-container">

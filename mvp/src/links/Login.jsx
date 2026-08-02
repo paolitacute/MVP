@@ -48,7 +48,7 @@ const Login = () => {
       
     } catch (err) {
       console.error(err);
-      setError("An unexpected error occurred.");
+      setError("Ocurrió un error inesperado.");
       setLoading(false);
     }
   };
@@ -56,7 +56,7 @@ const Login = () => {
   return (
     <main className="page-container flex-center">
       <form onSubmit={handleLogin} className="form-container">
-        <HeaderText text="Login to account" />
+        <HeaderText text="Iniciar sesión" />
         
         {/* Error messaging display */}
         {error && (
@@ -67,17 +67,17 @@ const Login = () => {
         
         <div className="form-inputs">
           <Input 
-            label="Email" 
+            label="Correo electrónico" 
             type="email"
             id="loginEmail"
             value={email} 
             onChange={(e) => setEmail(e.target.value)} 
             pattern="[a-z0-9]+@[a-z0-9]+\.[a-z]{2,}"
-            customErrorMessage="Please enter a valid lowercase email (e.g., name@domain.com)"
+            customErrorMessage="Por favor ingresa un correo válido en minúsculas (por ejemplo, nombre@dominio.com)"
             required 
           />
           <Input 
-            label="Password" 
+            label="Contraseña" 
             type="password" 
             id="password" 
             value={password} 
@@ -88,14 +88,14 @@ const Login = () => {
 
         {/* Updated ActionButton to reflect loading state */}
         <ActionButton 
-          text={loading ? "Logging in..." : "Login"} 
+          text={loading ? "Iniciando sesión..." : "Iniciar sesión"} 
           type="submit" 
           disabled={loading}
         />
         
         <div style={{ textAlign: 'center', marginTop: '1rem' }}>
           <span style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
-            New to the platform?{' '}
+            ¿Nuevo en la plataforma?{' '}
           </span>
           <button 
             type="button" 
@@ -109,7 +109,7 @@ const Login = () => {
               fontSize: '0.875rem'
             }}
           >
-            Create an account
+            Crear una cuenta
           </button>
         </div>
       </form>

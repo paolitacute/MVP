@@ -100,7 +100,7 @@ const CreateStore = () => {
 
     } catch (err) {
       console.log(err);
-      setError("An unexpected error occurred.");
+      setError("Ocurrió un error inesperado.");
       setLoading(false);
     }
   };
@@ -145,7 +145,7 @@ const CreateStore = () => {
   return (
     <main className="page-container flex-center" style={{ alignItems: 'flex-start', paddingTop: '4rem' }}>
       <form onSubmit={handleCreateStore} className="form-container">
-        <HeaderText text="Create a store" />
+        <HeaderText text="Crear una tienda" />
         
         {error && (
           <div className="error-message" style={{ color: 'red', marginBottom: '1rem', textAlign: 'center' }}>
@@ -154,23 +154,23 @@ const CreateStore = () => {
         )}
 
         <div className="form-inputs">
-          <Input label="Store name" id="storeName" value={formData.storeName} onChange={handleChange} required />
+          <Input label="Nombre de la tienda" id="storeName" value={formData.storeName} onChange={handleChange} required />
           <Input label="Slug" id="slug" value={formData.slug} onChange={handleChange} prefix="mvpname/" required />
           
-          <Checkbox id="sameAsSeller" label="Same as the seller" checked={formData.sameAsSeller} onChange={handleChange} />
+          <Checkbox id="sameAsSeller" label="Igual que el vendedor" checked={formData.sameAsSeller} onChange={handleChange} />
           
-          <Input label="Business phone number" type="tel" id="phone" value={formData.phone} pattern="[\+]?\s?\(?[0-9]{3}\)?-?\s?.?[0-9]{3}\)?-?\s?.?[0-9]{4,6}" customErrorMessage="Por ejemplo, 8091234567" onChange={handleChange} required />
-          <Input label="Business email" type="email" id="email" value={formData.email} onChange={handleChange} pattern="[a-z0-9]+@[a-z]+\.[a-z]{2,}" customErrorMessage="Please enter a valid lowercase email (e.g., name@domain.com)" required />
+          <Input label="Teléfono comercial" type="tel" id="phone" value={formData.phone} pattern="[\+]?	?\(?[0-9]{3}\)?-?\s?.?[0-9]{3}\)?-?\s?.?[0-9]{4,6}" customErrorMessage="Por ejemplo, 8091234567" onChange={handleChange} required />
+          <Input label="Correo comercial" type="email" id="email" value={formData.email} onChange={handleChange} pattern="[a-z0-9]+@[a-z]+\.[a-z]{2,}" customErrorMessage="Por favor ingresa un correo válido en minúsculas (por ejemplo, nombre@dominio.com)" required />
           
-          <Input label="Instagram" id="instagram" value={formData.instagram} onChange={handleChange} prefix="@" pattern="[\w.]+" customErrorMessage="Only include letters and digits"/>
-          <Input label="Store address" id="address" value={formData.address} onChange={handleChange} />
-          <Input label="Store description" id="description" value={formData.description} onChange={handleChange} type='textarea' rows={5} />
+          <Input label="Instagram" id="instagram" value={formData.instagram} onChange={handleChange} prefix="@" pattern="[\w.]+" customErrorMessage="Incluye solo letras y dígitos"/>
+          <Input label="Dirección" id="address" value={formData.address} onChange={handleChange} />
+          <Input label="Descripción de la tienda" id="description" value={formData.description} onChange={handleChange} type='textarea' rows={5} />
           
           <div className="input-group" style={{ padding: '0.5rem 0' }}>
-            <span className="input-label">Delivery?</span>
+            <span className="input-label">¿Ofrece Delivery?</span>
             <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.25rem' }}>
               <Badge 
-                text="Yes" 
+                text="Sí" 
                 active={formData.delivery === true} 
                 onClick={() => setFormData((prev) => ({ ...prev, delivery: true }))} 
                 type="filter"
@@ -186,14 +186,14 @@ const CreateStore = () => {
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', width: '100%' }}>
-          <ActionButton text={loading ? "Creating Store..." : "Create Store"} type="submit" disabled={loading} />
+          <ActionButton text={loading ? "Creando tienda..." : "Crear tienda"} type="submit" disabled={loading} />
           
           <button 
             type="button" 
             onClick={handleLogout}
             className="tertiary-action-btn"
           >
-            Log Out
+            Cerrar sesión
           </button>
         </div>
       </form>

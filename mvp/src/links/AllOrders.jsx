@@ -25,7 +25,7 @@ const AllOrders = () => {
       <>
       </>
       // <div style={{ padding: '2rem', textAlign: 'center' }}>
-      //    <p>Loading orders...</p>
+      //    <p>Cargando pedidos...</p>
       // </div>
     );
   }
@@ -34,7 +34,7 @@ const AllOrders = () => {
   if (error) {
     return (
       <div style={{ padding: '2rem', textAlign: 'center' }}>
-        <p>{error.message || 'Failed to load orders.'}</p>
+        <p>{error.message || 'Error al cargar los pedidos.'}</p>
         <NavBar />
       </div>
     );
@@ -43,7 +43,7 @@ const AllOrders = () => {
   return (
     <div>
       <HorizontalListPage
-        title="Orders"
+        title="Pedidos"
         filters={['Todo', 'Nueva', 'Pendiente', 'En progreso', 'Completada']}
         data={orders}
         onClick={handleCardClick}

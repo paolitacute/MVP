@@ -15,17 +15,17 @@ const ListingDetailPage = ({ listing, onEdit, onBack }) => {
   // Set up the menu options for the listing including Deactivate listing
   const menuOptions = [
     {
-      label: 'Edit listing',
+      label: 'Editar publicación',
       icon: <Pencil size={16} />,
       onClick: onEdit
     },
     {
-      label: 'Deactivate listing',
+      label: 'Desactivar publicación',
       icon: <PowerOff size={16} />,
       onClick: () => console.log(`Listing ${listing?.id || ''} deactivated`)
     },
     {
-      label: 'Delete listing',
+      label: 'Borrar publicación',
       icon: <Trash2 size={16} />,
       color: '#ef4444', // Red text and icon color
       onClick: () => console.log(`Listing ${listing?.id || 'deleted'} deleted`)
@@ -81,7 +81,7 @@ const ListingDetailPage = ({ listing, onEdit, onBack }) => {
           
           <div className="listing-meta-row">
             <div className="meta-item">
-              <span className="meta-label">Amount available</span>
+              <span className="meta-label">Cantidad disponible</span>
               <span className="meta-value">{listing.amountAvailable !== null ? listing.amountAvailable : 'Unlimited'}</span>
             </div>
           </div>
@@ -93,7 +93,7 @@ const ListingDetailPage = ({ listing, onEdit, onBack }) => {
 
         {listing.customizations && listing.customizations.length > 0 && (
           <div className="listing-customizations-section">
-            <HeaderText text="Customizations" />
+            <HeaderText text="Personalizaciones" />
             <div className="customizations-list-container">
               {listing.customizations.map((cust) => (
                 <CustomizationDetail

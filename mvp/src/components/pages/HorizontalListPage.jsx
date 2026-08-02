@@ -13,7 +13,7 @@ const formatDisplayDate = (dateString) => {
   
   if (!dateString) return null;
   const [year, month, day] = dateString.split('-');
-  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const months = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
   
   // parseInt removes any leading zeros from the day (e.g., "08" becomes "8")
   return `${months[parseInt(month, 10) - 1]} ${parseInt(day, 10)}`; 
@@ -88,7 +88,7 @@ const HorizontalListPage = ({ title, filters, data, onClick }) => {
       <SearchBar 
         value={searchQuery} 
         onChange={(e) => setSearchQuery(e.target.value)} 
-        placeholder="search"
+        placeholder="buscar"
       />
 
       <div className="badge-scroll-container">
@@ -96,11 +96,11 @@ const HorizontalListPage = ({ title, filters, data, onClick }) => {
           text={
             sortOrder === 'newest' ? (
               <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                <ArrowDown size={16} color="var(--text-main, #333)" /> Newest
+                <ArrowDown size={16} color="var(--text-main, #333)" /> Nuevas
               </span>
             ) : (
               <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                <ArrowUp size={16} color="var(--text-main, #333)" /> Oldest
+                <ArrowUp size={16} color="var(--text-main, #333)" /> Viejas
               </span>
             )
           }
@@ -127,9 +127,9 @@ const HorizontalListPage = ({ title, filters, data, onClick }) => {
             // Determine the correct date string for this specific item
             let dateString = null;
             if (item.sendByDate) {
-              dateString = `Send by ${formatDisplayDate(item.sendByDate)}`;
+              dateString = `Entregar para ${formatDisplayDate(item.sendByDate)}`;
             } else if (item.completedDate) {
-              dateString = `Completed ${formatDisplayDate(item.completedDate)}`;
+              dateString = `Completado ${formatDisplayDate(item.completedDate)}`;
             }
 
             return (

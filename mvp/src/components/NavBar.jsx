@@ -11,9 +11,9 @@ const NavBar = () => {
 
   // Dynamically build the paths using the extracted username
   const navItems = [
-    { name: 'Home', path: `/${username}/home`, icon: Home },
-    { name: 'Add', path: `/${username}/create-listing`, icon: PlusCircle }, 
-    { name: 'Profile', path: `/${username}/profile`, icon: User },
+    { name: 'Inicio', path: `/${username}/home`, icon: Home },
+    { name: 'Agregar', path: `/${username}/create-listing`, icon: PlusCircle }, 
+    { name: 'Perfil', path: `/${username}/profile`, icon: User },
   ];
 
   return (
