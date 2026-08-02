@@ -30,17 +30,16 @@ const OrderSuccessPage = () => {
       {/* Text Group */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
         <h1 style={{ fontSize: '2.25rem', fontWeight: '800', color: 'var(--text-main)', margin: 0, lineHeight: 1.2, letterSpacing: '-0.02em' }}>
-          Order Confirmed!
+          Orden Confirmada!
         </h1>
         <p style={{ fontSize: '1.15rem', color: 'var(--text-secondary)', fontWeight: '500', maxWidth: '280px', margin: '0 auto' }}>
-          The seller will let you know to your phone number soon.
+          El vendedor pronto se comunicará contigo a través de tu número de teléfono
         </p>
       </div>
 
       {/* Return Action */}
       <div style={{ marginTop: '1.5rem', width: '100%', maxWidth: '300px' }}>
-        {/* Updated onClick to use the dynamic slug instead of the hardcoded '/storefront' */}
-        <ActionButton text="Back to Storefront" onClick={() => navigate(`/${slug}`)} /> 
+        <ActionButton text="Volver a inicio" onClick={() => navigate(`/${slug}`)} /> 
       </div>
       
     </div>
