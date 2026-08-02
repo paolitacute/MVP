@@ -5,6 +5,15 @@ import HeaderText from '../components/HeaderText';
 import Input from '../components/Input';
 import ActionButton from '../components/ActionButton';
 
+const sanitizePhone = (phone) => {
+  if (!phone) return '';
+  const digits = phone.replace(/\D/g, '');
+  if (digits.length === 11 && digits.startsWith('1')) {
+    return digits.slice(1);
+  }
+  return digits;
+};
+
 const CreateSeller = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -17,7 +26,6 @@ const CreateSeller = () => {
     password: ''
   });
   
-  // Added state for handling UI feedback during auth
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   
@@ -33,6 +41,9 @@ const CreateSeller = () => {
     setError(null);
     setLoading(true);
     
+    // Sanitize phone number before sending
+    const sanitizedPhone = sanitizePhone(formData.phone);
+
     try {
       const { data, error } = await supabase.auth.signUp({
         email: formData.createEmail,
@@ -40,30 +51,25 @@ const CreateSeller = () => {
         options: {
           data: {
             full_name: formData.name,
-              phone: formData.phone, 
+            phone: sanitizedPhone, 
           }
         }
-      })
+      });
 
-      //1. Check if Supabase returned an authentication error
       if (error) {
-        setError(error.message); // Display the error to the user
+        setError(error.message);
         setLoading(false);
         console.log("There was an error", error);
-        return;  //Stop execution so they don't proceed to the next page
+        return;
       }
 
       setLoading(false);
       console.log('Account created for:', formData.name);
 
-      // 2. Extract the user ID
       const sellerId = data.user?.id;
-
-      // 3. Only pass the ID in the URL parameters
       navigate(`/create-store?id=${sellerId}`);
 
     } catch (err) {
-      // 2. This catch block will now only handle unexpected exceptions or network failures
       console.log(err);
       setError("An unexpected error occurred.");
       setLoading(false);
@@ -75,7 +81,6 @@ const CreateSeller = () => {
       <form onSubmit={handleCreateAccount} className="form-container">
         <HeaderText text="Create Seller Account" />
         
-        {/* Error messaging display */}
         {error && (
           <div className="error-message" style={{ color: 'red', marginBottom: '1rem', textAlign: 'center' }}>
             {error}
@@ -90,14 +95,13 @@ const CreateSeller = () => {
             onChange={handleChange} 
             required 
           />
-          {/* Changed value from formData.email to formData.createEmail to match state */}
           <Input 
             label="Email Address" 
             type="email" 
             id="createEmail" 
             value={formData.createEmail} 
             onChange={handleChange}
-            pattern="[a-z0-9]+@[a-z0-9]+\.[a-z]{2,}"
+            pattern="[a-z0-9]+@[a-z]+\.[a-z]{2,}"
             customErrorMessage="Please enter a valid lowercase email (e.g., name@domain.com)"
             required 
           />
@@ -108,6 +112,7 @@ const CreateSeller = () => {
             value={formData.phone} 
             onChange={handleChange} 
             pattern="[\+]?\s?\(?[0-9]{3}\)?-?\s?.?[0-9]{3}\)?-?\s?.?[0-9]{4,6}"
+            customErrorMessage="Por ejemplo, 8091234567"
             required 
           />
           <Input 
@@ -120,7 +125,6 @@ const CreateSeller = () => {
           />
         </div>
 
-        {/* Updated ActionButton to reflect loading state */}
         <ActionButton 
           text={loading ? "Creating Account..." : "Continue to Store Setup"} 
           type="submit" 

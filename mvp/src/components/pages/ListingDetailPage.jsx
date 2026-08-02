@@ -61,11 +61,12 @@ const ListingDetailPage = ({ listing, onEdit, onBack }) => {
 
   return (
     <>
-      <ActionsMenu options={menuOptions} />
+      
 
         <BackButton goTo={onBack}/>
       
       <div className="listing-detail-layout">
+        <ActionsMenu options={menuOptions} />
 
         {/* Render carousel only if we have at least one image from either source */}
         {images.length > 0 && (

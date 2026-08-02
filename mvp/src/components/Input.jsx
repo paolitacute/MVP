@@ -60,6 +60,7 @@ const Input = ({ label, type = 'text', value, onChange, id, required = false, pr
           name={id}
           value={value}
           onChange={onChange}
+          onWheel={(e) => e.target.blur()}
           className="input-field"
           required={required}
           min={min}
@@ -82,6 +83,7 @@ const Input = ({ label, type = 'text', value, onChange, id, required = false, pr
         name={id}
         value={value}
         onChange={onChange}
+        onWheel={type === 'number' ? (e) => e.target.blur() : undefined}
         className="input-field"
         required={required}
         aria-required={required}

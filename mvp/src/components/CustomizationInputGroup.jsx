@@ -5,7 +5,7 @@ import Checkbox from './Checkbox';
 import Toast from './Toast';
 import ImageUploader from './ImageUploader';
 
-const CustomizationInputGroup = ({ customization, onChange, onDelete }) => {
+const CustomizationInputGroup = ({ customization, onChange, onDelete, errors = {} }) => {
   const name = customization?.field || customization?.name || '';
   const isRequired = customization?.required !== false; 
   const options = customization?.options || [{ id: Date.now(), name: '', price: '', image: null }];
@@ -144,14 +144,22 @@ const CustomizationInputGroup = ({ customization, onChange, onDelete }) => {
                 {/* Price and Image */}
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'row', gap: '1rem' }}>
                   
-                  <Input 
-                    id={`option-price-${option.id}`} 
-                    label="Price" 
-                    prefix="$" 
-                    type="number"
-                    value={option.price}
-                    onChange={(e) => handleOptionChange(option.id, 'price', e.target.value)}
-                  />
+                  {/* Wrapped the Input in a column flexbox to allow the error message to sit beneath it */}
+                  <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+                    <Input 
+                      id={`option-price-${option.id}`} 
+                      label="Price" 
+                      prefix="$" 
+                      type="number"
+                      value={option.price}
+                      onChange={(e) => handleOptionChange(option.id, 'price', e.target.value)}
+                    />
+                    {errors[option.id] && (
+                      <span style={{ color: '#ef4444', fontSize: '0.85rem', marginTop: '0.25rem', display: 'block', textAlign: 'left' }}>
+                        {errors[option.id]}
+                      </span>
+                    )}
+                  </div>
                 
 
               {/* Image Uploader */}

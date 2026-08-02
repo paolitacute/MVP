@@ -2,16 +2,9 @@
 
 - When a seller receives an order, they should get an email of new order.
 - Create screens so the buyer can track an order (token)
-- Desactivar a Listing
-- Delete a Listing
 - Set if a customization is available
-- In CreateStore and CreateSeller, sanitize the phone number to be only numbers, no trailing one and no symbols
-- Create listing base price and amount available cannot be negative
-- Create listing amount available cannot be a decimal.
-- Phone number input needs to indicate what is the expected format
-- After the @, email addresses must only take letters (error seen in buyer form).
 - Add image input in create a store
-- When creating a listing, the number values change unintendedly, fijalos a solo input de teclado
+- Translate to Spanish
 
 
 
@@ -32,3 +25,11 @@
 - In CreateListing, customization is now on the side when it should be on the center
 - In CreateListing, customizations need to take one (1) image 
 - In CreateListing, mark customizations as not mandatory
+- Desactivar a Listing
+- Delete a Listing
+- When creating a listing, the number values change unintendedly, fijalos a solo input de teclado
+- Create listing amount available cannot be a decimal.
+- Create listing base price and amount available cannot be negative
+- In CreateStore and CreateSeller, sanitize the phone number to be only numbers, no trailing one and no symbols
+- Phone number input needs to indicate what is the expected format
+- After the @, email addresses must only take letters (error seen in buyer form).

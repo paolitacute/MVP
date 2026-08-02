@@ -34,8 +34,11 @@ const ModifyListingPage = ({
   const [amount, setAmount] = useState(initialData.amount || ''); 
   const [showToast, setShowToast] = useState(false); 
   const [isSubmitting, setIsSubmitting] = useState(false); 
+  
+  // States to track validation errors
+  const [errors, setErrors] = useState({}); 
+  const [customizationErrors, setCustomizationErrors] = useState({});
 
-  // Initialize customizations, mapping existing image_url from DB to the expected 'image' key
   const [customizations, setCustomizations] = useState(() => {
     const custs = initialData.customizations || [];
     return custs.map(cust => ({
@@ -47,7 +50,6 @@ const ModifyListingPage = ({
     }));
   });
 
-  // Create a derived array of URLs for rendering components that expect string sources
   const displayImages = images.map(img => 
     img instanceof File ? URL.createObjectURL(img) : img
   );
@@ -72,13 +74,23 @@ const ModifyListingPage = ({
     setCustomizations(customizations.map(cust => 
       cust.id === id ? { ...cust, ...updatedFields } : cust 
     ));
+    
+    // Clear validation errors when user modifies an option inside this customization
+    if (updatedFields.options && customizationErrors[id]) {
+      setCustomizationErrors(prev => ({ ...prev, [id]: null }));
+    }
   };
 
   const handleDeleteCustomization = (idToRemove) => {
     setCustomizations(customizations.filter((cust) => cust.id !== idToRemove)); 
+    // Clean up associated errors when a block is deleted
+    if (customizationErrors[idToRemove]) {
+      const updatedErrors = { ...customizationErrors };
+      delete updatedErrors[idToRemove];
+      setCustomizationErrors(updatedErrors);
+    }
   };
 
-  // Handler to append newly selected files to the existing images state array
   const handleImageUpload = (files) => {
     const newFilesArray = Array.from(files);
     setImages((prevImages) => [...prevImages, ...newFilesArray]);
@@ -86,6 +98,47 @@ const ModifyListingPage = ({
 
   const handleSubmit = async (e) => {
     e.preventDefault(); 
+    
+    // 1. Validate Base Inputs
+    const validationErrors = {};
+    if (productPrice !== '' && parseFloat(productPrice) < 0) {
+      validationErrors.price = 'The numbers must be at least 0';
+    }
+
+    if (amount !== '') {
+      const numAmount = Number(amount);
+      if (parseFloat(amount) < 0) {
+        validationErrors.amount = 'The numbers must be at least 0';
+      } else if (!Number.isInteger(numAmount)) {
+        validationErrors.amount = 'Amount available must be a whole number';
+      }
+    }
+
+    // 2. Validate Customizations
+    const custValidationErrors = {};
+    customizations.forEach(cust => {
+      const optionErrors = {};
+      cust.options.forEach(opt => {
+        if (opt.price !== '' && parseFloat(opt.price) < 0) {
+          optionErrors[opt.id] = 'The numbers must be at least 0';
+        }
+      });
+      // If any options in this block had errors, map them to the block ID
+      if (Object.keys(optionErrors).length > 0) {
+        custValidationErrors[cust.id] = optionErrors;
+      }
+    });
+
+    // 3. Halt submission if any errors are present
+    if (Object.keys(validationErrors).length > 0 || Object.keys(custValidationErrors).length > 0) {
+      setErrors(validationErrors);
+      setCustomizationErrors(custValidationErrors);
+      return;
+    }
+
+    // Proceed if all clear
+    setErrors({});
+    setCustomizationErrors({});
     setIsSubmitting(true); 
 
     const formData = {
@@ -98,7 +151,6 @@ const ModifyListingPage = ({
     };
 
     let isSuccess = true; 
-    
     if (onSave) {
       isSuccess = await onSave(formData); 
     }
@@ -243,22 +295,42 @@ const ModifyListingPage = ({
               onChange={(e) => setProductName(e.target.value)} 
             />
 
-            <Input 
-              id="product-price"  
-              label="Base Price" 
-              type='number'  
-              required={true} 
-              value={productPrice} 
-              onChange={(e) => setProductPrice(e.target.value)} 
-            />
+            <div>
+              <Input 
+                id="product-price"  
+                label="Base Price" 
+                type='number'  
+                required={true} 
+                value={productPrice} 
+                onChange={(e) => {
+                  setProductPrice(e.target.value);
+                  if (errors.price) setErrors(prev => ({ ...prev, price: null }));
+                }} 
+              />
+              {errors.price && (
+                <span style={{ color: '#ef4444', fontSize: '0.85rem', marginTop: '0.25rem', display: 'block', textAlign: 'left' }}>
+                  {errors.price}
+                </span>
+              )}
+            </div>
 
-            <Input 
-              id="amount-available"  
-              label="Amount available"  
-              type="number"  
-              value={amount} 
-              onChange={(e) => setAmount(e.target.value)} 
-            />
+            <div>
+              <Input 
+                id="amount-available"  
+                label="Amount available"  
+                type="number"  
+                value={amount} 
+                onChange={(e) => {
+                  setAmount(e.target.value);
+                  if (errors.amount) setErrors(prev => ({ ...prev, amount: null }));
+                }} 
+              />
+              {errors.amount && (
+                <span style={{ color: '#ef4444', fontSize: '0.85rem', marginTop: '0.25rem', display: 'block', textAlign: 'left' }}>
+                  {errors.amount}
+                </span>
+              )}
+            </div>
 
             <Input 
               id="description"  
@@ -277,7 +349,8 @@ const ModifyListingPage = ({
                 key={cust.id}  
                 customization={cust} 
                 onChange={(updatedFields) => handleCustomizationChange(cust.id, updatedFields)} 
-                onDelete={() => handleDeleteCustomization(cust.id)}  
+                onDelete={() => handleDeleteCustomization(cust.id)}
+                errors={customizationErrors[cust.id] || {}} 
               />
             ))}
 
