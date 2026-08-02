@@ -129,8 +129,8 @@ export const useHomeData = () => {
           text2: `$${price.toFixed(2)}`,
           text3:
             listing.stock_quantity !== null && listing.stock_quantity > 0
-              ? `${listing.stock_quantity} in stock`
-              : 'Made to order',
+              ? `${listing.stock_quantity} en stock`
+              : 'Hecho a pedido',
         };
       });
 
