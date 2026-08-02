@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../client';
 
-// Helper to check if the ID is a valid Postgres UUID[cite: 12]
+// Helper to check if the ID is a valid Postgres UUID
 const isValidUUID = (id) => {
   if (!id) return false;
   const regex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -17,6 +17,7 @@ export const useListingDataForEdit = (id) => {
         .from('product')
         .select(`
           id,
+          store_id,
           name,
           base_price,
           stock_quantity,
@@ -43,6 +44,7 @@ export const useListingDataForEdit = (id) => {
 
       if (data) {
         return {
+          storeId: data.store_id,
           name: data.name,
           price: parseFloat(data.base_price) || 0,
           description: data.description || "",
@@ -64,6 +66,9 @@ export const useListingDataForEdit = (id) => {
       return null;
     },
     enabled: !!id,
+    // Force React Query to always fetch fresh data from the database
+    refetchOnMount: 'always',
+    staleTime: 0,
   });
 };
 
@@ -73,7 +78,7 @@ export const useUpdateListing = (id) => {
 
   return useMutation({
     mutationFn: async (formData) => {
-      // 1. Format the customizations into the exact JSONB structure the RPC expects, stripping temporary frontend IDs[cite: 12]
+      // 1. Format the customizations into the exact JSONB structure the RPC expects, stripping temporary frontend IDs
       const formattedCustomizations = (formData.customizations || []).map(cat => ({
         id: isValidUUID(cat.id) ? cat.id : null, 
         field: cat.field,
@@ -81,13 +86,12 @@ export const useUpdateListing = (id) => {
         options: (cat.options || []).map(opt => ({
           id: isValidUUID(opt.id) ? opt.id : null, 
           name: opt.name,
-          price: parseFloat(opt.price) || 0,
-          image: opt.image || null
-        }))
+          price: parseFloat(opt.price) || 0
+        })) // Images are stripped out here since they are handled after the RPC
       })); 
 
-      // 2. Execute the selective upsert RPC function
-      const { error: rpcError } = await supabase.rpc('updateproductfull', {
+      // 2. Execute the selective upsert RPC function and capture its response data
+      const { data, error: rpcError } = await supabase.rpc('updateproductfull', {
         p_productid: id,
         p_name: formData.name,
         p_baseprice: parseFloat(formData.price) || 0,
@@ -98,22 +102,20 @@ export const useUpdateListing = (id) => {
 
       if (rpcError) throw rpcError;
 
-      // 3. Handle primary product images[cite: 12]
-      if (formData.image) {
-        await supabase.from('product_image').delete().eq('product_id', id); 
-        
-        if (formData.image.length > 0) {
-          const imageInserts = formData.image.map(imgUrl => ({
-            product_id: id,
-            image_url: imgUrl
-          })); 
-          
-          const { error: imageError } = await supabase.from('product_image').insert(imageInserts); 
-          if (imageError) throw imageError;
-        }
+      // 3. Normalize the RPC response to guarantee the structure expected by EditListing.jsx
+      let productid = id;
+      let categories = [];
+
+      if (data && typeof data === 'object') {
+        productid = data.productid || data.product_id || data.id || id;
+        categories = data.categories || data.category || [];
       }
       
-      return true;
+      // Return the exact structure needed for the image uploads
+      return {
+        productid,
+        categories
+      };
     },
     onSuccess: () => {
       // Invalidate the specific item and the whole list to ensure freshness

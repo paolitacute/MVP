@@ -32,9 +32,20 @@ const ModifyListingPage = ({
   const [productPrice, setProductPrice] = useState(initialData.price || ''); 
   const [description, setDescription] = useState(initialData.description || ''); 
   const [amount, setAmount] = useState(initialData.amount || ''); 
-  const [customizations, setCustomizations] = useState(initialData.customizations || []); 
   const [showToast, setShowToast] = useState(false); 
   const [isSubmitting, setIsSubmitting] = useState(false); 
+
+  // Initialize customizations, mapping existing image_url from DB to the expected 'image' key
+  const [customizations, setCustomizations] = useState(() => {
+    const custs = initialData.customizations || [];
+    return custs.map(cust => ({
+      ...cust,
+      options: cust.options?.map(opt => ({
+        ...opt,
+        image: opt.image !== undefined ? opt.image : (opt.image_url || null)
+      })) || []
+    }));
+  });
 
   // Create a derived array of URLs for rendering components that expect string sources
   const displayImages = images.map(img => 

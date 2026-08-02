@@ -23,8 +23,9 @@ const EditListing = () => {
 
   const handleUpdate = async (formData) => {
     try {
-      // Separate images from the form data so they aren't sent to the RPC
-      const { productImages, customizations, storeId, ...restData } = formData;
+      // 1. Separate images from the form data so they aren't sent to the RPC
+      // Removed storeId from this destructuring because it isn't in formData
+      const { productImages, customizations, ...restData } = formData;
       
       // Clean customizations to remove image Files before sending to DB
       const cleanCustomizations = customizations?.map(cust => ({
@@ -37,17 +38,19 @@ const EditListing = () => {
 
       const dbFormData = {
         ...restData,
-        storeId,
         customizations: cleanCustomizations
       };
 
-      // Call updateproductfull via mutation and get the IDs
+      // 2. Call updateproductfull via mutation and get the IDs
       const result = await updateListingMutation.mutateAsync(dbFormData);
       
-      // We expect the RPC to return { productid, categories: [{ categoryid, optionids }] }
+      // 3. Extract productid strictly in lowercase, alongside categories
       const { productid, categories } = result;
 
-      // Upload new product images and save their URLs
+      // 4. Retrieve storeId from the mutation result or fallback to the loaded listing data
+      const storeId = result.storeId || existingProductData.storeId || existingProductData.store_id;
+
+      // 5. Upload new product images and save their URLs
       if (productImages && productImages.length > 0) {
         for (const file of productImages) {
           if (file instanceof File) {
@@ -57,7 +60,7 @@ const EditListing = () => {
         }
       }
 
-      // Upload new customization option images and save their URLs matching by index position
+      // 6. Upload new customization option images and save their URLs matching by index position
       if (customizations && categories) {
         for (let i = 0; i < customizations.length; i++) {
           const cust = customizations[i];
@@ -77,10 +80,12 @@ const EditListing = () => {
         }
       }
       
-      navigate(`/${username}/listing/${id}`); 
+      // Return true to tell ModifyListingPage that the submission succeeded
+      return true; 
     } catch (err) {
       console.error("Error updating listing:", err); 
       alert("Failed to update listing. Please check the console for details."); 
+      return false; 
     }
   };
 
@@ -108,6 +113,7 @@ const EditListing = () => {
         successMessage="Listing updated successfully!"
         initialData={existingProductData}
         onSave={handleUpdate} 
+        onSubmitSuccess={() => navigate(`/${username}/listing/${id}`)}
       />
 
       <NavBar />

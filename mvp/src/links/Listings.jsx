@@ -43,6 +43,8 @@ const Listings = () => {
   }
 
   return (
+    <>
+    
     <div className='list-page-layout'> 
       <CardListPage
         title="Listings"
@@ -50,8 +52,9 @@ const Listings = () => {
         onItemClick={handleItemClick}
         onBack={`/${username}/home`}
       />
-      <NavBar />
     </div>
+    <NavBar />
+    </>
   );
 };
 

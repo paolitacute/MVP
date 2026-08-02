@@ -35,10 +35,12 @@ const AccountSettings = () => {
   // 3. Update loading state handling
   if (isLoading) {
     return (
-      <div className="page-container flex-center" style={{ paddingBottom: '6rem' }}>
-        <p>Loading account details...</p>
-        <NavBar />
-      </div>
+      <>
+      </>
+      // <div className="page-container flex-center" style={{ paddingBottom: '6rem' }}>
+      //   <p>Loading account details...</p>
+      //   <NavBar />
+      // </div>
     );
   }
 

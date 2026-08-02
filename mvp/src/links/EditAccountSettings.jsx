@@ -89,10 +89,12 @@ const EditAccountSettings = () => {
 
   if (loading) {
     return (
-      <div className="page-container flex-center" style={{ paddingBottom: '6rem' }}>
-        <p>Loading editable details...</p>
-        <NavBar />
-      </div>
+      <>
+      </>
+      // <div className="page-container flex-center" style={{ paddingBottom: '6rem' }}>
+      //   <p>Loading editable details...</p>
+      //   <NavBar />
+      // </div>
     );
   }
 
