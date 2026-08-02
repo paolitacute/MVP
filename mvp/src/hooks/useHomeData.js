@@ -130,7 +130,7 @@ export const useHomeData = () => {
           text3:
             listing.stock_quantity !== null && listing.stock_quantity > 0
               ? `${listing.stock_quantity} en stock`
-              : 'Hecho a pedido',
+              : 'Hecho por pedido',
         };
       });
 
