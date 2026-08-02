@@ -89,7 +89,7 @@ const CreateSeller = () => {
         
         <div className="form-inputs">
           <Input 
-            label="Nombre completo" 
+            label="Nombre y Apellido" 
             id="name" 
             value={formData.name} 
             onChange={handleChange} 
