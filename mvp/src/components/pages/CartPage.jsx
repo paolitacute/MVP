@@ -13,7 +13,8 @@ const CartPage = ({
   onEditItem,
   handleCheckout, 
   buyerInfo, 
-  setBuyerInfo 
+  setBuyerInfo,
+  isCheckingOut // 1. Added isCheckingOut to props
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -29,8 +30,9 @@ const CartPage = ({
   }, []);
 
   const onConfirmOrder = async (formData) => {
+    // 2. Await the checkout process first so the modal stays open while loading
+    await handleCheckout(formData); 
     setIsModalOpen(false); 
-    await handleCheckout(formData); // Triggers the Supabase RPC call from Cart.jsx
   };
 
   return (
@@ -48,7 +50,6 @@ const CartPage = ({
             <CartProduct 
               key={`${item.productId}-${index}`} 
               product={item} 
-              // 1. Add item.customMessage to these function calls
               onQuantityChange={(_, newQuantity) => updateQuantity(item.productId, item.selectedOptionIds, item.customMessage, newQuantity)}
               onEdit={() => onEditItem(item)}
               onDelete={() => removeFromCart(item.productId, item.selectedOptionIds, item.customMessage)}
@@ -83,7 +84,7 @@ const CartPage = ({
       <div style={{ paddingBottom: '1rem' }}>
         <ActionButton 
           text="Realizar pedido" 
-          onClick={() => setIsModalOpen(true)} 
+          onClick={() => (cartItems.length) > 0 ? setIsModalOpen(true) : alert("Tu carrito no puede estar vacío al realizar un pedido.")} 
         />
       </div>
 
@@ -98,7 +99,8 @@ const CartPage = ({
             buyerInfo={buyerInfo}
             setBuyerInfo={setBuyerInfo}
             onSubmit={onConfirmOrder} 
-            onCancel={() => setIsModalOpen(false)} 
+            onCancel={() => !isCheckingOut && setIsModalOpen(false)} // Prevent closing by accident while loading
+            isCheckingOut={isCheckingOut} // 3. Pass this down so your modal can disable its confirm button
           />
         </div>
       )}

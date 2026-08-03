@@ -60,10 +60,10 @@ const OrderDetailPage = ({
   // Configure ActionsMenu options with the Trash icon and red color
   const menuOptions = [
     {
-      label: 'Eliminar pedido',
+      label: 'Cancelar pedido',
       icon: <Trash2 size={16} />,
       color: '#ef4444', // Red text and icon color
-      onClick: () => console.log(`Order ${orderId} deleted`)
+      onClick: () => console.log(`Orden ${orderId} deleted`)
     }
   ];
 

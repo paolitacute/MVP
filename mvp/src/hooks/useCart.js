@@ -1,18 +1,19 @@
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState, useEffect } from 'react';
+import { supabase } from '../client'; // Ensure this path is correct
 
 export function useCart() {
-  // 1. Initialize state from localStorage
   const [cartItems, setCartItems] = useState(() => {
     const savedCart = localStorage.getItem('storefront_cart');
     return savedCart ? JSON.parse(savedCart) : [];
   });
 
-  // 2. Sync to localStorage whenever cartItems changes
+  const queryClient = useQueryClient();
+
   useEffect(() => {
     localStorage.setItem('storefront_cart', JSON.stringify(cartItems));
   }, [cartItems]);
 
-  // 3. Add to cart (handles duplicates with the exact same customizations)
   const addToCart = (newItem) => {
     setCartItems((prevCart) => {
       const existingItemIndex = prevCart.findIndex(
@@ -23,18 +24,14 @@ export function useCart() {
       );
 
       if (existingItemIndex >= 0) {
-        // Increment quantity if the exact same product and options are already in the cart
         const updatedCart = [...prevCart];
         updatedCart[existingItemIndex].quantity += newItem.quantity;
         return updatedCart;
       }
-
-      // Otherwise, add it as a new line item
       return [...prevCart, newItem];
     });
   };
 
-  // 4. Remove an item
   const removeFromCart = (productId, selectedOptionIds, customMessage) => {
     setCartItems(prev => prev.filter(i => 
       !(i.productId === productId && 
@@ -43,7 +40,6 @@ export function useCart() {
     ));
   };
 
-  // 5. Update quantity
   const updateQuantity = (productId, selectedOptionIds, customMessage, newQuantity) => {
     setCartItems(prev => prev.map(i => {
       if (
@@ -55,14 +51,49 @@ export function useCart() {
       }
       return i;
     }));
-  };
+  }
 
-  // 6. Clear the cart (call this after a successful checkout)
   const clearCart = () => {
     setCartItems([]);
   };
 
-  // Calculate total items for a cart badge
+  // TanStack Mutation for Checkout
+  const checkoutMutation = useMutation({
+    mutationFn: async (formData) => {
+      const deliveryDateTimestamp = new Date(`${formData.neededBy}T12:00:00`).toISOString();
+
+      const { data, error } = await supabase.rpc('checkout', {
+        p_cart: {
+          buyer: {
+            name: formData.name,
+            phone: formData.whatsapp,
+            email: formData.email,
+            address: formData.address,
+          },
+          deliverydate: deliveryDateTimestamp, 
+          items: cartItems.map((ci) => ({
+            productid: ci.productId,
+            quantity: ci.quantity,
+            optionids: ci.selectedOptionIds,
+            custommessage: ci.customMessage,
+          })),
+        },
+      });
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ 
+        queryKey: ['homeData'],
+        refetchType: 'all' 
+      });
+      
+      // Clear the cart on successful checkout
+      clearCart();
+    },
+  });
+
   const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
   return {
@@ -72,5 +103,7 @@ export function useCart() {
     updateQuantity,
     clearCart,
     totalItems,
+    checkout: checkoutMutation.mutateAsync,
+    isCheckingOut: checkoutMutation.isPending,
   };
 }

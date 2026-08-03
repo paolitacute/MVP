@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Trash2, Pencil, PowerOff } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { disableProduct, enableProduct, deleteProduct } from '../../utils/productActions';
+import { useProductActions } from '../../hooks/useProductActions';
 import HeaderText from '../HeaderText';
 import ImageCarousel from '../ImageCarousel';
 import CustomizationDetail from '../CustomizationDetail';
@@ -10,7 +10,10 @@ import ActionsMenu from '../ActionsMenu';
 
 const ListingDetailPage = ({ listing, onEdit, onBack }) => {
   const [isUpdating, setIsUpdating] = useState(false);
+  
   const navigate = useNavigate();
+
+  const { disableProduct, enableProduct, deleteProduct, isPending } = useProductActions();
 
   useEffect(() => {
     window.scrollTo(0, 0);

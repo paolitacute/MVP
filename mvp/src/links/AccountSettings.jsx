@@ -115,7 +115,7 @@ const AccountSettings = () => {
                       src={store.logo} 
                       alt={`Logo de ${store.name}`} 
                       containerClass="" 
-                      imgClass="square-image" 
+                      imgClass="circle-image logo" 
                     />
                   </div>
                 </div>

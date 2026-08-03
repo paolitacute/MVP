@@ -41,6 +41,8 @@ export const useCreateListing = () => {
       // 5. Execute the RPC function and capture its response data
       const { data, error } = await supabase.rpc('createproductfull', rpcPayload);
 
+      queryClient.invalidateQueries({ queryKey: ['homeData'] });
+
       if (error) throw error;
       
       // 6. Normalize the RPC response to guarantee the structure

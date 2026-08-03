@@ -7,8 +7,6 @@ const OrderSuccessPage = () => {
   const navigate = useNavigate();
   const { slug } = useParams(); // Extract the store slug from the URL
 
-  console.log(slug);
-
   return (
     <div className="page-container flex-center" style={{ flexDirection: 'column', textAlign: 'center', gap: '2rem', height: '100vh' }}>
       
