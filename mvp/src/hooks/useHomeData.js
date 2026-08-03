@@ -91,6 +91,7 @@ export const useHomeData = () => {
           )
         `)
         .eq('store_id', storeId)
+        .is('deleted_at', null)
         .order('created_at', { ascending: false });
 
       if (productsError) throw productsError;

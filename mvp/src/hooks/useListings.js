@@ -30,6 +30,7 @@ export const useListings = () => {
           )
         `)
         .eq('store_id', storeData.id)
+        .is('deleted_at', null)
         .order('created_at', { ascending: false });
 
       if (productsError) throw productsError;

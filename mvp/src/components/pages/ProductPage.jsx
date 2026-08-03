@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 import HeaderText from '../HeaderText';
 import Input from '../Input';
 import ActionButton from '../ActionButton';
@@ -310,31 +311,13 @@ const ProductPage = ({ product, onAddToCart, onBack, initialCartData }) => {
           {/* Flecha Izquierda (Visible principalmente en desktop) */}
           {images.length > 1 && (
             <button
+              className="carousel-control carousel-prev"
               onClick={(e) => {
                 e.stopPropagation(); 
                 setActiveImageIndex((prev) => (prev - 1 + images.length) % images.length);
               }}
-              style={{
-                position: 'absolute',
-                left: '2rem',
-                background: 'rgba(255, 255, 255, 0.15)',
-                border: 'none',
-                color: 'white',
-                fontSize: '2rem',
-                cursor: 'pointer',
-                width: '50px',
-                height: '50px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                borderRadius: '50%',
-                zIndex: 10000,
-                transition: 'background 0.2s ease'
-              }}
-              onMouseEnter={(e) => e.target.style.background = 'rgba(255, 255, 255, 0.3)'}
-              onMouseLeave={(e) => e.target.style.background = 'rgba(255, 255, 255, 0.15)'}
             >
-              &#10094;
+              <ArrowLeft size={24} color="var(--text-main, #333)" />
             </button>
           )}
 
@@ -355,31 +338,13 @@ const ProductPage = ({ product, onAddToCart, onBack, initialCartData }) => {
           {/* Flecha Derecha (Visible principalmente en desktop) */}
           {images.length > 1 && (
             <button
+              className="carousel-control carousel-next"
               onClick={(e) => {
-                e.stopPropagation();
-                setActiveImageIndex((prev) => (prev + 1) % images.length);
+                e.stopPropagation(); 
+                setActiveImageIndex((prev) => (prev - 1 + images.length) % images.length);
               }}
-              style={{
-                position: 'absolute',
-                right: '2rem',
-                background: 'rgba(255, 255, 255, 0.15)',
-                border: 'none',
-                color: 'white',
-                fontSize: '2rem',
-                cursor: 'pointer',
-                width: '50px',
-                height: '50px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                borderRadius: '50%',
-                zIndex: 10000,
-                transition: 'background 0.2s ease'
-              }}
-              onMouseEnter={(e) => e.target.style.background = 'rgba(255, 255, 255, 0.3)'}
-              onMouseLeave={(e) => e.target.style.background = 'rgba(255, 255, 255, 0.15)'}
             >
-              &#10095;
+              <ArrowRight size={24} color="var(--text-main, #333)" />
             </button>
           )}
         </div>

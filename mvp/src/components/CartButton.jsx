@@ -7,13 +7,7 @@ const CartButton = ({ floating = true }) => {
   const { slug } = useParams();
 
   return (
-    <nav 
-      className="cart-container"
-      style={{
-        position: floating ? 'fixed' : 'static',
-        zIndex: floating ? 1000 : 'auto',
-      }}
-    >
+    <nav className={`cart-container ${floating ? 'cart-floating' : ''}`.trim()}>
       <button 
         className="cart-btn" 
         onClick={() => navigate(`/${slug}/cart`)} 
