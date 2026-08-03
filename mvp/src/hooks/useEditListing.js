@@ -96,7 +96,7 @@ export const useUpdateListing = (id) => {
         p_name: formData.name,
         p_baseprice: parseFloat(formData.price) || 0,
         p_description: formData.description || null,
-        p_stockquantity: parseInt(formData.amount, 10) || 0,
+        p_stockquantity: null, // parseInt(formData.amount, 10) || 0,
         p_customizations: formattedCustomizations
       }); 
 

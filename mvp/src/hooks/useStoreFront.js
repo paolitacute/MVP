@@ -32,6 +32,8 @@ export const useStoreFront = (slug) => {
           )
         `)
         .eq('store_id', store.id)
+        .eq('enabled', true)
+        .is('deleted_at', null)
         .order('created_at', { ascending: false });
 
       if (productsError) throw productsError;

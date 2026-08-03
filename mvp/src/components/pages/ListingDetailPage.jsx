@@ -1,5 +1,7 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Trash2, Pencil, PowerOff } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { disableProduct, enableProduct, deleteProduct } from '../../utils/productActions';
 import HeaderText from '../HeaderText';
 import ImageCarousel from '../ImageCarousel';
 import CustomizationDetail from '../CustomizationDetail';
@@ -7,32 +9,91 @@ import BackButton from '../BackButton';
 import ActionsMenu from '../ActionsMenu';
 
 const ListingDetailPage = ({ listing, onEdit, onBack }) => {
+  const [isUpdating, setIsUpdating] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
-  // Set up the menu options for the listing including Deactivate listing
+  if (!listing) return <div className="listing-detail-layout">Loading...</div>;
+
+  const handlePause = async () => {
+    setIsUpdating(true);
+    try {
+      await disableProduct(listing.id);
+      alert('Producto pausado exitosamente.');
+      // If you have a refresh function passed as a prop, call it here.
+    } catch (error) {
+      console.error("Error pausing product:", error);
+      alert('Hubo un error al pausar el producto.');
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const handleReactivate = async () => {
+    setIsUpdating(true);
+    try {
+      await enableProduct(listing.id);
+      alert('Producto reactivado exitosamente.');
+      // If you have a refresh function passed as a prop, call it here.
+    } catch (error) {
+      console.error("Error reactivating product:", error);
+      alert('Hubo un error al reactivar el producto.');
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    const confirmDelete = window.confirm("¿Estás seguro de que quieres eliminar este producto? Esta acción no se puede deshacer.");
+    if (confirmDelete) {
+      setIsUpdating(true);
+      try {
+        await deleteProduct(listing.id);
+        alert('Producto eliminado exitosamente.');
+        navigate(-1);
+      } catch (error) {
+        console.error("Error deleting product:", error);
+        alert('Hubo un error al eliminar el producto.');
+      } finally {
+        setIsUpdating(false);
+      }
+    }
+  };
+
+  // Dynamically set up the menu options
   const menuOptions = [
     {
       label: 'Editar publicación',
       icon: <Pencil size={16} />,
       onClick: onEdit
-    },
-    {
-      label: 'Desactivar publicación',
-      icon: <PowerOff size={16} />,
-      onClick: () => console.log(`Listing ${listing?.id || ''} deactivated`)
-    },
-    {
-      label: 'Borrar publicación',
-      icon: <Trash2 size={16} />,
-      color: '#ef4444', // Red text and icon color
-      onClick: () => console.log(`Listing ${listing?.id || 'deleted'} deleted`)
     }
   ];
 
-  if (!listing) return <div className="listing-detail-layout">Loading...</div>;
+  // Check the active state to determine which toggle to show
+  if (listing.enabled !== false) {
+    menuOptions.push({
+      label: isUpdating ? 'Procesando...' : 'Desactivar publicación',
+      icon: <PowerOff size={16} />,
+      onClick: handlePause
+    });
+  } else {
+    menuOptions.push({
+      label: isUpdating ? 'Procesando...' : 'Reactivar publicación',
+      icon: <PowerOff size={16} />,
+      onClick: handleReactivate
+    });
+  }
+
+  // Delete is always an option unless we filter deleted items out earlier in the list
+  menuOptions.push({
+    label: isUpdating ? 'Procesando...' : 'Borrar publicación',
+    icon: <Trash2 size={16} />,
+    color: '#ef4444',
+    onClick: handleDelete
+  });
 
   // 1. Extract base product images
   let baseImages = [];
@@ -61,14 +122,11 @@ const ListingDetailPage = ({ listing, onEdit, onBack }) => {
 
   return (
     <>
-      
-
-        <BackButton goTo={onBack}/>
+      <BackButton goTo={onBack}/>
       
       <div className="listing-detail-layout">
         <ActionsMenu options={menuOptions} />
 
-        {/* Render carousel only if we have at least one image from either source */}
         {images.length > 0 && (
           <div className="listing-carousel-section">
             <ImageCarousel images={images} />
@@ -79,13 +137,6 @@ const ListingDetailPage = ({ listing, onEdit, onBack }) => {
           <h1 className="hero-product-title">{listing.name}</h1>
           <span className="hero-product-price">${listing.price.toFixed(2)}</span>
           
-          <div className="listing-meta-row">
-            <div className="meta-item">
-              <span className="meta-label">Cantidad disponible</span>
-              <span className="meta-value">{listing.amountAvailable !== null ? listing.amountAvailable : 'Unlimited'}</span>
-            </div>
-          </div>
-
           <div className="listing-description">
             <p>{listing.description}</p>
           </div>

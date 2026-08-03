@@ -6,8 +6,8 @@
 - Especificar la moneda al comprador y al vendedor 
 - Pantalla de carga entre crear una tienda y el home
 - MODO OSCURO
-- Botones para navegar entre comprador y vendedor
-- Marcar un producto como hecho por pedido
+
+
 
 
 
@@ -46,3 +46,4 @@
 - Add image input in create a store
 - Cart product edit button is unfuctional
 - If a product has a message, even if you add another product, treat it like a different one
+- Botones para navegar entre comprador y vendedor

@@ -45,7 +45,7 @@ const CardListPage = ({
               imageSrc={item.image}
               text1={item.name}
               text2={`$${item.price.toFixed(2)}`}
-              text3={item.amountAvailable !== null ? `${item.amountAvailable} in stock` : 'Made to order'}
+              // text3={item.amountAvailable !== null ? `${item.amountAvailable} in stock` : 'Hecho por pedido'}
               onClick={() => onItemClick(item.id)}
             />
           ))}

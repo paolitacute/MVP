@@ -311,7 +311,7 @@ const ModifyListingPage = ({
             </div>
 
             <div>
-              <Input 
+              {/* <Input 
                 id="amount-available"  
                 label="Cantidad disponible"  
                 type="number"  
@@ -334,7 +334,7 @@ const ModifyListingPage = ({
                     setErrors(prev => ({ ...prev, amount: null }));
                   }
                 }} 
-              />
+              /> */}
               {errors.amount && (
                 <span style={{ color: '#ef4444', fontSize: '0.85rem', marginTop: '0.25rem', display: 'block', textAlign: 'left' }}>
                   {errors.amount}

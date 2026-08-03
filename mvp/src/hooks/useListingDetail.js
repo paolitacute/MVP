@@ -14,6 +14,7 @@ export const useListingDetail = (id) => {
           name,
           base_price,
           stock_quantity,
+          enabled,
           description,
           product_image (
             image_url
@@ -41,6 +42,7 @@ export const useListingDetail = (id) => {
         price: parseFloat(data.base_price) || 0,
         amountAvailable: data.stock_quantity,
         description: data.description || '',
+        enabled: data.enabled,
         image: data.product_image?.map(img => img.image_url) || [],
         customizations: data.customization_category?.map(cat => ({
           id: cat.id,

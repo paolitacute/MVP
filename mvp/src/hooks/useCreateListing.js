@@ -34,7 +34,7 @@ export const useCreateListing = () => {
         p_name: formData.name,
         p_baseprice: formData.price,
         p_description: formData.description || null,
-        p_stockquantity: formData.amount || 0,
+        p_stockquantity: null, // formData.amount || 0,
         p_customizations: cleanCustomizations,
       };
 

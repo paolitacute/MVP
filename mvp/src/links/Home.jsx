@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, Link } from 'react-router-dom'; // 1. Imported Link
 import SectionWithCards from '../components/SectionWithCards';
 import NavBar from '../components/NavBar';
 import { useHomeData } from '../hooks/useHomeData';
@@ -19,11 +19,6 @@ const Home = () => {
     return (
       <>
       </>
-      // <div className="home-layout">
-      //   <nav className="topbar">
-      //     <p>Loading your store...</p>
-      //   </nav>
-      // </div>
     );
   }
 
@@ -53,10 +48,20 @@ const Home = () => {
     onClick: () => navigate(`/${username}/listing/${listing.id}`)
   }));
 
+  // Get store slug from hook data (fallback to username if storeSlug isn't explicitly defined)
+  const storeSlug = data?.storeSlug || data?.store?.slug || username;
+
   return (
     <div className="home-layout">
       <nav className="topbar">
         <p>¡Hola, {data?.sellerName || 'Vendedor'}!</p>
+        <Link 
+          to={`/${storeSlug}`} 
+          target="_blank" 
+          rel="noopener noreferrer"
+        >
+          Ir a mi tienda
+        </Link>
       </nav>
 
       <main className="home-content">

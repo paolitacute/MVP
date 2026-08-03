@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { Trash2, Pencil, PowerOff } from 'lucide-react';
 import EditButton from '../components/EditButton';
 import BackButton from '../components/BackButton';
 import HeaderText from '../components/HeaderText';
@@ -7,6 +8,7 @@ import CategoryDetail from '../components/CategoryDetail';
 import NavBar from '../components/NavBar';
 import ActionButton from '../components/ActionButton'; 
 import Image from '../components/Image'; 
+import ActionsMenu from '../components/ActionsMenu'; 
 import { useAccountSettings, useLogout } from '../hooks/useAccountSettings'; 
 
 const AccountSettings = () => {
@@ -19,6 +21,25 @@ const AccountSettings = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  const menuOptions = [
+      {
+        label: 'Editar publicación',
+        icon: <Pencil size={16} />,
+        onClick: () => navigate(`/${username}/profile/edit`)
+      },
+      {
+        label: 'Desactivar publicación',
+        icon: <PowerOff size={16} />,
+        onClick: () => console.log(`Listing ${listing?.id || ''} deactivated`)
+      },
+      {
+        label: 'Borrar publicación',
+        icon: <Trash2 size={16} />,
+        color: '#ef4444', // Red text and icon color
+        onClick: () => console.log(`Listing ${listing?.id || 'deleted'} deleted`)
+      }
+    ];
 
   const handleLogout = async () => {
     try {
@@ -58,7 +79,7 @@ const AccountSettings = () => {
             <HeaderText text="Configuración de la cuenta" />
           </div>
           
-          <EditButton onClick={() => navigate(`/${username}/profile/edit`)} />
+          <ActionsMenu options={menuOptions} />
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>

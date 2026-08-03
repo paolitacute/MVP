@@ -25,7 +25,6 @@ export const useListings = () => {
           id,
           name,
           base_price,
-          stock_quantity,
           product_image (
             image_url
           )
