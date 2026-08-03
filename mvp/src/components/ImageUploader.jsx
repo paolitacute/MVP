@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { Plus, Pencil, Trash2 } from 'lucide-react'; 
 
-const ImageUploader = ({ onImageSelected, image, onDelete }) => {
+const ImageUploader = ({ onImageSelected, image, onDelete, label = "Imagen del Producto" }) => {
   const fileInputRef = useRef(null);
   const [previewUrl, setPreviewUrl] = useState(null);
 
@@ -131,7 +131,7 @@ const ImageUploader = ({ onImageSelected, image, onDelete }) => {
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
           <Plus color="var(--text-secondary, #6b7280)" size={32} />
           <span className="image-uploader-text" style={{ color: 'var(--text-secondary, #6b7280)', fontSize: '0.9rem' }}>
-            Imagen del Producto
+            {label} 
           </span>
         </div>
       )}

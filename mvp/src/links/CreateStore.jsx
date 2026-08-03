@@ -6,6 +6,8 @@ import Input from '../components/Input';
 import Checkbox from '../components/Checkbox';
 import ActionButton from '../components/ActionButton';
 import Badge from '../components/Badge';
+import ImageUploader from '../components/ImageUploader';
+import { uploadStoreLogo, saveStoreLogo } from '../utils/productImages'; 
 
 const sanitizePhone = (phone) => {
   if (!phone) return '';
@@ -37,8 +39,12 @@ const CreateStore = () => {
     delivery: false, 
   });
   
+  const [logoFile, setLogoFile] = useState(null); 
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+  
+  // State to track slug availability status
+  const [slugStatus, setSlugStatus] = useState(null); // 'checking', 'available', 'taken', or null
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -59,6 +65,44 @@ const CreateStore = () => {
     fetchSellerData();
   }, []);
 
+  // Effect to verify slug availability with debounce
+  useEffect(() => {
+    const checkSlugAvailability = async () => {
+      if (!formData.slug) {
+        setSlugStatus(null);
+        return;
+      }
+
+      setSlugStatus('checking');
+
+      try {
+        // NOTE: Change 'store' to your exact table name if it differs (e.g., 'stores')
+        const { data, error } = await supabase
+          .from('store') 
+          .select('slug')
+          .eq('slug', formData.slug)
+          .maybeSingle();
+
+        if (error) {
+          console.error("Error checking slug:", error);
+          setSlugStatus(null);
+        } else if (data) {
+          setSlugStatus('taken');
+        } else {
+          setSlugStatus('available');
+        }
+      } catch (err) {
+        console.error(err);
+        setSlugStatus(null);
+      }
+    };
+
+    // Wait 500ms after the user stops typing before making the query
+    const timeoutId = setTimeout(checkSlugAvailability, 500);
+
+    return () => clearTimeout(timeoutId);
+  }, [formData.slug]);
+
   const handleLogout = async () => {
     await supabase.auth.signOut();
     navigate('/login');
@@ -66,10 +110,16 @@ const CreateStore = () => {
 
   const handleCreateStore = async (e) => {
     e.preventDefault();
+    
+    // Prevent submission if slug is taken
+    if (slugStatus === 'taken') {
+      setError("El usuario de tu tienda ya está en uso. Por favor, elige otro.");
+      return;
+    }
+
     setError(null);
     setLoading(true);
 
-    // Sanitize business phone number before sending
     const sanitizedPhone = sanitizePhone(formData.phone);
 
     try {
@@ -91,12 +141,15 @@ const CreateStore = () => {
         return;  
       }
 
+      if (logoFile instanceof File) {
+        const { publicUrl } = await uploadStoreLogo(logoFile, storeId);
+        await saveStoreLogo(storeId, publicUrl);
+      }
+
       setLoading(false);
       console.log('Store created:', formData.storeName);
       
-      setTimeout(() => {
-        navigate(`/${username}/home`); 
-      }, 1000);
+      window.location.href = `/${username}/home`; 
 
     } catch (err) {
       console.log(err);
@@ -148,14 +201,38 @@ const CreateStore = () => {
         <HeaderText text="Crear una tienda" />
         
         {error && (
-          <div className="error-message" style={{ color: 'red', marginBottom: '1rem', textAlign: 'center' }}>
+          <div className="error-message" style={{ color: '#ef4444', marginBottom: '1rem', textAlign: 'center' }}>
             {error}
           </div>
         )}
 
         <div className="form-inputs">
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}>
+            <div style={{ width: '150px', height: '150px' }}>
+              <ImageUploader 
+                image={logoFile} 
+                onImageSelected={(files) => setLogoFile(files[0])} 
+                onDelete={() => setLogoFile(null)} 
+                label="Logo de la Tienda" 
+              />
+            </div>
+          </div>
+
           <Input label="Nombre de la tienda" id="storeName" value={formData.storeName} onChange={handleChange} required />
-          <Input label="Slug" id="slug" value={formData.slug} onChange={handleChange} prefix="mvpname/" required />
+          
+          <div>
+            <Input label="Usuario de tu tienda" id="slug" value={formData.slug} onChange={handleChange} prefix="waku/" required />
+            {slugStatus === 'taken' && (
+              <span style={{ color: '#ef4444', fontSize: '0.85rem', marginTop: '0.25rem', display: 'block', textAlign: 'left' }}>
+                Este usuario de tienda ya está en uso.
+              </span>
+            )}
+            {slugStatus === 'available' && formData.slug.length > 0 && (
+              <span style={{ color: '#22c55e', fontSize: '0.85rem', marginTop: '0.25rem', display: 'block', textAlign: 'left' }}>
+                Usuario de tienda disponible.
+              </span>
+            )}
+          </div>
           
           <Checkbox id="sameAsSeller" label="Igual que el vendedor" checked={formData.sameAsSeller} onChange={handleChange} />
           
@@ -186,7 +263,11 @@ const CreateStore = () => {
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', width: '100%' }}>
-          <ActionButton text={loading ? "Creando tienda..." : "Crear tienda"} type="submit" disabled={loading} />
+          <ActionButton 
+            text={loading ? "Creando tienda..." : "Crear tienda"} 
+            type="submit" 
+            disabled={loading || slugStatus === 'taken'} 
+          />
           
           <button 
             type="button" 

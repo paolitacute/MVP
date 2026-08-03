@@ -22,7 +22,7 @@ export const useAccountSettings = () => {
       // 3. Fetch store information[cite: 14]
       const { data: storeData, error: storeError } = await supabase
         .from('store')
-        .select('name, slug, phone, email, instagram, address, description, delivery')
+        .select('name, slug, phone, email, instagram, address, description, delivery, logo')
         .eq('seller_id', user.id)
         .single();
 

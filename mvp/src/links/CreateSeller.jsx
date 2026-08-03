@@ -67,7 +67,7 @@ const CreateSeller = () => {
       console.log('Account created for:', formData.name);
 
       const sellerId = data.user?.id;
-      navigate(`/create-store?id=${sellerId}`);
+      window.location.href = `/create-store?id=${sellerId}`;
 
     } catch (err) {
       console.log(err);

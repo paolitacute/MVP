@@ -10,6 +10,7 @@ const CartPage = ({
   cartItems, 
   removeFromCart, 
   updateQuantity, 
+  onEditItem,
   handleCheckout, 
   buyerInfo, 
   setBuyerInfo 
@@ -47,9 +48,10 @@ const CartPage = ({
             <CartProduct 
               key={`${item.productId}-${index}`} 
               product={item} 
-              onQuantityChange={(_, newQuantity) => updateQuantity(item.productId, item.selectedOptionIds, newQuantity)}
-              onEdit={() => console.log('Navigate to edit item')}
-              onDelete={() => removeFromCart(item.productId, item.selectedOptionIds)}
+              // 1. Add item.customMessage to these function calls
+              onQuantityChange={(_, newQuantity) => updateQuantity(item.productId, item.selectedOptionIds, item.customMessage, newQuantity)}
+              onEdit={() => onEditItem(item)}
+              onDelete={() => removeFromCart(item.productId, item.selectedOptionIds, item.customMessage)}
             />
           ))
         ) : (
@@ -64,7 +66,7 @@ const CartPage = ({
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '2rem', padding: '1.5rem 0 0.5rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold', color: 'var(--text-main)', fontSize: '1.125rem' }}>
             <span>Subtotal</span>
-            <span>${subtotal.toFixed(2)}</span>
+            <span>RD${subtotal.toFixed(2)}</span>
           </div>
           <div style={{ height: '1px', backgroundColor: 'var(--border-light)', margin: '0.5rem 0' }}></div>
           <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--text-secondary)' }}>

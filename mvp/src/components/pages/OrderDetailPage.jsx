@@ -31,12 +31,12 @@ const calculateProductPrice = (product) => {
 
 // Helper to calculate the grand total for the array of products
 const calculateOrderPrice = (products) => {
-  if (!products || !Array.isArray(products)) return '$0.00';
+  if (!products || !Array.isArray(products)) return 'RD$0.00';
   const total = products.reduce((sum, product) => {
     return sum + calculateProductPrice(product);
   }, 0) || 0;
   
-  return `$${total.toFixed(2)}`;
+  return `RD$${total.toFixed(2)}`;
 };
 
 const OrderDetailPage = ({ 
@@ -148,7 +148,7 @@ const OrderDetailPage = ({
                 imageSrc={product.image}
                 title={product.name}
                 subtitle={formatCustomizations(product.customizations)}
-                status={`$${calculateProductPrice(product).toFixed(2)}`}
+                status={`RD$${calculateProductPrice(product).toFixed(2)}`}
               />
             </div>
         ))}

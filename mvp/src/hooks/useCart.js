@@ -16,9 +16,10 @@ export function useCart() {
   const addToCart = (newItem) => {
     setCartItems((prevCart) => {
       const existingItemIndex = prevCart.findIndex(
-        (item) =>
-          item.productId === newItem.productId &&
-          JSON.stringify(item.selectedOptionIds) === JSON.stringify(newItem.selectedOptionIds)
+        (i) => 
+          i.productId === newItem.productId && 
+          JSON.stringify(i.selectedOptionIds) === JSON.stringify(newItem.selectedOptionIds) &&
+          (i.customMessage || '') === (newItem.customMessage || '') 
       );
 
       if (existingItemIndex >= 0) {
@@ -34,28 +35,26 @@ export function useCart() {
   };
 
   // 4. Remove an item
-  const removeFromCart = (productId, selectedOptionIds) => {
-    setCartItems((prevCart) =>
-      prevCart.filter(
-        (item) =>
-          !(item.productId === productId &&
-            JSON.stringify(item.selectedOptionIds) === JSON.stringify(selectedOptionIds))
-      )
-    );
+  const removeFromCart = (productId, selectedOptionIds, customMessage) => {
+    setCartItems(prev => prev.filter(i => 
+      !(i.productId === productId && 
+        JSON.stringify(i.selectedOptionIds) === JSON.stringify(selectedOptionIds) &&
+        (i.customMessage || '') === (customMessage || ''))
+    ));
   };
 
   // 5. Update quantity
-  const updateQuantity = (productId, selectedOptionIds, newQuantity) => {
-    if (newQuantity < 1) return;
-
-    setCartItems((prevCart) =>
-      prevCart.map((item) =>
-        item.productId === productId &&
-        JSON.stringify(item.selectedOptionIds) === JSON.stringify(selectedOptionIds)
-          ? { ...item, quantity: newQuantity }
-          : item
-      )
-    );
+  const updateQuantity = (productId, selectedOptionIds, customMessage, newQuantity) => {
+    setCartItems(prev => prev.map(i => {
+      if (
+        i.productId === productId && 
+        JSON.stringify(i.selectedOptionIds) === JSON.stringify(selectedOptionIds) &&
+        (i.customMessage || '') === (customMessage || '')
+      ) {
+        return { ...i, quantity: newQuantity };
+      }
+      return i;
+    }));
   };
 
   // 6. Clear the cart (call this after a successful checkout)

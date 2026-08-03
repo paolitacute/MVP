@@ -25,10 +25,12 @@ const StoreFrontPage = ({ storeData, listings, slug }) => {
 
   return (
     <>
+    <nav className="topbar">
+        <p style={{fontSize: '0.8rem'}}>¿Eres un vendedor? <a href="/login">Inicia sesión aquí</a></p>
+    </nav>
     <CartButton />
     <div className="storefront-container">
       
-      {/* Use the dynamically fetched store data */}
       <StoreWelcomeBanner 
         storeName={storeData?.name || 'Store'} 
         storeLogo={storeData?.logo} 
@@ -48,7 +50,7 @@ const StoreFrontPage = ({ storeData, listings, slug }) => {
               key={item.id}
               imageSrc={item.image}
               text1={item.name}
-              text2={`$${item.price.toFixed(2)}`}
+              text2={`RD$${item.price.toFixed(2)}`}
               onClick={() => handleProductClick(item.id)}
             />
           ))}

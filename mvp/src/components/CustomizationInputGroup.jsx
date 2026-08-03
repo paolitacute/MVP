@@ -196,6 +196,7 @@ label={`Opción ${index + 1}`}
                   image={option.image}
                   onImageSelected={(files) => handleOptionChange(option.id, 'image', files[0])}
                   onDelete={() => handleOptionChange(option.id, 'image', null)}
+                  label = "Imagen de la Opción"
                 />
               </div>
               </div>

@@ -9,13 +9,10 @@ import DetailsLine from '../DetailsLine';
 import BackButton from '../BackButton';
 
 const formatDisplayDate = (dateString) => {
-  
-  
   if (!dateString) return null;
   const [year, month, day] = dateString.split('-');
   const months = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
   
-  // parseInt removes any leading zeros from the day (e.g., "08" becomes "8")
   return `${months[parseInt(month, 10) - 1]} ${parseInt(day, 10)}`; 
 };
 
@@ -26,7 +23,6 @@ const formatTitle = (products) => {
       .join(', ');
 };
 
-// Helper to calculate a single product's total price including customizations
 const calculateProductPrice = (product) => {
   if (!product || !product.price) return 0;
   const basePrice = parseFloat(product.price.replace('$', '')) || 0;
@@ -37,27 +33,28 @@ const calculateProductPrice = (product) => {
   return basePrice + customizationsPrice;
 };
 
-// Helper to calculate the grand total for an entire order
 const calculateOrderPrice = (order) => {
-  if (!order || !order.products) return '$0.00';
+  if (!order || !order.products) return 'RD$0.00';
   const total = order.products?.reduce((sum, product) => {
     return sum + calculateProductPrice(product);
   }, 0) || 0;
   
-  return `$${total.toFixed(2)}`;
+  return `RD$${total.toFixed(2)}`;
 };
 
 const HorizontalListPage = ({ title, filters, data, onClick }) => {
   const [searchQuery, setSearchQuery] = useState('');
+  
+  // Set initial active filter based on the object structure
   const [activeFilter, setActiveFilter] = useState(filters[0]);
   const [sortOrder, setSortOrder] = useState('newest');
 
   const filteredData = data.filter((item) => {
-    const matchesFilter = activeFilter === 'Todo' || item.status === activeFilter;
+    // Check if the current filter is "all" or if the item's status matches the filter ID
+    const matchesFilter = activeFilter.id === 'all' || item.status === activeFilter.id;
 
     const searchLower = searchQuery.toLowerCase();
     
-    // Updated to use the calculated order price for searchability
     const calculatedPrice = calculateOrderPrice(item);
     const searchableText = `${item.title} ${item.buyer?.name || ''} ${calculatedPrice}`.toLowerCase();
     const matchesSearch = !searchQuery || searchableText.includes(searchLower);
@@ -109,12 +106,13 @@ const HorizontalListPage = ({ title, filters, data, onClick }) => {
           onClick={() => setSortOrder(prev => prev === 'newest' ? 'oldest' : 'newest')} 
         />
 
+        {/* Map through the filter objects to display the label */}
         {filters.map((filter) => (
           <Badge 
-            key={filter} 
-            text={filter} 
+            key={filter.id} 
+            text={filter.label} 
             type="filter"
-            active={activeFilter === filter} 
+            active={activeFilter.id === filter.id} 
             onClick={() => setActiveFilter(filter)} 
           />
         ))}
@@ -124,13 +122,15 @@ const HorizontalListPage = ({ title, filters, data, onClick }) => {
         <div className="card-list-container">
           {filteredData.map((item) => {
             
-            // Determine the correct date string for this specific item
             let dateString = null;
             if (item.sendByDate) {
               dateString = `Entregar para ${formatDisplayDate(item.sendByDate)}`;
             } else if (item.completedDate) {
-              dateString = `Completado ${formatDisplayDate(item.completedDate)}`;
+              dateString = `Completado el ${formatDisplayDate(item.completedDate)}`;
             }
+
+            // Fallback to item.status if for some reason the ID is missing from the filter array
+            const statusLabel = filters.find(f => f.id === item.status)?.label || item.status;
 
             return (
               <HorizontalCardLeft 
@@ -138,7 +138,7 @@ const HorizontalListPage = ({ title, filters, data, onClick }) => {
                 imageSrc={item.products?.[0]?.image || ''} 
                 imageNotifCount={item.itemCount}
                 title={formatTitle(item.products)}
-                status={item.status}
+                status={statusLabel}
                 subtitle={
                   <DetailsLine 
                     items={[ item.buyer.name, dateString, calculateOrderPrice(item) ]} 

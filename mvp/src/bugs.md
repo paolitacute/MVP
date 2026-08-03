@@ -3,8 +3,11 @@
 - When a seller receives an order, they should get an email of new order.
 - Create screens so the buyer can track an order (token)
 - Set if a customization is available
-- Add image input in create a store
-- Translate to Spanish
+- Especificar la moneda al comprador y al vendedor 
+- Pantalla de carga entre crear una tienda y el home
+- MODO OSCURO
+- Botones para navegar entre comprador y vendedor
+- Marcar un producto como hecho por pedido
 
 
 
@@ -33,3 +36,13 @@
 - In CreateStore and CreateSeller, sanitize the phone number to be only numbers, no trailing one and no symbols
 - Phone number input needs to indicate what is the expected format
 - After the @, email addresses must only take letters (error seen in buyer form).
+- Translate to Spanish
+- Actualizar filtro de estados para que tomen el id de la base de datos 
+- Click on the image of a product as a buyer to maximize it
+- Frontend needs to check that needed by is at least today
+- Bloquear botones de submit una vez se clickea 
+- Customization message is not showing in product order detail
+- Tell the user that 2 slugs cannot be the same
+- Add image input in create a store
+- Cart product edit button is unfuctional
+- If a product has a message, even if you add another product, treat it like a different one

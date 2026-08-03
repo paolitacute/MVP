@@ -108,7 +108,7 @@ export const useHomeData = () => {
           imageSrc: itemImage,
           text1: firstItem?.product_name || 'Order Details',
           text2: order.buyer_name,
-          text3: `$${totalAmount.toFixed(2)}`,
+          text3: `RD$${totalAmount.toFixed(2)}`,
         };
       });
 
@@ -126,7 +126,7 @@ export const useHomeData = () => {
           id: listing.id,
           imageSrc: mainImage,
           text1: listing.name,
-          text2: `$${price.toFixed(2)}`,
+          text2: `RD$${price.toFixed(2)}`,
           text3:
             listing.stock_quantity !== null && listing.stock_quantity > 0
               ? `${listing.stock_quantity} en stock`

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Pencil, Trash2 } from 'lucide-react';
 import HeaderText from '../HeaderText';
@@ -34,6 +34,7 @@ const ModifyListingPage = ({
   const [amount, setAmount] = useState(initialData.amount || ''); 
   const [showToast, setShowToast] = useState(false); 
   const [isSubmitting, setIsSubmitting] = useState(false); 
+  const isSubmittingRef = useRef(false);
   
   // States to track validation errors
   const [errors, setErrors] = useState({}); 
@@ -75,9 +76,24 @@ const ModifyListingPage = ({
       cust.id === id ? { ...cust, ...updatedFields } : cust 
     ));
     
-    // Clear validation errors when user modifies an option inside this customization
-    if (updatedFields.options && customizationErrors[id]) {
-      setCustomizationErrors(prev => ({ ...prev, [id]: null }));
+    // Validate customization options dynamically
+    if (updatedFields.options) {
+      const optionErrors = {};
+      updatedFields.options.forEach(opt => {
+        if (opt.price !== '' && parseFloat(opt.price) < 0) {
+          optionErrors[opt.id] = 'Los números deben ser de al menos 0';
+        }
+      });
+
+      setCustomizationErrors(prev => {
+        const newErrors = { ...prev };
+        if (Object.keys(optionErrors).length > 0) {
+          newErrors[id] = optionErrors;
+        } else {
+          delete newErrors[id];
+        }
+        return newErrors;
+      });
     }
   };
 
@@ -99,46 +115,15 @@ const ModifyListingPage = ({
   const handleSubmit = async (e) => {
     e.preventDefault(); 
     
-    // 1. Validate Base Inputs
-    const validationErrors = {};
-    if (productPrice !== '' && parseFloat(productPrice) < 0) {
-      validationErrors.price = 'Los números deben ser de al menos 0';
-    }
-
-    if (amount !== '') {
-      const numAmount = Number(amount);
-      if (parseFloat(amount) < 0) {
-        validationErrors.amount = 'Los números deben ser de al menos 0';
-      } else if (!Number.isInteger(numAmount)) {
-        validationErrors.amount = 'La cantidad disponible debe ser un número entero';
-      }
-    }
-
-    // 2. Validate Customizations
-    const custValidationErrors = {};
-    customizations.forEach(cust => {
-      const optionErrors = {};
-      cust.options.forEach(opt => {
-        if (opt.price !== '' && parseFloat(opt.price) < 0) {
-          optionErrors[opt.id] = 'Los números deben ser de al menos 0';
-        }
-      });
-      // If any options in this block had errors, map them to the block ID
-      if (Object.keys(optionErrors).length > 0) {
-        custValidationErrors[cust.id] = optionErrors;
-      }
-    });
-
-    // 3. Halt submission if any errors are present
-    if (Object.keys(validationErrors).length > 0 || Object.keys(custValidationErrors).length > 0) {
-      setErrors(validationErrors);
-      setCustomizationErrors(custValidationErrors);
+    if (isSubmittingRef.current) {
       return;
     }
+    
+    if (Object.values(errors).some(err => err !== null) || Object.keys(customizationErrors).length > 0) {
+      return; 
+    }
 
-    // Proceed if all clear
-    setErrors({});
-    setCustomizationErrors({});
+    isSubmittingRef.current = true;
     setIsSubmitting(true); 
 
     const formData = {
@@ -155,9 +140,8 @@ const ModifyListingPage = ({
       isSuccess = await onSave(formData); 
     }
 
-    setIsSubmitting(false); 
-
     if (isSuccess) {
+      // SUCCESS: Leave isSubmitting as true so the button stays disabled!
       setShowToast(true); 
       setTimeout(() => {
         setShowToast(false); 
@@ -169,6 +153,11 @@ const ModifyListingPage = ({
           }
         }, 300); 
       }, 2000); 
+    } else {
+      // FAIL: Only unlock the button if there was an error saving, 
+      // so the user can fix it and try again.
+      isSubmittingRef.current = false;
+      setIsSubmitting(false); 
     }
   };
 
@@ -230,7 +219,7 @@ const ModifyListingPage = ({
                     alignItems: 'center' 
                   }}>
                     <div style={{ height: '80px', width: '100%' }}>
-                      <ImageUploader onImageSelected={handleImageUpload} />
+                      <ImageUploader onImageSelected={handleImageUpload} label = ""/>
                     </div>
                     
                     <div style={{ 
@@ -303,8 +292,15 @@ const ModifyListingPage = ({
                 required={true} 
                 value={productPrice} 
                 onChange={(e) => {
-                  setProductPrice(e.target.value);
-                  if (errors.price) setErrors(prev => ({ ...prev, price: null }));
+                  const val = e.target.value;
+                  setProductPrice(val);
+                  
+                  // Real-time validation for price
+                  if (val !== '' && parseFloat(val) < 0) {
+                    setErrors(prev => ({ ...prev, price: 'Los números deben ser de al menos 0' }));
+                  } else {
+                    setErrors(prev => ({ ...prev, price: null }));
+                  }
                 }} 
               />
               {errors.price && (
@@ -321,8 +317,22 @@ const ModifyListingPage = ({
                 type="number"  
                 value={amount} 
                 onChange={(e) => {
-                  setAmount(e.target.value);
-                  if (errors.amount) setErrors(prev => ({ ...prev, amount: null }));
+                  const val = e.target.value;
+                  setAmount(val);
+                  
+                  // Real-time validation for amount
+                  if (val !== '') {
+                    const numAmount = Number(val);
+                    if (parseFloat(val) < 0) {
+                      setErrors(prev => ({ ...prev, amount: 'Los números deben ser de al menos 0' }));
+                    } else if (!Number.isInteger(numAmount)) {
+                      setErrors(prev => ({ ...prev, amount: 'La cantidad disponible debe ser un número entero' }));
+                    } else {
+                      setErrors(prev => ({ ...prev, amount: null }));
+                    }
+                  } else {
+                    setErrors(prev => ({ ...prev, amount: null }));
+                  }
                 }} 
               />
               {errors.amount && (
@@ -367,7 +377,11 @@ const ModifyListingPage = ({
           </div>
 
           <div className="footer-action">
-            <ActionButton text={isSubmitting ? 'Guardando...' : buttonText} type="submit" disabled={isSubmitting} />
+            <ActionButton 
+              text={isSubmitting ? 'Guardando...' : buttonText} 
+              type="submit" 
+              disabled={isSubmitting || Object.values(errors).some(err => err !== null) || Object.keys(customizationErrors).length > 0} 
+            />
           </div>
        </form>
 

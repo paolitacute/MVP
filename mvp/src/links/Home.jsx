@@ -56,7 +56,7 @@ const Home = () => {
   return (
     <div className="home-layout">
       <nav className="topbar">
-        <p>Hola {data?.sellerName || 'Vendedor'}!</p>
+        <p>¡Hola, {data?.sellerName || 'Vendedor'}!</p>
       </nav>
 
       <main className="home-content">

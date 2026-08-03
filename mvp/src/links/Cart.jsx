@@ -1,25 +1,28 @@
 import React, { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom'; // Imported hooks for routing
+import { useParams, useNavigate } from 'react-router-dom'; 
 import CartPage from '../components/pages/CartPage';
 import { useCart } from '../hooks/useCart';
 import { supabase } from '../client'; 
 
 const Cart = () => {
-  // Extract the slug from the URL and set up navigation
   const { slug } = useParams(); 
   const navigate = useNavigate();
 
-  // 1. Bring in the cart state and functions from the custom hook
   const { cartItems, clearCart, removeFromCart, updateQuantity } = useCart();
 
-  // 2. Create state for the buyer information
   const [buyerName, setBuyerName] = useState('');
   const [buyerPhone, setBuyerPhone] = useState('');
   const [buyerEmail, setBuyerEmail] = useState('');
   const [buyerAddress, setBuyerAddress] = useState('');
   const [neededBy, setNeededBy] = useState('');
 
-  // 3. Define the checkout function using your Supabase RPC logic
+  // 1. Add this function to handle routing to edit mode
+  const handleEditItem = (item) => {
+    navigate(`/${slug}/product/${item.productId}`, { 
+      state: { editMode: true, cartItem: item } 
+    });
+  };
+
   const handleCheckout = async (formData) => {
     if (cartItems.length === 0) {
       alert("¡Tu carrito está vacío!");
@@ -62,6 +65,7 @@ const Cart = () => {
       cartItems={cartItems}
       removeFromCart={removeFromCart}
       updateQuantity={updateQuantity}
+      onEditItem={handleEditItem} // 2. Pass it as a prop
       handleCheckout={handleCheckout}
       buyerInfo={{ buyerName, buyerPhone, buyerEmail, buyerAddress }}
       setBuyerInfo={{ setBuyerName, setBuyerPhone, setBuyerEmail, setBuyerAddress }}

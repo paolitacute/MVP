@@ -9,7 +9,7 @@ const CardListPage = ({
   data, 
   onItemClick, 
   onBack = -1,
-  emptyMessage = "Nothing to see here yet." // Add the prop with a default fallback
+  emptyMessage = "Nada que ver aquí aún." // Add the prop with a default fallback
 }) => {
 
   useEffect(() => {

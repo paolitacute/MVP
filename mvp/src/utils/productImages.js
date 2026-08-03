@@ -48,3 +48,18 @@ export const deleteProductImage = async (imageId, filePath) => {
   await supabase.storage.from('product-images').remove([filePath]);
   await supabase.from('product_image').delete().eq('id', imageId);
 };
+
+// Add these to your existing imageUploads.js file
+
+// Foto del logo de la tienda
+export const uploadStoreLogo = (file, storeId) =>
+  uploadImage(file, `${storeId}/logo`, { maxWidth: 600, quality: 0.8 });
+
+// Actualizar la fila de la tienda con el URL del logo
+export const saveStoreLogo = async (storeId, publicUrl) => {
+  const { error } = await supabase
+    .from('store') 
+    .update({ logo: publicUrl }) 
+    .eq('id', storeId);
+  if (error) throw error;
+};

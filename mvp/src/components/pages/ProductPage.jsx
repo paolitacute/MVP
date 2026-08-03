@@ -6,10 +6,37 @@ import BackButton from '../BackButton';
 import CartButton from '../CartButton';
 import ImageCarousel from '../ImageCarousel';
 
-const ProductPage = ({ product, onAddToCart, onBack }) => {
-  const [customizations, setCustomizations] = useState({});
-  const [customMessage, setCustomMessage] = useState('');
+// 1. Accept the new initialCartData prop
+const ProductPage = ({ product, onAddToCart, onBack, initialCartData }) => {
+  
+  // 2. Initialize customizations based on existing cart data if available
+  const [customizations, setCustomizations] = useState(() => {
+    if (!initialCartData || !initialCartData.selectedOptionIds) return {};
+    
+    const initial = {};
+    if (product.customizations) {
+      product.customizations.forEach((cust) => {
+        // Map back from selectedOptionIds to the specific field
+        const selectedOption = cust.options.find(opt => 
+          initialCartData.selectedOptionIds.map(String).includes(String(opt.id))
+        );
+        if (selectedOption) {
+          initial[cust.field] = selectedOption.id;
+        }
+      });
+    }
+    return initial;
+  });
+
+  // 3. Initialize custom message from cart data
+  const [customMessage, setCustomMessage] = useState(initialCartData?.customMessage || '');
+  
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [errors, setErrors] = useState({});
+  const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+  const [touchStart, setTouchStart] = useState(null);
+  const [touchEnd, setTouchEnd] = useState(null);
+  const minSwipeDistance = 50;
 
   let baseImages = [];
   if (Array.isArray(product.image)) {
@@ -35,6 +62,11 @@ const ProductPage = ({ product, onAddToCart, onBack }) => {
 
   const handleCustomizationChange = (field, value) => {
     setCustomizations(prev => ({ ...prev, [field]: value }));
+    
+    // 2. Limpiar el error si el usuario selecciona una opción válida
+    if (errors[field]) {
+      setErrors(prev => ({ ...prev, [field]: null }));
+    }
 
     if (value === '') {
       setActiveImageIndex(0);
@@ -57,6 +89,29 @@ const ProductPage = ({ product, onAddToCart, onBack }) => {
   };
 
   const handleAddToCart = () => {
+    // 3. Validar personalizaciones requeridas antes de agregar al carrito
+    let hasErrors = false;
+    const newErrors = {};
+
+    if (product.customizations) {
+      product.customizations.forEach((cust) => {
+        // Si es requerido y el usuario no ha seleccionado nada (está indefinido o vacío)
+        if (cust.required && !customizations[cust.field]) {
+          newErrors[cust.field] = 'Esta personalización es obligatoria.';
+          hasErrors = true;
+        }
+      });
+    }
+
+    // Si hay errores, actualizamos el estado y detenemos la ejecución
+    if (hasErrors) {
+      setErrors(newErrors);
+      return;
+    }
+
+    // Si todo está bien, limpiamos los errores y enviamos
+    setErrors({});
+    
     onAddToCart({
       product,
       customizations,
@@ -91,7 +146,47 @@ const ProductPage = ({ product, onAddToCart, onBack }) => {
     window.scrollTo(0, 0);
   }, []);
 
+  // Handle mouse wheel scrolling for desktop
+  const handleModalWheel = (e) => {
+    if (images.length > 1) {
+      if (e.deltaY > 0) {
+        setActiveImageIndex((prev) => (prev + 1) % images.length);
+      } else {
+        setActiveImageIndex((prev) => (prev - 1 + images.length) % images.length);
+      }
+    }
+  };
+
+  // Touch handlers for mobile swipe
+  const onTouchStart = (e) => {
+    setTouchEnd(null); // Reset touch end
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+    
+    if (isLeftSwipe && images.length > 1) {
+      // Swipe left -> Next image
+      setActiveImageIndex((prev) => (prev + 1) % images.length);
+    } else if (isRightSwipe && images.length > 1) {
+      // Swipe right -> Previous image
+      setActiveImageIndex((prev) => (prev - 1 + images.length) % images.length);
+    }
+  };
+
   return (
+    <>
+    <CartButton floating={false}/>
+
     <div className="product-page-layout">
       <BackButton goTo={onBack} />
       
@@ -99,7 +194,11 @@ const ProductPage = ({ product, onAddToCart, onBack }) => {
           
           {images.length > 0 ? (
             <div className="product-page-image-container">
-              <div className="hero-image-container" style={{ height: '35vh', borderRadius: '1rem' }}>
+              <div 
+                className="hero-image-container" 
+                style={{ height: '35vh', borderRadius: '1rem', cursor: 'zoom-in' }}
+                onClick={() => setIsImageModalOpen(true)}
+              >
                 <ImageCarousel 
                   images={images} 
                   activeIndex={activeImageIndex}
@@ -119,7 +218,7 @@ const ProductPage = ({ product, onAddToCart, onBack }) => {
         <div className="product-details-container">
           <div className="product-header-group">
             <HeaderText text={product.name} />
-            <span className="product-price-text">${totalPrice.toFixed(2)}</span>
+            <span className="product-price-text">RD${totalPrice.toFixed(2)}</span>
             <span className="product-delivery-text">
               {product.delivery ? 'Delivery disponible' : 'Solo para recoger'}
             </span>
@@ -135,32 +234,36 @@ const ProductPage = ({ product, onAddToCart, onBack }) => {
           <div className="form-inputs" style={{ marginTop: '0.5rem' }}>
             {product.customizations?.map((customization) => {
               
-              // 1. Map out the standard options first
               const mappedOptions = customization.options.map(opt => {
-                const priceAddition = parseFloat(opt.price) > 0 ? ` (+$${opt.price})` : '';
+                const priceAddition = parseFloat(opt.price) > 0 ? ` (+RD$${opt.price})` : '';
                 return {
                   label: `${opt.name}${priceAddition}`,
                   value: opt.id
                 };
               });
 
-              // 2. Conditionally prepend the "None" option if the field is not required
               const formattedOptions = customization.required 
                 ? mappedOptions 
                 : [{ label: 'Ninguno', value: '' }, ...mappedOptions];
 
+              // 4. Se envuelve el input en un div para mostrar el mensaje de error debajo si corresponde
               return (
-                <Input
-                  key={customization.id}
-                  type="dropdown"
-                  id={`customization-${customization.id}`}
-                  label={customization.field}
-                  // 3. Dynamically set the required prop on the Input component
-                  required={customization.required || false} 
-                  options={formattedOptions}
-                  value={customizations[customization.field] || ''}
-                  onChange={(e) => handleCustomizationChange(customization.field, e.target.value)}
-                />
+                <div key={customization.id}>
+                  <Input
+                    type="dropdown"
+                    id={`customization-${customization.id}`}
+                    label={customization.field}
+                    required={customization.required || false} 
+                    options={formattedOptions}
+                    value={customizations[customization.field] || ''}
+                    onChange={(e) => handleCustomizationChange(customization.field, e.target.value)}
+                  />
+                  {errors[customization.field] && (
+                    <span style={{ color: '#ef4444', fontSize: '0.85rem', marginTop: '0.25rem', display: 'block', textAlign: 'left' }}>
+                      {errors[customization.field]}
+                    </span>
+                  )}
+                </div>
               );
             })}
 
@@ -176,12 +279,114 @@ const ProductPage = ({ product, onAddToCart, onBack }) => {
           </div>
 
           <div style={{ marginTop: '1rem' }}>
-            <ActionButton text="Añadir al carrito" onClick={handleAddToCart} />
+            {/* 4. Update the button text to reflect the action */}
+            <ActionButton 
+              text={initialCartData ? "Actualizar carrito" : "Añadir al carrito"} 
+              onClick={handleAddToCart} 
+            />
           </div>
         </div>
       </div>
+
+      {/* Modal de pantalla completa interactivo */}
+      {isImageModalOpen && images.length > 0 && (
+        <div 
+          style={{
+            position: 'fixed',
+            top: 0, left: 0, right: 0, bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.9)', 
+            zIndex: 9999, 
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'zoom-out'
+          }}
+          onClick={() => setIsImageModalOpen(false)} 
+          onWheel={handleModalWheel}
+          onTouchStart={onTouchStart}
+          onTouchMove={onTouchMove}
+          onTouchEnd={onTouchEnd}
+        >
+          {/* Flecha Izquierda (Visible principalmente en desktop) */}
+          {images.length > 1 && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation(); 
+                setActiveImageIndex((prev) => (prev - 1 + images.length) % images.length);
+              }}
+              style={{
+                position: 'absolute',
+                left: '2rem',
+                background: 'rgba(255, 255, 255, 0.15)',
+                border: 'none',
+                color: 'white',
+                fontSize: '2rem',
+                cursor: 'pointer',
+                width: '50px',
+                height: '50px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: '50%',
+                zIndex: 10000,
+                transition: 'background 0.2s ease'
+              }}
+              onMouseEnter={(e) => e.target.style.background = 'rgba(255, 255, 255, 0.3)'}
+              onMouseLeave={(e) => e.target.style.background = 'rgba(255, 255, 255, 0.15)'}
+            >
+              &#10094;
+            </button>
+          )}
+
+          <img 
+            src={images[activeImageIndex]} 
+            alt={product.name} 
+            onClick={(e) => e.stopPropagation()} 
+            style={{
+              maxWidth: '85vw', 
+              maxHeight: '90vh', 
+              objectFit: 'contain',
+              borderRadius: '8px',
+              boxShadow: '0 4px 25px rgba(0,0,0,0.5)',
+              cursor: 'default'
+            }} 
+          />
+
+          {/* Flecha Derecha (Visible principalmente en desktop) */}
+          {images.length > 1 && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setActiveImageIndex((prev) => (prev + 1) % images.length);
+              }}
+              style={{
+                position: 'absolute',
+                right: '2rem',
+                background: 'rgba(255, 255, 255, 0.15)',
+                border: 'none',
+                color: 'white',
+                fontSize: '2rem',
+                cursor: 'pointer',
+                width: '50px',
+                height: '50px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: '50%',
+                zIndex: 10000,
+                transition: 'background 0.2s ease'
+              }}
+              onMouseEnter={(e) => e.target.style.background = 'rgba(255, 255, 255, 0.3)'}
+              onMouseLeave={(e) => e.target.style.background = 'rgba(255, 255, 255, 0.15)'}
+            >
+              &#10095;
+            </button>
+          )}
+        </div>
+      )}
       
     </div>
+    </>
   );
 };
 

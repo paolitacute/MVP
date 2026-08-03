@@ -267,10 +267,12 @@ body {
   top: 0;
   width: 700px;
   max-width: 100%;
+  min-height: 50px;
   background-color: var(--primary-purple);
   border-top: 1px solid var(--border-light);
   display: flex;
   justify-content: space-between;
+  align-items: center;
   padding: 0.75rem 0;
   box-shadow: 0 -2px 10px rgba(0,0,0,0.03);
   z-index: 1000;
@@ -279,14 +281,20 @@ body {
   padding: 0.5rem 1.5rem;
 }
 
+.topbar a{
+  color: var(--surface-color);
+  text-decoration: none;      
+  border-bottom: 1px solid var(--surface-color);
+
+}
+
 .cart-container {
-  position: fixed;
   top: 0;
   width: 700px;
   max-width: 100%;
   display: flex;
   justify-content: flex-end;
-  padding: 2rem 2rem 0rem;
+  padding: 1rem 2rem;
   z-index: 1000;
   color: var(--surface-color);
   font-size: 1.225rem;
@@ -507,7 +515,6 @@ body {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  text-align: left;
 }
 
 .card-text-secondary {
@@ -516,13 +523,13 @@ body {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  text-align: left;
 }
 
 .card-text-tertiary {
   font-size: 0.725rem;
   font-weight: 600;
   color: var(--primary-purple);
+  text-align: center;
 }
 
 @media (min-width: 900px) {
