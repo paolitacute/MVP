@@ -188,7 +188,7 @@ ${productDetails}
 
 Subtotal: ${subtotalString}
 Costo de Delivery: ${formattedDelivery}
-Total a pagar: ${formattedTotal}
+*Total a pagar: ${formattedTotal}*
 
 Confirma para enviarte método de pago.`;
 

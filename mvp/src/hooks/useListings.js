@@ -25,6 +25,7 @@ export const useListings = () => {
           id,
           name,
           base_price,
+          enabled,
           product_image (
             image_url
           )
@@ -41,6 +42,7 @@ export const useListings = () => {
         name: listing.name,
         price: parseFloat(listing.base_price) || 0,
         amountAvailable: listing.stock_quantity,
+        enabled: listing.enabled,
         image: listing.product_image?.[0]?.image_url || null, 
       }));
     }

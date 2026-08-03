@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query'; // 1. Imported useQueryClient
 import { supabase } from '../client'; 
 import BackButton from '../components/BackButton';
 import HeaderText from '../components/HeaderText';
@@ -8,17 +9,19 @@ import ActionButton from '../components/ActionButton';
 import NavBar from '../components/NavBar';
 import Toast from '../components/Toast';
 import Badge from '../components/Badge';
+import ImageUploader from '../components/ImageUploader'; 
+import { uploadStoreLogo } from '../utils/productImages';
 
 const EditAccountSettings = () => {
   const navigate = useNavigate();
   const { username } = useParams();
+  const queryClient = useQueryClient(); // 2. Initialized queryClient
 
   const [sellerForm, setSellerForm] = useState({});
   const [storeForm, setStoreForm] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   
-  // State variables for the toast notification
   const [showToast, setShowToast] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -31,11 +34,9 @@ const EditAccountSettings = () => {
     try {
       setLoading(true);
       
-      // 1. Get authenticated user
       const { data: { user }, error: authError } = await supabase.auth.getUser();
       if (authError || !user) throw authError || new Error('No user authenticated');
 
-      // 2. Fetch seller information
       const { data: sellerData, error: sellerError } = await supabase
         .from('seller')
         .select('name, email, phone')
@@ -44,10 +45,9 @@ const EditAccountSettings = () => {
 
       if (sellerError) throw sellerError;
 
-      // 3. Fetch store information (Including delivery field)
       const { data: storeData, error: storeError } = await supabase
         .from('store')
-        .select('name, slug, phone, email, instagram, address, description, delivery')
+        .select('id, name, slug, phone, email, instagram, address, description, delivery, logo')
         .eq('seller_id', user.id)
         .single();
 
@@ -55,7 +55,6 @@ const EditAccountSettings = () => {
         throw storeError;
       }
 
-      // Populate forms with fetched data
       if (sellerData) setSellerForm(sellerData);
       if (storeData) setStoreForm(storeData);
 
@@ -70,15 +69,13 @@ const EditAccountSettings = () => {
   const handleSave = async (e) => {
     e.preventDefault();
     
-    if (isSaving) return; // Prevent double-clicking
+    if (isSaving) return; 
     setIsSaving(true);
 
     try {
-      // 1. Get authenticated user
       const { data: { user }, error: authError } = await supabase.auth.getUser();
       if (authError || !user) throw authError || new Error('No user authenticated');
 
-      // 2. Update seller table
       const { error: sellerUpdateError } = await supabase
         .from('seller')
         .update({
@@ -90,7 +87,12 @@ const EditAccountSettings = () => {
 
       if (sellerUpdateError) throw sellerUpdateError;
 
-      // 3. Update store table including delivery field
+      let logoUrl = storeForm.logo;
+      if (storeForm.logo instanceof File) {
+        const { publicUrl } = await uploadStoreLogo(storeForm.logo, storeForm.id);
+        logoUrl = publicUrl;
+      }
+
       const { error: storeUpdateError } = await supabase
         .from('store')
         .update({
@@ -102,22 +104,23 @@ const EditAccountSettings = () => {
           address: storeForm.address,
           delivery: storeForm.delivery,
           description: storeForm.description,
+          logo: logoUrl, 
         })
         .eq('seller_id', user.id);
 
       if (storeUpdateError) throw storeUpdateError;
 
-      // 4. Trigger the toast animation
+      // 3. Invalidate TanStack queries to refetch the data globally across the app
+      queryClient.invalidateQueries({ queryKey: ['accountSettings'] });
+      queryClient.invalidateQueries({ queryKey: ['store', storeForm.id] }); // Optional based on your other fetch hooks
+
       setShowToast(true);
 
-      // 5. Wait 2 seconds, hide toast, and navigate back
       setTimeout(() => {
         setShowToast(false);
-        
         setTimeout(() => {
           navigate(`/${username}/profile`);
         }, 300);
-        
       }, 2000);
 
     } catch (err) {
@@ -129,12 +132,7 @@ const EditAccountSettings = () => {
 
   if (loading) {
     return (
-      <>
-      </>
-      // <div className="page-container flex-center" style={{ paddingBottom: '6rem' }}>
-      //   <p>Cargando detalles editables...</p>
-      //   <NavBar />
-      // </div>
+      <></>
     );
   }
 
@@ -151,7 +149,6 @@ const EditAccountSettings = () => {
     <>
       <div className="page-container" style={{ paddingBottom: '6rem', position: 'relative' }}>
         
-        {/* Header Area */}
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: '2rem', gap: '1rem' }}>
           <BackButton />
           <HeaderText text="Editar configuración" />
@@ -159,7 +156,6 @@ const EditAccountSettings = () => {
 
         <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
           
-          {/* Section 1: Seller Information */}
           <div className="form-container" style={{ gap: '1rem', padding: '1.5rem', width: '100%', maxWidth: '100%' }}>
             <h3 className="section-subtitle" style={{ color: 'var(--text-main)', marginBottom: '0.5rem' }}>
               Información del vendedor
@@ -192,11 +188,20 @@ const EditAccountSettings = () => {
             />
           </div>
 
-          {/* Section 2: Store Information */}
           <div className="form-container" style={{ gap: '1rem', padding: '1.5rem', width: '100%', maxWidth: '100%', marginBottom: '1rem' }}>
-            <h3 className="section-subtitle" style={{ color: 'var(--text-main)', marginBottom: '0.5rem' }}>
+            <h3 className="section-subtitle" style={{ color: 'var(--text-main)', marginBottom: '1rem' }}>
               Información de la tienda
             </h3>
+
+            <div style={{ width: '120px', height: '120px', margin: '0 auto 1rem auto' }}>
+              <ImageUploader 
+                image={storeForm.logo} 
+                onImageSelected={(files) => setStoreForm({ ...storeForm, logo: files[0] })} 
+                onDelete={() => setStoreForm({ ...storeForm, logo: null })}
+                label="Logo de tienda"
+              />
+            </div>
+
             <Input 
               label="Nombre de la tienda" 
               value={storeForm.name || ''} 
@@ -260,7 +265,6 @@ const EditAccountSettings = () => {
             />
           </div>
 
-          {/* Action Footer */}
           <div style={{ paddingBottom: '2rem' }}>
               <ActionButton 
                 text={isSaving ? "Guardando..." : "Guardar cambios"} 

@@ -49,8 +49,6 @@ export const deleteProductImage = async (imageId, filePath) => {
   await supabase.from('product_image').delete().eq('id', imageId);
 };
 
-// Add these to your existing imageUploads.js file
-
 // Foto del logo de la tienda
 export const uploadStoreLogo = (file, storeId) =>
   uploadImage(file, `${storeId}/logo`, { maxWidth: 600, quality: 0.8 });

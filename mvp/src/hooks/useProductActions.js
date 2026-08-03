@@ -8,6 +8,7 @@ export const useProductActions = () => {
   const invalidateProducts = () => {
     queryClient.invalidateQueries({ queryKey: ['listings'] });
     queryClient.invalidateQueries({ queryKey: ['homeData'] });
+    queryClient.invalidateQueries({ queryKey: ['listing'] });
   };
 
   const disableMutation = useMutation({

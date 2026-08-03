@@ -87,6 +87,7 @@ const ImageUploader = ({ onImageSelected, image, onDelete, label = "Imagen del P
           {/* Delete Button */}
           {onDelete && (
             <button
+              type="button"
               onClick={handleDeleteClick}
               style={{
                 position: 'absolute',

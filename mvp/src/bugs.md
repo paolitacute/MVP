@@ -6,6 +6,9 @@
 - Especificar la moneda al comprador y al vendedor 
 - Pantalla de carga entre crear una tienda y el home
 - MODO OSCURO
+- Los productos de una tienda que ofrece delivery dicen Solo para recoger
+- Detalles de la orden en celular estan centrados en vez de a la izquierda
+
 
 
 
@@ -47,3 +50,5 @@
 - Cart product edit button is unfuctional
 - If a product has a message, even if you add another product, treat it like a different one
 - Botones para navegar entre comprador y vendedor
+- Cuando un vendedor desactiva publicacion, tener un letrero que diga desactivado
+- When editing a picture in a listing the form submit automatically when it should not

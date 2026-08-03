@@ -14,13 +14,14 @@ const CartPage = ({
   handleCheckout, 
   buyerInfo, 
   setBuyerInfo,
-  isCheckingOut // 1. Added isCheckingOut to props
+  isCheckingOut 
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  // 1. Add state for the empty cart modal
+  const [showEmptyCartModal, setShowEmptyCartModal] = useState(false);
 
-  // Calculate the subtotal by summing base prices and customization modifier prices, multiplied by quantity
   const subtotal = cartItems.reduce((total, item) => {
-    const itemPrice = item.price || 0; // Ensures fallback if price is missing
+    const itemPrice = item.price || 0; 
     const customizationsTotal = item.customizations?.reduce((sum, cust) => sum + (cust.modifierPrice || 0), 0) || 0;
     return total + ((itemPrice + customizationsTotal) * item.quantity);
   }, 0);
@@ -30,7 +31,6 @@ const CartPage = ({
   }, []);
 
   const onConfirmOrder = async (formData) => {
-    // 2. Await the checkout process first so the modal stays open while loading
     await handleCheckout(formData); 
     setIsModalOpen(false); 
   };
@@ -62,7 +62,6 @@ const CartPage = ({
         )}
       </div>
 
-      {/* Order Summary Section */}
       {cartItems.length > 0 && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '2rem', padding: '1.5rem 0 0.5rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold', color: 'var(--text-main)', fontSize: '1.125rem' }}>
@@ -84,7 +83,8 @@ const CartPage = ({
       <div style={{ paddingBottom: '1rem' }}>
         <ActionButton 
           text="Realizar pedido" 
-          onClick={() => (cartItems.length) > 0 ? setIsModalOpen(true) : alert("Tu carrito no puede estar vacío al realizar un pedido.")} 
+          // 2. Replace alert with setShowEmptyCartModal(true)
+          onClick={() => (cartItems.length) > 0 ? setIsModalOpen(true) : setShowEmptyCartModal(true)} 
         />
       </div>
 
@@ -99,9 +99,36 @@ const CartPage = ({
             buyerInfo={buyerInfo}
             setBuyerInfo={setBuyerInfo}
             onSubmit={onConfirmOrder} 
-            onCancel={() => !isCheckingOut && setIsModalOpen(false)} // Prevent closing by accident while loading
-            isCheckingOut={isCheckingOut} // 3. Pass this down so your modal can disable its confirm button
+            onCancel={() => !isCheckingOut && setIsModalOpen(false)} 
+            isCheckingOut={isCheckingOut} 
           />
+        </div>
+      )}
+
+      {/* 3. New Empty Cart Modal */}
+      {showEmptyCartModal && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+          backgroundColor: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', 
+          zIndex: 3000, padding: '1.5rem'
+        }}>
+          <div style={{ backgroundColor: 'white', padding: '2rem', borderRadius: '8px', maxWidth: '400px', width: '100%', textAlign: 'center', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}>
+            <h3 style={{ marginTop: 0, marginBottom: '1rem', color: 'var(--text-primary)', fontSize: '1.5rem' }}>
+              ¡Espera!
+            </h3>
+            <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem' }}>
+              Tu carrito no puede estar vacío al realizar un pedido.
+            </p>
+            
+            <button
+                className="secondary-action-btn"
+                style={{ width: '100%' }}
+                onClick={() => setShowEmptyCartModal(false)}
+              >
+                Aceptar
+            </button>
+          </div>
         </div>
       )}
     </div>

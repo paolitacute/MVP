@@ -86,6 +86,7 @@ export const useHomeData = () => {
           name,
           base_price,
           stock_quantity,
+          enabled,
           product_image (
             image_url
           )
@@ -129,10 +130,7 @@ export const useHomeData = () => {
           imageSrc: mainImage,
           text1: listing.name,
           text2: `RD$${price.toFixed(2)}`,
-          // text3:
-          //   listing.stock_quantity !== null && listing.stock_quantity > 0
-          //     ? `${listing.stock_quantity} en stock`
-          //     : 'Hecho por pedido',
+          text3: listing.enabled == false ? 'Desactivado' : ''
         };
       });
 
