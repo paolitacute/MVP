@@ -11,16 +11,16 @@ const CartProduct = ({ product, onQuantityChange, onEdit, onDelete }) => {
         </div>
         <div className="product-text-container" style={{ flexGrow: 1 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <span className="product-main-text">{product.name}</span>
-            <span className="product-main-text">RD${product.price.toFixed(2)}</span>
+            <span className="product-main-text" style={{textAlign: 'left'}}>{product.name}</span>
+            <span className="product-main-text" style={{textAlign: 'right'}}>RD${product.price.toFixed(2)}</span>
           </div>
           {product.customizations?.map((cust, idx) => (
             <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem' }}>
-              <span style={{ color: 'var(--text-secondary)' }}>
+              <span style={{ color: 'var(--text-secondary)', textAlign: 'left' }}>
                 {cust.label}: {cust.value}
               </span>
               {cust.modifierPrice > 0 && (
-                <span style={{ color: 'var(--text-secondary)' }}>
+                <span style={{ color: 'var(--text-secondary)', textAlign: 'right' }}>
                   +RD${cust.modifierPrice.toFixed(2)}
                 </span>
               )}
