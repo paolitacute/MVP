@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { ArrowLeft, Trash2 } from 'lucide-react'; // Added Trash2 import
+import React, { useEffect, useState } from 'react';
+import { ArrowLeft, Trash2 } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import HeaderText from '../HeaderText';
 import DetailsLine from '../DetailsLine';
@@ -7,7 +7,7 @@ import HorizontalCardLeft from '../HorizontalCardLeft';
 import Dropdown from '../Dropdown';
 import BuyerInfo from '../BuyerInfo';
 import BackButton from '../BackButton';
-import ActionsMenu from '../ActionsMenu'; // Updated to import ActionsMenu
+import ActionsMenu from '../ActionsMenu';
 
 // formatDisplayDate is now a pure helper function without any hooks
 const formatDisplayDate = (dateString) => {
@@ -51,9 +51,17 @@ const OrderDetailPage = ({
   onCancelOrder 
 }) => {
   const navigate = useNavigate();
-  const { username } = useParams(); // Extract the dynamic username from the URL
+  const { username } = useParams();
 
-  // The hook must be at the top level of your component
+  // State for the cancellation confirmation modal
+  const [showCancelConfirm, setShowCancelConfirm] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
+
+  // Modal states for the result
+  const [showResultModal, setShowResultModal] = useState(false);
+  const [resultMessage, setResultMessage] = useState('');
+  const [isSuccess, setIsSuccess] = useState(false);
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -64,9 +72,33 @@ const OrderDetailPage = ({
       label: 'Cancelar pedido',
       icon: <Trash2 size={16} />,
       color: '#ef4444', 
-      onClick: onCancelOrder 
+      onClick: () => setShowCancelConfirm(true) // Open local modal instead of direct call
     }
   ];
+
+  const executeCancel = async () => {
+    setShowCancelConfirm(false);
+    setIsUpdating(true);
+    try {
+      if (onCancelOrder) {
+        await onCancelOrder(); // Awaits the promise from the parent component
+      }
+      setResultMessage('Pedido cancelado exitosamente.');
+      setIsSuccess(true);
+      setShowResultModal(true);
+    } catch (error) {
+      console.error("Error cancelling order:", error);
+      setResultMessage('Hubo un error al cancelar el pedido.');
+      setIsSuccess(false);
+      setShowResultModal(true);
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const handleCloseResult = () => {
+    setShowResultModal(false);
+  };
 
   const renderDynamicStatusHeader = () => {
     switch (status) {
@@ -97,7 +129,7 @@ const OrderDetailPage = ({
   return (
     <div className="order-detail-layout">
       {/* Meatballs Actions Menu */}
-      <ActionsMenu options={menuOptions} />
+      <ActionsMenu options={status !== 'canceled' ? menuOptions : undefined} />
 
       <BackButton />
 
@@ -112,6 +144,7 @@ const OrderDetailPage = ({
             value={status}
             onChange={onStatusChange}
             options={[
+              { label: 'Estado', value: 'estado' },
               { label: 'Pendiente', value: 'pending' },
               { label: 'En progreso', value: 'send_by' },
               { label: 'Completado', value: 'completed' },
@@ -130,7 +163,6 @@ const OrderDetailPage = ({
         {status !== 'canceled' && (
           <button 
           className="secondary-action-btn"
-          // Dynamically route using the username
           onClick={() => navigate(`/${username}/order/${orderId}/summary`)}
         >
           Generar Recibo de Orden
@@ -140,13 +172,12 @@ const OrderDetailPage = ({
 
       <div className="divider"></div>
 
-      <h3 className="items-header">{products.length} {products.length == 1 ? 'artículo' : 'artículos'}</h3>
+      <h3 className="items-header">{products.length} {products.length === 1 ? 'artículo' : 'artículos'}</h3>
       
       <div className="items-list">
         {products.map((product) => (
             <div 
               key={product.id} 
-              // Dynamically route using the username
               onClick={() => navigate(`/${username}/order/${orderId}/product/${product.id}`)}
               style={{ cursor: 'pointer' }}
             >
@@ -159,6 +190,69 @@ const OrderDetailPage = ({
             </div>
         ))}
       </div>
+
+      {/* Cancel Confirmation Modal */}
+      {showCancelConfirm && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+          backgroundColor: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', 
+          zIndex: 3000, padding: '1.5rem'
+        }}>
+          <div style={{ backgroundColor: 'white', padding: '2rem', borderRadius: '8px', maxWidth: '400px', width: '100%', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}>
+            <h3 style={{ marginTop: 0, marginBottom: '1rem', color: 'var(--text-main)', fontSize: '1.25rem' }}>
+              ¿Estás seguro de cancelar este pedido?
+            </h3>
+            <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem', lineHeight: '1.5' }}>
+              Una vez que se cancele el pedido, esta acción es irreversible y no podrás cambiar su estado.
+            </p>
+            
+            <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem'}}>
+              <button
+                className="tertiary-action-btn"
+                style={{ width: '100%' }}
+                onClick={() => !isUpdating && executeCancel()}
+              >
+                {isUpdating ? 'Cancelando...' : 'Sí, cancelar'}
+              </button>
+              <button
+                className="secondary-action-btn"
+                style={{ width: '100%' }}
+                onClick={() => !isUpdating && setShowCancelConfirm(false)}
+              >
+                Volver
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Result Status Modal for Cancellation */}
+      {showResultModal && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+          backgroundColor: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', 
+          zIndex: 3000, padding: '1.5rem'
+        }}>
+          <div style={{ backgroundColor: 'white', padding: '2rem', borderRadius: '8px', maxWidth: '400px', width: '100%', textAlign: 'center', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}>
+            <h3 style={{ marginTop: 0, marginBottom: '1rem', color: isSuccess ? '#10b981' : '#ef4444', fontSize: '1.5rem' }}>
+              {isSuccess ? '¡Éxito!' : 'Error'}
+            </h3>
+            <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem' }}>
+              {resultMessage}
+            </p>
+            
+            <button
+                className="action-button"
+                style={{ width: '100%' }}
+                onClick={handleCloseResult}
+              >
+                Aceptar
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

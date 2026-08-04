@@ -62,8 +62,8 @@ const HorizontalListPage = ({ title, filters, data, onClick }) => {
 
     return matchesFilter && matchesSearch;
   }).sort((a, b) => {
-    const dateA = new Date(a.completedDate || a.sendByDate || 0).getTime();
-    const dateB = new Date(b.completedDate || b.sendByDate || 0).getTime();
+    const dateA = new Date(a.sendByDate || 0).getTime();
+    const dateB = new Date(b.sendByDate || 0).getTime();
     return sortOrder === 'newest' ? dateB - dateA : dateA - dateB;
   });
 
@@ -133,11 +133,11 @@ const HorizontalListPage = ({ title, filters, data, onClick }) => {
             text={
               sortOrder === 'newest' ? (
                 <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                  <ArrowDown size={16} color="var(--text-main, #333)" /> Nuevas
+                  <ArrowUp size={16} color="var(--text-main, #333)" /> Viejas
                 </span>
               ) : (
                 <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                  <ArrowUp size={16} color="var(--text-main, #333)" /> Viejas
+                  <ArrowDown size={16} color="var(--text-main, #333)" /> Nuevas
                 </span>
               )
             }
@@ -177,6 +177,7 @@ const HorizontalListPage = ({ title, filters, data, onClick }) => {
             }
 
             const statusLabel = filters.find(f => f.id === item.status)?.label || item.status;
+            console.log(statusLabel)
 
             return (
               <HorizontalCardLeft 

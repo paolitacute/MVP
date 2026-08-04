@@ -15,7 +15,7 @@ export const useProductDetail = (id, slug) => {
           base_price,
           description,
           stock_quantity,
-          store_id,
+          store_id (delivery),
           product_image (
             image_url
           ),
@@ -32,9 +32,9 @@ export const useProductDetail = (id, slug) => {
           )
         `)
         .eq('id', id)
-        .single(); //[cite: 16]
+        .single(); 
 
-      if (fetchError) throw fetchError; //[cite: 16]
+      if (fetchError) throw fetchError; 
 
       return {
         id: data.id,
@@ -43,6 +43,7 @@ export const useProductDetail = (id, slug) => {
         description: data.description,
         amountAvailable: data.stock_quantity,
         image: data.product_image?.map(img => img.image_url) || [],
+        delivery: data.store_id.delivery,
         customizations: data.customization_category?.map(cat => ({
           id: cat.id,
           field: cat.name,
@@ -54,7 +55,7 @@ export const useProductDetail = (id, slug) => {
             image: opt.image_url
           })) || []
         })) || []
-      }; //[cite: 16]
+      }; 
     },
     enabled: !!id,
     
@@ -73,7 +74,7 @@ export const useProductDetail = (id, slug) => {
             id: partialProduct.id,
             name: partialProduct.name,
             price: partialProduct.price,
-            // Use empty strings and arrays so no special messages render while waiting
+            delivery: partialProduct.store_id.delivery,
             description: '', 
             amountAvailable: 0,
             image: partialProduct.image ? [partialProduct.image] : [],

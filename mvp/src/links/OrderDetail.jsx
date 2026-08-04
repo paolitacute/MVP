@@ -15,7 +15,6 @@ const OrderDetail = () => {
   const updateStatusMutation = useUpdateOrderStatus();
   
   // 3. Keep local state strictly for UI modals
-  const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [pendingStatus, setPendingStatus] = useState('');
 
   const handleStatusChange = (e) => {
@@ -36,8 +35,6 @@ const OrderDetail = () => {
   };
 
   const handleCancelOrder = () => {
-    const isConfirmed = window.confirm("¿Estás seguro de que quieres cancelar este pedido?");
-    if (isConfirmed) {
       updateStatusMutation.mutate({
         orderId: id,
         newUIStatus: 'canceled',
@@ -45,7 +42,6 @@ const OrderDetail = () => {
       }, {
         onError: () => alert('Failed to cancel order. Please try again.')
       });
-    }
   };
 
   const confirmCompletion = () => {
@@ -109,45 +105,6 @@ const OrderDetail = () => {
         onStatusChange={handleStatusChange}
         onCancelOrder={handleCancelOrder} 
       />
-
-      {showConfirmModal && (
-        <div style={{
-          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-          backgroundColor: 'rgba(0, 0, 0, 0.4)', display: 'flex',
-          alignItems: 'center', justifyContent: 'center', zIndex: 9999, padding: '1.5rem'
-        }}>
-          <div style={{
-            backgroundColor: 'var(--surface-color, #fff)', padding: '2rem',
-            borderRadius: '16px', width: '100%', maxWidth: '400px',
-            boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)', display: 'flex',
-            flexDirection: 'column', gap: '1.5rem', textAlign: 'center'
-          }}>
-            <h3 style={{ fontSize: '1.25rem', fontWeight: '700', color: 'var(--text-main)', margin: 0 }}>
-              Confirmar finalización
-            </h3>
-            <p style={{ color: 'var(--text-secondary)', margin: 0, fontSize: '1rem' }}>
-              ¿Estás seguro de que quieres marcar este pedido como completado?
-            </p>
-            <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem' }}>
-              <button
-                className="action-button"
-                style={{ backgroundColor: '#f1f5f9', color: 'var(--text-main)' }}
-                onClick={cancelCompletion}
-                disabled={isUpdating}
-              >
-                Cancelar
-              </button>
-              <button
-                className="action-button"
-                onClick={confirmCompletion}
-                disabled={isUpdating}
-              >
-                {isUpdating ? 'Actualizando...' : 'Confirmar'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       <NavBar/>
     </>

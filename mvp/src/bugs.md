@@ -6,8 +6,13 @@
 - Especificar la moneda al comprador y al vendedor 
 - Pantalla de carga entre crear una tienda y el home
 - MODO OSCURO
-- Los productos de una tienda que ofrece delivery dicen Solo para recoger
-- Detalles de la orden en celular estan centrados en vez de a la izquierda
+- Despues de crear una tienda, pantalla de carga
+- Especificar cual correo quieres al iniciar sesion
+- Al crear una publicacion, indica que hay un error pero crea la publicacion igualmente
+- Account settings in cellphone is centered when it should be aligned to the left
+- Boton para copiar link de la tienda
+- Fecha de neededby must include today
+- El estado por default de una orden es nueva, pero el dropdown dice pendiente y cuando lo seleccionas, no cambia automaticamente
 
 
 
@@ -52,3 +57,5 @@
 - Botones para navegar entre comprador y vendedor
 - Cuando un vendedor desactiva publicacion, tener un letrero que diga desactivado
 - When editing a picture in a listing the form submit automatically when it should not
+- Los productos de una tienda que ofrece delivery dicen Solo para recoger
+- Detalles de la orden en celular estan centrados en vez de a la izquierda

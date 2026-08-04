@@ -31,7 +31,7 @@ export const useHomeData = () => {
       }
 
       const storeId = storeData.id;
-      const storeSlug = storeData.slug; // <-- Extracted storeSlug
+      const storeSlug = storeData.slug; 
 
       // 3. Fetch Orders
       const { data: ordersData, error: ordersError } = await supabase
@@ -50,6 +50,7 @@ export const useHomeData = () => {
           )
         `)
         .eq('store_id', storeId)
+        .neq('status_id', 'db127261-35fe-447f-ab0c-4aab8d21bde4')
         .order('created_at', { ascending: false });
 
       if (ordersError) throw ordersError;

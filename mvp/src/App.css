@@ -776,8 +776,10 @@ body {
 
 .badge-status-new { background-color: #fffbeb; color: #b45309; border-color: #fde68a; }
 .badge-status-pending { background-color: #f9f3fb; color: var(--primary-purple); border-color: var(--primary-purple); }
-.badge-status-complete { background-color: #f0fdf4; color: #15803d; border-color: #bbf7d0; }
 .badge-status-in-progress { background-color: #f9f3fb; color: var(--primary-purple); border-color: var(--primary-purple); }
+.badge-status-complete { background-color: #f0fdf4; color: #15803d; border-color: #bbf7d0; }
+.badge-status-canceled { background-color: #fdf0f0; color: #9e2424; border-color: #f7bbbb; }
+
 
 /* --- Horizontal Card Left --- */
 .horizontal-card-left {

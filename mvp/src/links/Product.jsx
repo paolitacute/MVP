@@ -45,6 +45,7 @@ const Product = () => {
       name: orderData.product.name,
       price: orderData.product.price,
       image: orderData.product.image.length > 0 ? orderData.product.image[0] : 'https://via.placeholder.com/150',
+      storeId: orderData.product.storeId,
       quantity: editMode ? editCartItem.quantity : 1, 
       customizations: formattedCustomizations,
       selectedOptionIds: selectedOptionIds,
@@ -95,6 +96,7 @@ const Product = () => {
       </div>
     ); 
   }
+  
   
   return (
     <ProductPage 

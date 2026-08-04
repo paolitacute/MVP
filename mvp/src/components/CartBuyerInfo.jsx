@@ -16,7 +16,7 @@ const CartBuyerInfo = ({ onSubmit, onCancel }) => {
   const [dateError, setDateError] = useState('');
 
   // Obtenemos la fecha actual en formato YYYY-MM-DD para usarla como límite
-  const today = new Date().toISOString().split('T')[0];
+  const today = new Date().toLocaleDateString('en-CA');
 
   const handleChange = (e) => {
     const { id, value } = e.target;

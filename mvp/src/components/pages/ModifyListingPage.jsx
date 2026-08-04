@@ -143,10 +143,8 @@ const ModifyListingPage = ({
     if (isSuccess) {
       // SUCCESS: Leave isSubmitting as true so the button stays disabled!
       setShowToast(true); 
-      console.log("primer timeout")
       setTimeout(() => {
         setShowToast(false); 
-        console.log("segundo timeout")
         setTimeout(() => {
           if (onSubmitSuccess) {
             onSubmitSuccess(); 

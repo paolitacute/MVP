@@ -7,12 +7,12 @@ const Badge = ({ text, active, onClick, type = "filter" }) => {
     const typeStatus = text ? text.toLowerCase() : '';
     let statusClass = 'badge-status-in-progress'; // Default fallback
 
-    if (typeStatus === 'pending') {
-      statusClass = 'badge-status-pending';
-    } else if (typeStatus === 'complete' || typeStatus === 'completed') {
-      statusClass = 'badge-status-complete';
-    } else if (typeStatus === 'new') {
+    if (typeStatus === 'nueva') {
       statusClass = 'badge-status-new';
+    } else if (typeStatus === 'completada') {
+      statusClass = 'badge-status-complete';
+    } else if (typeStatus === 'cancelado') {
+      statusClass = 'badge-status-canceled';
     }
 
     return (

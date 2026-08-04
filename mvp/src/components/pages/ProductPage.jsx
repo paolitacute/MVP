@@ -9,7 +9,6 @@ import ImageCarousel from '../ImageCarousel';
 
 // 1. Accept the new initialCartData prop
 const ProductPage = ({ product, onAddToCart, onBack, initialCartData }) => {
-  
   // 2. Initialize customizations based on existing cart data if available
   const [customizations, setCustomizations] = useState(() => {
     if (!initialCartData || !initialCartData.selectedOptionIds) return {};
