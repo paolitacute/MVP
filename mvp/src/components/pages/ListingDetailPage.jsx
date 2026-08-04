@@ -97,7 +97,7 @@ const ListingDetailPage = ({ listing, onEdit, onBack }) => {
 
   const menuOptions = [
     {
-      label: 'Editar publicación',
+      label: 'Editar',
       icon: <Pencil size={16} />,
       onClick: onEdit
     }
@@ -105,20 +105,20 @@ const ListingDetailPage = ({ listing, onEdit, onBack }) => {
 
   if (listing.enabled !== false) {
     menuOptions.push({
-      label: isUpdating ? 'Procesando...' : 'Desactivar publicación',
+      label: isUpdating ? 'Procesando...' : 'Desactivar',
       icon: <PowerOff size={16} />,
       onClick: handlePause
     });
   } else {
     menuOptions.push({
-      label: isUpdating ? 'Procesando...' : 'Reactivar publicación',
+      label: isUpdating ? 'Procesando...' : 'Reactivar',
       icon: <PowerOff size={16} />,
       onClick: handleReactivate
     });
   }
 
   menuOptions.push({
-    label: isUpdating ? 'Procesando...' : 'Borrar publicación',
+    label: isUpdating ? 'Procesando...' : 'Borrar',
     icon: <Trash2 size={16} />,
     color: '#ef4444',
     onClick: handleDeleteClick

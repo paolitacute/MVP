@@ -24,21 +24,21 @@ const AccountSettings = () => {
 
   const menuOptions = [
       {
-        label: 'Editar publicación',
+        label: 'Editar',
         icon: <Pencil size={16} />,
         onClick: () => navigate(`/${username}/profile/edit`)
       },
-      {
-        label: 'Desactivar publicación',
-        icon: <PowerOff size={16} />,
-        onClick: () => console.log(`Listing ${listing?.id || ''} deactivated`)
-      },
-      {
-        label: 'Borrar publicación',
-        icon: <Trash2 size={16} />,
-        color: '#ef4444', // Red text and icon color
-        onClick: () => console.log(`Listing ${listing?.id || 'deleted'} deleted`)
-      }
+      // {
+      //   label: 'Desactivar',
+      //   icon: <PowerOff size={16} />,
+      //   onClick: () => console.log(`Listing ${listing?.id || ''} deactivated`)
+      // },
+      // {
+      //   label: 'Borrar',
+      //   icon: <Trash2 size={16} />,
+      //   color: '#ef4444', // Red text and icon color
+      //   onClick: () => console.log(`Listing ${listing?.id || 'deleted'} deleted`)
+      // }
     ];
 
   const handleLogout = async () => {

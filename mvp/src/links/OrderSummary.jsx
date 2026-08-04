@@ -150,7 +150,7 @@ const OrderSummary = () => {
 
   const handleDeliverySubmit = () => {
     if (!deliveryInput.trim()) {
-      setDeliveryError('Please enter a delivery amount.');
+      setDeliveryError('Por favor ingrese un monto de delivery.');
       return;
     }
 
@@ -178,7 +178,7 @@ const OrderSummary = () => {
     const formattedDelivery = `$${deliveryNum.toFixed(2)}`;
     const formattedTotal = `$${totalNum.toFixed(2)}`;
 
-    const finalMessage = `Hola! Somos ${storeName}.
+    const finalMessage = `¡Hola! Somos ${storeName}
 
 Número de Orden: #${orderNumber}
 Fecha de orden: ${orderDate}

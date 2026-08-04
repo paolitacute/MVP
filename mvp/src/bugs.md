@@ -7,15 +7,19 @@
 - Pantalla de carga entre crear una tienda y el home
 - MODO OSCURO
 - Despues de crear una tienda, pantalla de carga
-- Especificar cual correo quieres al iniciar sesion
 - Al crear una publicacion, indica que hay un error pero crea la publicacion igualmente
-- Account settings in cellphone is centered when it should be aligned to the left
-- Boton para copiar link de la tienda
-- Fecha de neededby must include today
+- Account settings in cellphone is centered when it should be aligned to the left PONLOS UNO DEBAJO DE OTRO
 - El estado por default de una orden es nueva, pero el dropdown dice pendiente y cuando lo seleccionas, no cambia automaticamente
+- Al presionar el boton copiar en Order Summary, el estatus de la orden cambia a pendiente
+- Al pasar la fecha de send by the una orden, automaticamente marcarla como estado "Atrasada"
 
 
-
+PRIORIDADES:
+- No te deja marcar una orden como completada
+- Fecha de neededby must include today
+- Boton para copiar link de la tienda
+- En OrderSummary, el monto de delivery no puede aceptar negativos
+- Especificar cual correo quieres al iniciar sesion
 
 
 
