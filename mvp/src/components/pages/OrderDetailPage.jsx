@@ -47,7 +47,8 @@ const OrderDetailPage = ({
   total,
   buyer, 
   products,
-  onStatusChange
+  onStatusChange,
+  onCancelOrder 
 }) => {
   const navigate = useNavigate();
   const { username } = useParams(); // Extract the dynamic username from the URL
@@ -62,8 +63,8 @@ const OrderDetailPage = ({
     {
       label: 'Cancelar pedido',
       icon: <Trash2 size={16} />,
-      color: '#ef4444', // Red text and icon color
-      onClick: () => console.log(`Orden ${orderId} deleted`)
+      color: '#ef4444', 
+      onClick: onCancelOrder 
     }
   ];
 
@@ -74,9 +75,11 @@ const OrderDetailPage = ({
       case 'pending':
         return <h1 className="dynamic-status-header status-send">Pendiente</h1>;
       case 'send_by':
-        return <h1 className="dynamic-status-header status-send">Entregar antes de {dateAction}</h1>;
+        return <h1 className="dynamic-status-header status-send">Entregar antes de {formatDisplayDate(dateAction)}</h1>;
       case 'new':
         return <h1 className="dynamic-status-header status-new">Nuevo pedido</h1>;
+      case 'canceled':
+        return <h1 className="dynamic-status-header" style={{ color: '#ef4444' }}>Cancelado</h1>;
       default:
         return <h1 className="dynamic-status-header">Estado del pedido</h1>;
     }
@@ -104,16 +107,17 @@ const OrderDetailPage = ({
 
       <div className="order-meta-row">
         <DetailsLine items={[`Pedido realizado el ${formatDisplayDate(dateOrdered)}`, calculatedTotal]} />
-        <Dropdown 
-          value={status}
-          onChange={onStatusChange}
-          options={[
-            { label: 'Nuevo pedido', value: 'new' },
-            { label: 'Pendiente', value: 'pending' },
-            { label: 'En progreso', value: 'send_by' },
-            { label: 'Completado', value: 'completed' },
-          ]}
-        />
+        {status !== 'canceled' && (
+          <Dropdown 
+            value={status}
+            onChange={onStatusChange}
+            options={[
+              { label: 'Pendiente', value: 'pending' },
+              { label: 'En progreso', value: 'send_by' },
+              { label: 'Completado', value: 'completed' },
+            ]}
+          />
+        )}
       </div>
 
       <BuyerInfo 
@@ -123,13 +127,15 @@ const OrderDetailPage = ({
       />
 
       <div className="summary-button-container">
-        <button 
+        {status !== 'canceled' && (
+          <button 
           className="secondary-action-btn"
           // Dynamically route using the username
           onClick={() => navigate(`/${username}/order/${orderId}/summary`)}
         >
           Generar Recibo de Orden
         </button>
+        )}
       </div>
 
       <div className="divider"></div>

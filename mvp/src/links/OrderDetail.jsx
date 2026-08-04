@@ -35,6 +35,19 @@ const OrderDetail = () => {
     }
   };
 
+  const handleCancelOrder = () => {
+    const isConfirmed = window.confirm("¿Estás seguro de que quieres cancelar este pedido?");
+    if (isConfirmed) {
+      updateStatusMutation.mutate({
+        orderId: id,
+        newUIStatus: 'canceled',
+        statusMap: data.statusMap
+      }, {
+        onError: () => alert('Failed to cancel order. Please try again.')
+      });
+    }
+  };
+
   const confirmCompletion = () => {
     updateStatusMutation.mutate({
       orderId: id,
@@ -94,6 +107,7 @@ const OrderDetail = () => {
         buyer={order.buyer}
         products={order.products}
         onStatusChange={handleStatusChange}
+        onCancelOrder={handleCancelOrder} 
       />
 
       {showConfirmModal && (
