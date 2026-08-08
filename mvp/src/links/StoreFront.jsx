@@ -1,11 +1,12 @@
 import React from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import StoreFrontPage from '../components/pages/StoreFrontPage';
-import { useStoreFront } from '../hooks/useStoreFront'; // 1. Import the custom hook
+import { useStoreFront } from '../hooks/useStoreFront'; 
 
 const StoreFront = () => {
   // Assuming buyers navigate to something like /store/:slug
   const { slug } = useParams(); 
+  const navigate = useNavigate();
   
   // 2. Destructure data, loading state, and error from TanStack Query
   const { data, isLoading, error } = useStoreFront(slug);
@@ -13,19 +14,42 @@ const StoreFront = () => {
   // 3. Update loading state handling to use isLoading
   if (isLoading) {
     return (
-      <>
-      </>
-      // <div style={{ display: 'flex', justifyContent: 'center', paddingTop: '3rem' }}>
-      //   <p>Loading store...</p>
-      // </div>
+      // <>
+      // </>
+      <div style={{ display: 'flex', justifyContent: 'center', paddingTop: '3rem' }}>
+        <p>Cargando tienda...</p>
+      </div>
     );
   }
 
   // 4. Update error state handling to read error.message
   if (error) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', paddingTop: '3rem', color: 'red' }}>
-        <p>Error loading store: {error.message}</p>
+      <div className="page-container flex-center" style={{ flexDirection: 'column', gap: '1rem', textAlign: 'center' }}>
+        <h1 className="header-text-center" style={{ fontSize: '2.5rem' }}>Tienda no encontrada</h1>
+        
+        <p style={{ color: 'var(--text-secondary)', fontSize: '1rem', maxWidth: '400px' }}>
+          El enlace que seguiste parece estar roto o la tienda que buscas no existe.
+        </p>
+        
+        {/* Seller Login Prompt Block */}
+        <div style={{ 
+          backgroundColor: 'var(--surface-color)', 
+          padding: '2rem', 
+          borderRadius: '16px', 
+          border: '1px solid var(--border-light)', 
+          marginTop: '1.5rem',
+          width: '100%',
+          maxWidth: '350px',
+          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.05)'
+        }}>
+          <h2 className="header-text-center" style={{ fontSize: '1.25rem', marginBottom: '1rem' }}>
+            ¿Eres un vendedor?
+          </h2>
+          <button className="action-button" onClick={() => navigate('/login')}>
+            Iniciar sesión aquí
+          </button>
+        </div>
       </div>
     );
   }

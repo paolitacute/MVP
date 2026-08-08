@@ -75,7 +75,7 @@ const CartPage = ({
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--text-secondary)' }}>
             <span>Total</span>
-            <span>Calculado por el vendedor</span>
+            <span style={{ textAlign: 'right'}}>Calculado por el vendedor</span>
           </div>
         </div>
       )}

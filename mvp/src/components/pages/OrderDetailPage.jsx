@@ -48,7 +48,10 @@ const OrderDetailPage = ({
   buyer, 
   products,
   onStatusChange,
-  onCancelOrder 
+  onCancelOrder,
+  showConfirmModal,         
+  onConfirmCompletion,      
+  onCancelCompletion
 }) => {
   const navigate = useNavigate();
   const { username } = useParams();
@@ -221,6 +224,41 @@ const OrderDetailPage = ({
                 onClick={() => !isUpdating && setShowCancelConfirm(false)}
               >
                 Volver
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showConfirmModal && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+          backgroundColor: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', 
+          zIndex: 3000, padding: '1.5rem'
+        }}>
+          <div style={{ backgroundColor: 'white', padding: '2rem', borderRadius: '8px', maxWidth: '400px', width: '100%', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}>
+            <h3 style={{ marginTop: 0, marginBottom: '1rem', color: 'var(--text-main)', fontSize: '1.25rem' }}>
+              ¿Deseas marcar este pedido como completado?
+            </h3>
+            <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem', lineHeight: '1.5' }}>
+              Esto actualizará el estado del pedido y registrará la fecha actual.
+            </p>
+            
+            <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem'}}>
+              <button
+                className="secondary-action-btn"
+                style={{ width: '100%' }}
+                onClick={onCancelCompletion}
+              >
+                Volver
+              </button>
+              <button
+                className="action-button"
+                style={{ width: '100%' }}
+                onClick={onConfirmCompletion}
+              >
+                Marcar completada
               </button>
             </div>
           </div>

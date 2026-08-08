@@ -44,17 +44,23 @@ const StoreFrontPage = ({ storeData, listings, slug }) => {
           onChange={(e) => setSearchTerm(e.target.value)} 
         />
 
-        <div className="cards-grid-container">
-          {filteredData.map((item) => (
-            <VerticalCard
-              key={item.id}
-              imageSrc={item.image}
-              text1={item.name}
-              text2={`RD$${item.price.toFixed(2)}`}
-              onClick={() => handleProductClick(item.id)}
-            />
-          ))}
-        </div>
+        {filteredData.length === 0 ? (
+          <div className="empty-section-message">
+            Nada que ver aquí aún
+          </div>
+        ) : (
+          <div className="cards-grid-container">
+            {filteredData.map((item) => (
+              <VerticalCard
+                key={item.id}
+                imageSrc={item.image}
+                text1={item.name}
+                text2={`RD$${item.price.toFixed(2)}`}
+                onClick={() => handleProductClick(item.id)}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </div>
     </>

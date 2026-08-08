@@ -10,7 +10,7 @@ const CartProduct = ({ product, onQuantityChange, onEdit, onDelete }) => {
           <img src={product.image} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
         </div>
         <div className="product-text-container" style={{ flexGrow: 1 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <div className='product-main-text-container'>
             <span className="product-main-text">{product.name}</span>
             <span className="product-main-text">RD${product.price.toFixed(2)}</span>
           </div>

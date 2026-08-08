@@ -52,7 +52,6 @@ const CardListPage = ({
         </div>
       ) : (
         <div className="empty-section-message" style={{ marginTop: '1.5rem' }}>
-          {/* If there's a search term, you might want to dynamically adjust the message */}
           {searchTerm ? `No results found for "${searchTerm}"` : emptyMessage}
         </div>
       )}

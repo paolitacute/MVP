@@ -445,7 +445,8 @@ body {
 .section-title {
   font-size: 1.75rem;
   font-weight: 700;
-  color: var(--text-main)
+  color: var(--text-main);
+  text-align: left;
 }
 
 .view-all-link {
@@ -1011,6 +1012,22 @@ body {
   gap: 0.25rem;
 }
 
+.product-main-text-container {
+  display: flex;
+  justify-content: space-between;
+}
+
+@media (max-width: 500px) {
+  .product-main-text-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    line-height: 1.25;
+    gap: 0.4rem;
+    margin-bottom: 0.3rem;
+  }
+}
+
 .product-main-text {
   font-size: 1rem;
   font-weight: 600;
@@ -1186,6 +1203,7 @@ body {
   font-size: 1rem;
   cursor: pointer;
   transition: background-color 0.2s ease;
+  margin-top: 0.5rem;
 }
 
 .secondary-action-btn:hover {
@@ -1203,6 +1221,7 @@ body {
   font-size: 1rem;
   cursor: pointer;
   transition: background-color 0.2s ease;
+  margin-top: 0.5rem
 }
 
 .secondary-action-btn:hover {

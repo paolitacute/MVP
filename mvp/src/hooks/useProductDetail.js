@@ -74,7 +74,7 @@ export const useProductDetail = (id, slug) => {
             id: partialProduct.id,
             name: partialProduct.name,
             price: partialProduct.price,
-            delivery: partialProduct.store_id.delivery,
+            delivery: partialProduct.delivery,
             description: '', 
             amountAvailable: 0,
             image: partialProduct.image ? [partialProduct.image] : [],

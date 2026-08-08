@@ -8,16 +8,16 @@ export const useStoreFront = (slug) => {
       // 1. Fetch store details using the URL slug
       const { data: store, error: storeError } = await supabase
         .from('store')
-        .select('id, name, logo')
+        .select('id, name, logo, delivery')
         .eq('slug', slug)
-        .single();
+        .maybeSingle();
 
       if (storeError) throw storeError;
       if (!store) throw new Error('Store not found');
 
       const storeData = {
         name: store.name,
-        logo: store.logo
+        logo: store.logo,
       };
 
       // 2. Fetch published products for this specific store
@@ -50,5 +50,6 @@ export const useStoreFront = (slug) => {
     },
     // Only execute the query if the slug is available
     enabled: !!slug,
+    retry: false,
   });
 };

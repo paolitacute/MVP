@@ -16,6 +16,7 @@ const OrderDetail = () => {
   
   // 3. Keep local state strictly for UI modals
   const [pendingStatus, setPendingStatus] = useState('');
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   const handleStatusChange = (e) => {
     const newStatus = e.target.value;
@@ -104,6 +105,11 @@ const OrderDetail = () => {
         products={order.products}
         onStatusChange={handleStatusChange}
         onCancelOrder={handleCancelOrder} 
+        
+        // Pass these down:
+        showConfirmModal={showConfirmModal}
+        onConfirmCompletion={confirmCompletion}
+        onCancelCompletion={cancelCompletion}
       />
 
       <NavBar/>

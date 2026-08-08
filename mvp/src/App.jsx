@@ -49,25 +49,17 @@ const AuthGuard = ({ children }) => {
         return;
       }
 
-      // Fetch the seller's name to generate the URL slug
-      const { data: seller } = await supabase
-        .from('seller')
-        .select('name')
-        .eq('id', session.user.id)
-        .single();
-        
-      if (seller && isMounted) {
-        setUsername(seller.name.toLowerCase().replace(/\s+/g, ''));
-      }
-
+      // 1. Fetch the store's slug directly to use as the URL prefix
       const { data: stores } = await supabase
         .from('store') 
-        .select('id')
+        .select('id, slug') 
         .eq('seller_id', session.user.id) 
         .limit(1);
 
       if (isMounted) {
          if (stores && stores.length > 0) {
+           // 2. Set the URL parameter to the store's slug instead of the seller's name
+           setUsername(stores[0].slug); 
            setAuthStatus('has_store');
          } else {
            setAuthStatus('no_store');

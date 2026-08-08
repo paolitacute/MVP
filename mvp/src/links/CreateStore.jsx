@@ -199,12 +199,6 @@ const CreateStore = () => {
     <main className="page-container flex-center" style={{ alignItems: 'flex-start', paddingTop: '4rem' }}>
       <form onSubmit={handleCreateStore} className="form-container">
         <HeaderText text="Crear una tienda" />
-        
-        {error && (
-          <div className="error-message" style={{ color: '#ef4444', marginBottom: '1rem', textAlign: 'center' }}>
-            {error}
-          </div>
-        )}
 
         <div className="form-inputs">
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}>
@@ -239,7 +233,7 @@ const CreateStore = () => {
           <Input label="Teléfono comercial" type="tel" id="phone" value={formData.phone} pattern="[\+]?	?\(?[0-9]{3}\)?-?\s?.?[0-9]{3}\)?-?\s?.?[0-9]{4,6}" customErrorMessage="Por ejemplo, 8091234567" onChange={handleChange} required />
           <Input label="Correo comercial" type="email" id="email" value={formData.email} onChange={handleChange} pattern="[a-z0-9]+@[a-z]+\.[a-z]{2,}" customErrorMessage="Por favor ingresa un correo válido en minúsculas (por ejemplo, nombre@dominio.com)" required />
           
-          <Input label="Instagram" id="instagram" value={formData.instagram} onChange={handleChange} prefix="@" pattern="[\w.]+" customErrorMessage="Incluye solo letras y dígitos"/>
+          <Input label="Instagram" id="instagram" value={formData.instagram} onChange={handleChange} prefix="@" pattern="[a-z0-9._]" customErrorMessage="Incluye solo letras y dígitos"/>
           <Input label="Dirección" id="address" value={formData.address} onChange={handleChange} />
           <Input label="Descripción de la tienda" id="description" value={formData.description} onChange={handleChange} type='textarea' rows={5} />
           
@@ -263,6 +257,13 @@ const CreateStore = () => {
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', width: '100%' }}>
+
+          {error && (
+          <div className="error-message" style={{ color: '#ef4444', marginBottom: '1rem', textAlign: 'center' }}>
+            {error}
+          </div>
+        )}
+
           <ActionButton 
             text={loading ? "Creando tienda..." : "Crear tienda"} 
             type="submit" 
@@ -277,6 +278,7 @@ const CreateStore = () => {
             Cerrar sesión
           </button>
         </div>
+
       </form>
     </main>
   );
