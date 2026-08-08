@@ -147,7 +147,7 @@ const OrderDetailPage = ({
               { label: 'Estado', value: 'estado' },
               { label: 'Pendiente', value: 'pending' },
               { label: 'En progreso', value: 'send_by' },
-              { label: 'Completado', value: 'completed' },
+              { label: 'Completada', value: 'completed' },
             ]}
           />
         )}
