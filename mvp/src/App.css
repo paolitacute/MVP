@@ -1037,6 +1037,12 @@ body {
   font-size: 1.25rem;
 }
 
+@media (max-width: 700px) {
+  .category-detail-container {
+    flex-direction: column;
+  }
+}
+
 .category-label {
   color: var(--text-secondary);
   font-weight: 500;
@@ -1045,6 +1051,12 @@ body {
 .category-value {
   color: var(--text-main);
   font-weight: 600;
+}
+
+@media (min-width: 700px) {
+  .category-modifier-price {
+    margin-left: auto;
+  }
 }
 
 /* --- HERO IMAGE STYLING --- */
