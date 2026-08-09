@@ -5,7 +5,7 @@
 - Set if a customization is available
 - Especificar la moneda al comprador y al vendedor 
 - Pantalla de carga entre crear una tienda y el home
-- MODO OSCURO
+
 - Despues de crear una tienda, pantalla de carga
 - Al crear una publicacion, indica que hay un error pero crea la publicacion igualmente
 - Account settings in cellphone is centered when it should be aligned to the left PONLOS UNO DEBAJO DE OTRO
@@ -15,8 +15,8 @@
 
 
 PRIORIDADES:
-- No te deja marcar una orden como completada
-- Fecha de neededby must include today
+
+
 - Boton para copiar link de la tienda
 - En OrderSummary, el monto de delivery no puede aceptar negativos
 - Especificar cual correo quieres al iniciar sesion
@@ -63,3 +63,6 @@ PRIORIDADES:
 - When editing a picture in a listing the form submit automatically when it should not
 - Los productos de una tienda que ofrece delivery dicen Solo para recoger
 - Detalles de la orden en celular estan centrados en vez de a la izquierda
+- MODO OSCURO
+- No te deja marcar una orden como completada
+- Fecha de neededby must include today
