@@ -26,7 +26,7 @@ const StoreFrontPage = ({ storeData, listings, slug }) => {
   return (
     <>
     <nav className="topbar">
-        <p style={{fontSize: '0.8rem'}}>¿Eres un vendedor? <a href="/login">Inicia sesión aquí</a></p>
+        <p style={{fontSize: '0.8rem'}}>¿Tienes una tienda? <a href="https://forms.gle/PwNGzLqzKsvc5wPa6" target="_blank" rel="noopener noreferrer">Regístrala aquí</a></p>
     </nav>
     <CartButton />
     <div className="storefront-container">
