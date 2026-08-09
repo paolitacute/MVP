@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Trash2, Pencil, PowerOff } from 'lucide-react';
 import EditButton from '../components/EditButton';
@@ -47,6 +47,20 @@ const AccountSettings = () => {
       navigate('/login', { replace: true }); 
     } catch (err) {
       console.error("Unexpected error during logout:", err);
+    }
+  };
+  
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyLink = () => {
+    if (store && store.slug) {
+      const storeLink = `${window.location.origin}/${store.slug}`;
+      navigator.clipboard.writeText(storeLink)
+        .then(() => {
+          setCopied(true);
+          setTimeout(() => setCopied(false), 2000);
+        })
+        .catch(err => console.error('Error al copiar: ', err));
     }
   };
 
@@ -136,12 +150,27 @@ const AccountSettings = () => {
             </div>
           )}
           
-          {/* Logout Button */}
-          <div style={{ marginTop: '1rem' }}>
-            <ActionButton 
-              text={logoutMutation.isPending ? "Cerrando sesión..." : "Cerrar sesión"} 
-              onClick={handleLogout} 
-            />
+          {/* Action Buttons */}
+          <div style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            
+            {/* Copy Storefront Link Button (Purple by default) */}
+            <button 
+              className="action-button" 
+              onClick={handleCopyLink}
+            >
+              {copied ? "¡Enlace copiado!" : "Copiar enlace de la tienda"}
+            </button>
+
+            {/* Logout Button */}
+            <button 
+              className="action-button" 
+              style={{ backgroundColor: '#ef4444' }} 
+              onClick={handleLogout}
+              disabled={logoutMutation.isPending}
+            >
+              {logoutMutation.isPending ? "Cerrando sesión..." : "Cerrar sesión"}
+            </button>
+
           </div>
 
         </div>
