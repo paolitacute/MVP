@@ -69,8 +69,8 @@ const Input = ({ label, type = 'text', value, onChange, id, required = false, pr
             width: '100%', 
             textAlign: 'center', 
             padding: '0.75rem 0',
-            MozAppearance: 'textfield', // Hides default browser arrows in Firefox
-            WebkitAppearance: 'none' // Hides default browser arrows in Safari/Chrome
+            MozAppearance: 'textfield', 
+            WebkitAppearance: 'none' 
           }}
         />
       );

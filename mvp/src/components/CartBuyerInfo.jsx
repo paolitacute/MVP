@@ -3,6 +3,12 @@ import Input from './Input';
 import ActionButton from './ActionButton';
 import HeaderText from './HeaderText';
 
+const sanitizePhone = (phone) => {
+  if (!phone) return '';
+  const digits = phone.replace(/\D/g, '');
+  return digits.slice(-10);
+};
+
 const CartBuyerInfo = ({ onSubmit, onCancel }) => {
   const [formData, setFormData] = useState({
     name: '',
@@ -12,17 +18,14 @@ const CartBuyerInfo = ({ onSubmit, onCancel }) => {
     neededBy: '' 
   });
 
-  // Estado para manejar el error de validación de la fecha
   const [dateError, setDateError] = useState('');
 
-  // Obtenemos la fecha actual en formato YYYY-MM-DD para usarla como límite
   const today = new Date().toLocaleDateString('en-CA');
 
   const handleChange = (e) => {
     const { id, value } = e.target;
     setFormData(prev => ({ ...prev, [id]: value }));
     
-    // Validar la fecha inmediatamente cuando el usuario la cambia
     if (id === 'neededBy') {
       if (value < today) {
         setDateError('La fecha debe ser de al menos hoy.');
@@ -35,14 +38,19 @@ const CartBuyerInfo = ({ onSubmit, onCancel }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     
-    // Validar una última vez antes de enviar, por si acaso
     if (formData.neededBy < today) {
       setDateError('La fecha debe ser de al menos hoy.');
       return; 
     }
 
     setDateError(''); 
-    onSubmit(formData);
+    
+    const sanitizedData = {
+      ...formData,
+      whatsapp: sanitizePhone(formData.whatsapp)
+    };
+
+    onSubmit(sanitizedData);
   };
 
   return (

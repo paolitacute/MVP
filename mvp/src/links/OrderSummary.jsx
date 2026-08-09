@@ -96,6 +96,7 @@ const OrderSummary = () => {
             id,
             created_at,
             buyer_address,
+            buyer_phone,
             store ( name ),
             order_item (
               product_name,
@@ -128,6 +129,7 @@ const OrderSummary = () => {
           id: orderData.id,
           created_at: orderData.created_at,
           buyer_address: orderData.buyer_address,
+          buyer_phone: orderData.buyer_phone,
           storeName: orderData.store?.name || 'Tu Tienda',
           products: formattedProducts
         });
@@ -180,30 +182,39 @@ const OrderSummary = () => {
 
     const finalMessage = `¡Hola! Somos ${storeName}
 
-Número de Orden: #${orderNumber}
-Fecha de orden: ${orderDate}
+    Número de Orden: #${orderNumber}
+    Fecha de orden: ${orderDate}
 
-Detalle de tu orden:
-${productDetails}
+    Detalle de tu orden:
+    ${productDetails}
 
-Subtotal: ${subtotalString}
-Costo de Delivery: ${formattedDelivery}
-*Total a pagar: ${formattedTotal}*
+    Subtotal: ${subtotalString}
+    Costo de Delivery: ${formattedDelivery}
+    *Total a pagar: ${formattedTotal}*
 
-Confirma para enviarte método de pago.`;
+    Confirma para enviarte método de pago.`;
 
     setMessage(finalMessage);
     setShowDeliveryModal(false);
   };
 
-  const handleCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(message); 
-      setShowToast(true);
-      setTimeout(() => setShowToast(false), 2000);
-    } catch (err) {
-      console.error('Failed to copy text: ', err); 
+  const handleWhatsAppRedirect = () => {
+    let phone = orderInfo?.buyer_phone || '';
+    
+    // Dejar solo los números (elimina guiones, paréntesis, etc.)
+    phone = phone.replace(/\D/g, '');
+    
+    // Si el número tiene 10 dígitos (formato estándar sin prefijo), le agregamos el '1'
+    if (phone.length === 10) {
+      phone = '1' + phone;
     }
+
+    // Codificar el texto para que sea seguro usarlo en una URL
+    const encodedMessage = encodeURIComponent(message);
+    
+    // Crear el enlace dinámico y abrirlo en una nueva pestaña
+    const whatsappUrl = `https://wa.me/${phone}?text=${encodedMessage}`;
+    window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
   };
 
   if (loading) {
@@ -240,8 +251,11 @@ Confirma para enviarte método de pago.`;
         />
       </div>
       
-      <div className="footer-action">
-         <ActionButton text="Copiar" onClick={handleCopy} /> 
+      <div style={{ flex: 1 }}>
+        <ActionButton 
+          text="Enviar por WhatsApp" 
+          onClick={handleWhatsAppRedirect} 
+        /> 
       </div>
 
       {showDeliveryModal && (
@@ -286,7 +300,7 @@ Confirma para enviarte método de pago.`;
             <div style={{ textAlign: 'left' }}>
               <Input 
                 id="delivery-amount"
-                label="Ingresa el monto de delivery ($)"
+                label="Ingresa el monto de delivery (RD$)"
                 value={deliveryInput}
                 onChange={(e) => {
                   setDeliveryInput(e.target.value);
