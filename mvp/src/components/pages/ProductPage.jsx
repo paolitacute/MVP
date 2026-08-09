@@ -218,7 +218,7 @@ const ProductPage = ({ product, onAddToCart, onBack, initialCartData }) => {
         <div className="product-details-container">
           <div className="product-header-group">
             <HeaderText text={product.name} />
-            <span className="product-price-text">RD${totalPrice.toFixed(2)}</span>
+            <span className="product-price-text">RD${Number(totalPrice.toFixed(2)).toLocaleString()}</span>
             <span className="product-delivery-text">
               {product.delivery ? 'Delivery disponible' : 'Solo para recoger'}
             </span>
@@ -235,7 +235,7 @@ const ProductPage = ({ product, onAddToCart, onBack, initialCartData }) => {
             {product.customizations?.map((customization) => {
               
               const mappedOptions = customization.options.map(opt => {
-                const priceAddition = parseFloat(opt.price) > 0 ? ` (+RD$${opt.price})` : '';
+                const priceAddition = parseFloat(opt.price) > 0 ? ` (+RD$${Number(opt.price).toLocaleString()})` : '';
                 return {
                   label: `${opt.name}${priceAddition}`,
                   value: opt.id

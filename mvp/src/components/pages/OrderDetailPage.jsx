@@ -36,7 +36,7 @@ const calculateOrderPrice = (products) => {
     return sum + calculateProductPrice(product);
   }, 0) || 0;
   
-  return `RD$${total.toFixed(2)}`;
+  return `RD$${Number(total.toFixed(2)).toLocaleString()}`;
 };
 
 const OrderDetailPage = ({ 
@@ -188,7 +188,7 @@ const OrderDetailPage = ({
                 imageSrc={product.image}
                 title={product.name}
                 subtitle={formatCustomizations(product.customizations)}
-                status={`RD$${calculateProductPrice(product).toFixed(2)}`}
+                status={`RD$${Number(calculateProductPrice(product).toFixed(2)).toLocaleString()}`}
               />
             </div>
         ))}

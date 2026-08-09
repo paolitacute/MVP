@@ -24,7 +24,7 @@ const CustomizationDetail = ({ title, isRequired, options }) => {
             <HorizontalCardRight
               key={index}
               title={opt.name}
-              subtitle={hasPrice ? `+RD$${opt.price}` : ''}
+              subtitle={hasPrice ? `+RD$${Number(opt.price).toLocaleString()}` : ''}
               imageSrc={opt.image || ''} 
             />
           );

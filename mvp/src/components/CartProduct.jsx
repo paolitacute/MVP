@@ -12,7 +12,7 @@ const CartProduct = ({ product, onQuantityChange, onEdit, onDelete }) => {
         <div className="product-text-container" style={{ flexGrow: 1 }}>
           <div className='product-main-text-container'>
             <span className="product-main-text">{product.name}</span>
-            <span className="product-main-text">RD${product.price.toFixed(2)}</span>
+            <span className="product-main-text">RD${Number(product.price.toFixed(2)).toLocaleString()}</span>
           </div>
           {product.customizations?.map((cust, idx) => (
             <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem' }}>
@@ -21,7 +21,7 @@ const CartProduct = ({ product, onQuantityChange, onEdit, onDelete }) => {
               </span>
               {cust.modifierPrice > 0 && (
                 <span style={{ color: 'var(--text-secondary)', textAlign: 'right' }}>
-                  +RD${cust.modifierPrice.toFixed(2)}
+                  +RD${Number(cust.modifierPrice.toFixed(2)).toLocaleString()}
                 </span>
               )}
             </div>

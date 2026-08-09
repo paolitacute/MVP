@@ -13,7 +13,7 @@ const CategoryDetail = ({ category, option, price, showDivider }) => {
         {/* Only render the price element if the value is greater than zero */}
         {numericPrice > 0 && (
           <span className="category-modifier-price" style={{ color: 'var(--text-secondary)', fontSize: '1rem' }}>
-            +RD${price.replace('$', '')}
+            +RD${Number(price.replace('$', '')).toLocaleString()}
           </span>
         )}
       </div>

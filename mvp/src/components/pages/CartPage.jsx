@@ -66,7 +66,7 @@ const CartPage = ({
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '2rem', padding: '1.5rem 0 0.5rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold', color: 'var(--text-main)', fontSize: '1.125rem' }}>
             <span>Subtotal</span>
-            <span>RD${subtotal.toFixed(2)}</span>
+            <span>RD${Number(subtotal.toFixed(2)).toLocaleString()}</span>
           </div>
           <div style={{ height: '1px', backgroundColor: 'var(--border-light)', margin: '0.5rem 0' }}></div>
           <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--text-secondary)' }}>

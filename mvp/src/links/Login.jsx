@@ -67,7 +67,7 @@ const Login = () => {
         
         <div className="form-inputs">
           <Input 
-            label="Correo electrónico" 
+            label="Correo electrónico del vendedor" 
             type="email"
             id="loginEmail"
             value={email} 

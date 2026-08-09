@@ -39,7 +39,7 @@ const calculateOrderPrice = (order) => {
     return sum + calculateProductPrice(product);
   }, 0) || 0;
   
-  return `RD$${total.toFixed(2)}`;
+  return `RD$${Number(total.toFixed(2)).toLocaleString()}`;
 };
 
 const HorizontalListPage = ({ title, filters, data, onClick }) => {

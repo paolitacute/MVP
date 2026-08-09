@@ -57,7 +57,7 @@ const CartBuyerInfo = ({ onSubmit, onCancel }) => {
     <form className="form-container" onSubmit={handleSubmit}>
       <HeaderText text="Detalles del pedido" />
       <div className="form-inputs">
-        <Input id="name" label="Nombre completo" value={formData.name} onChange={handleChange} required />
+        <Input id="name" label="Nombre y Apellido" value={formData.name} onChange={handleChange} required />
         <Input id="whatsapp" label="Número de WhatsApp" value={formData.whatsapp} onChange={handleChange} pattern="[\+]?\s?\(?[0-9]{3}\)?-?\s?.?[0-9]{3}\)?-?\s?.?[0-9]{4,6}" required />
         <Input id="email" label="Correo electrónico" type="email" value={formData.email} onChange={handleChange} pattern="[a-z0-9]+@[a-z0-9]+\.[a-z]{2,}" required />
         <Input id="address" label="Dirección de entrega" rows={3} value={formData.address} onChange={handleChange} required />

@@ -44,7 +44,7 @@ const ProductOrderedDetailPage = ({ product }) => {
   }
 
   // Calculate the new dynamic price
-  const calculatedPrice = `RD$${calculateProductPrice(product).toFixed(2)}`;
+  const calculatedPrice = `RD$${Number(calculateProductPrice(product).toFixed(2)).toLocaleString()}`;
 
   return (
     <div className="hero-page-layout" style={{ position: 'relative' }}>

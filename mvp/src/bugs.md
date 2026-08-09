@@ -3,24 +3,13 @@
 - When a seller receives an order, they should get an email of new order.
 - Create screens so the buyer can track an order (token)
 - Set if a customization is available
-- Especificar la moneda al comprador y al vendedor 
 - Pantalla de carga entre crear una tienda y el home
-
 - Despues de crear una tienda, pantalla de carga
 - Al crear una publicacion, indica que hay un error pero crea la publicacion igualmente
 - Account settings in cellphone is centered when it should be aligned to the left PONLOS UNO DEBAJO DE OTRO
 - El estado por default de una orden es nueva, pero el dropdown dice pendiente y cuando lo seleccionas, no cambia automaticamente
 - Al presionar el boton copiar en Order Summary, el estatus de la orden cambia a pendiente
 - Al pasar la fecha de send by the una orden, automaticamente marcarla como estado "Atrasada"
-
-
-PRIORIDADES:
-
-
-- Boton para copiar link de la tienda
-- En OrderSummary, el monto de delivery no puede aceptar negativos
-- Especificar cual correo quieres al iniciar sesion
-
 
 
 # IN PROGRESS
@@ -66,3 +55,7 @@ PRIORIDADES:
 - MODO OSCURO
 - No te deja marcar una orden como completada
 - Fecha de neededby must include today
+- Boton para copiar link de la tienda (reemplazado con enviar por whatsapp)
+- En OrderSummary, el monto de delivery no puede aceptar negativos
+- Especificar cual correo quieres al iniciar sesion
+- Especificar la moneda al comprador y al vendedor 

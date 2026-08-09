@@ -60,9 +60,12 @@ const formatProductsList = (products) => {
     let itemText = `– ${qtyPrefix}${product.name}: ${calculatedProductPrice}`; 
     
     if (product.customizations && product.customizations.length > 0) {
-      const customizationsText = product.customizations.map(cust => 
-        `  • ${cust.category}: ${cust.option} (+${cust.price || '$0.00'})` 
-      ).join('\n');
+      const customizationsText = product.customizations.map(cust => {
+        // Only append the price string if it is not $0.00
+        const priceLabel = cust.price && cust.price !== '$0.00' ? ` (+${cust.price})` : '';
+        return `  • ${cust.category}: ${cust.option}${priceLabel}`;
+      }).join('\n');
+      
       itemText += `\n${customizationsText}`;
     }
     
@@ -182,17 +185,16 @@ const OrderSummary = () => {
 
     const finalMessage = `¡Hola! Somos ${storeName}
 
-    Número de Orden: #${orderNumber}
-    Fecha de orden: ${orderDate}
+Fecha de orden: ${orderDate}
 
-    Detalle de tu orden:
-    ${productDetails}
+Detalle de tu orden:
+${productDetails}
 
-    Subtotal: ${subtotalString}
-    Costo de Delivery: ${formattedDelivery}
-    *Total a pagar: ${formattedTotal}*
+Subtotal: ${subtotalString}
+Costo de Delivery: ${formattedDelivery}
+*Total a pagar: ${formattedTotal}*
 
-    Confirma para enviarte método de pago.`;
+Confirma para enviarte método de pago.`;
 
     setMessage(finalMessage);
     setShowDeliveryModal(false);
@@ -246,7 +248,7 @@ const OrderSummary = () => {
           type="textarea"
           value={message}
           onChange={(e) => setMessage(e.target.value)}
-          rows={20}
+          rows={18}
           required
         />
       </div>
@@ -300,10 +302,14 @@ const OrderSummary = () => {
             <div style={{ textAlign: 'left' }}>
               <Input 
                 id="delivery-amount"
+                type="number"
+                min="0"
                 label="Ingresa el monto de delivery (RD$)"
                 value={deliveryInput}
                 onChange={(e) => {
-                  setDeliveryInput(e.target.value);
+                  // Elimina el signo de menos (-) si el usuario intenta escribirlo o pegarlo
+                  const cleanValue = e.target.value.replace(/-/g, '');
+                  setDeliveryInput(cleanValue);
                   setDeliveryError('');
                 }}
                 required
