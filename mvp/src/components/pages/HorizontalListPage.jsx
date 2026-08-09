@@ -111,7 +111,7 @@ const HorizontalListPage = ({ title, filters, data, onClick }) => {
       <SearchBar 
         value={searchQuery} 
         onChange={(e) => setSearchQuery(e.target.value)} 
-        placeholder="buscar"
+        placeholder="Buscar"
       />
 
       {/* New Wrapper for Grid Layout */}
