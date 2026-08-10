@@ -205,16 +205,16 @@ const ListingDetailPage = ({ listing, onEdit, onBack }) => {
               <button
                 className="tertiary-action-btn"
                 style={{ width: '100%' }}
-                onClick={() => !isUpdating && executeDelete()}
+                onClick={() => !isUpdating && setShowDeleteConfirm(false)}
               >
-                {isUpdating ? 'Eliminando...' : 'Sí, eliminar'}
+                Cancelar
               </button>
               <button
                 className="secondary-action-btn"
                 style={{ width: '100%' }}
-                onClick={() => !isUpdating && setShowDeleteConfirm(false)}
+                onClick={() => !isUpdating && executeDelete()}
               >
-                Cancelar
+                {isUpdating ? 'Eliminando...' : 'Sí, eliminar'}
               </button>
             </div>
           </div>

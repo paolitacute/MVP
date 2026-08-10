@@ -214,16 +214,16 @@ const OrderDetailPage = ({
               <button
                 className="tertiary-action-btn"
                 style={{ width: '100%' }}
-                onClick={() => !isUpdating && executeCancel()}
+                onClick={() => !isUpdating && setShowCancelConfirm(false)}
               >
-                {isUpdating ? 'Cancelando...' : 'Sí, cancelar'}
+                Volver
               </button>
               <button
                 className="secondary-action-btn"
                 style={{ width: '100%' }}
-                onClick={() => !isUpdating && setShowCancelConfirm(false)}
+                onClick={() => !isUpdating && executeCancel()}
               >
-                Volver
+                {isUpdating ? 'Cancelando...' : 'Sí, cancelar'}
               </button>
             </div>
           </div>
