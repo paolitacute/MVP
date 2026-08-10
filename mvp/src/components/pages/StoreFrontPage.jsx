@@ -55,7 +55,7 @@ const StoreFrontPage = ({ storeData, listings, slug }) => {
                 key={item.id}
                 imageSrc={item.image}
                 text1={item.name}
-                text2={`RD$${Number(item.price.toFixed(2)).toLocaleString()}`}
+                text2={`RD$${Number(item.price.toFixed(2)).toLocaleString()}+`}
                 onClick={() => handleProductClick(item.id)}
               />
             ))}
