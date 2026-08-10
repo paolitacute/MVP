@@ -10,6 +10,7 @@
 - El estado por default de una orden es nueva, pero el dropdown dice pendiente y cuando lo seleccionas, no cambia automaticamente
 - Al presionar el boton copiar en Order Summary, el estatus de la orden cambia a pendiente
 - Al pasar la fecha de send by the una orden, automaticamente marcarla como estado "Atrasada"
+- Add a button to choose the amount of products to add to the cart in the product page (keep the one in the cart)
 
 
 # IN PROGRESS
