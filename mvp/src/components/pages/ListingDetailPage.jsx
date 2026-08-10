@@ -161,7 +161,7 @@ const ListingDetailPage = ({ listing, onEdit, onBack }) => {
 
         <div className="listing-info-section">
           <h1 className="hero-product-title">{listing.name}</h1>
-          <span className="hero-product-price">${listing.price.toFixed(2)}</span>
+          <span className="hero-product-price">RD${Number(listing.price.toFixed(2)).toLocaleString()}</span>
           
           <div className="listing-description">
             <p>{listing.description}</p>

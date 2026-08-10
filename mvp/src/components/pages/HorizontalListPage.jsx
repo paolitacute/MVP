@@ -45,7 +45,7 @@ const calculateOrderPrice = (order) => {
 const HorizontalListPage = ({ title, filters, data, onClick }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState(filters[0]);
-  const [sortOrder, setSortOrder] = useState('newest');
+  const [sortOrder, setSortOrder] = useState('sooner');
   
   // New state and refs for badge scrolling
   const scrollRef = useRef(null);
@@ -64,7 +64,7 @@ const HorizontalListPage = ({ title, filters, data, onClick }) => {
   }).sort((a, b) => {
     const dateA = new Date(a.sendByDate || 0).getTime();
     const dateB = new Date(b.sendByDate || 0).getTime();
-    return sortOrder === 'newest' ? dateB - dateA : dateA - dateB;
+    return sortOrder === 'sooner' ? dateA - dateB : dateB - dateA;
   });
 
   const navigate = useNavigate();
@@ -131,19 +131,19 @@ const HorizontalListPage = ({ title, filters, data, onClick }) => {
         >
           <Badge 
             text={
-              sortOrder === 'newest' ? (
+              sortOrder === 'sooner' ? (
                 <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                  <ArrowUp size={16} color="var(--text-main, #333)" /> Viejas
+                  <ArrowDown size={16} color="var(--text-main, #333)" /> Próximas
                 </span>
               ) : (
                 <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                  <ArrowDown size={16} color="var(--text-main, #333)" /> Nuevas
+                  <ArrowUp size={16} color="var(--text-main, #333)" /> Posteriores
                 </span>
               )
             }
             type="filter"
             active={false} 
-            onClick={() => setSortOrder(prev => prev === 'newest' ? 'oldest' : 'newest')} 
+            onClick={() => setSortOrder(prev => prev === 'sooner' ? 'later' : 'sooner')} 
           />
 
           {filters.map((filter) => (

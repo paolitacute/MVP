@@ -53,7 +53,7 @@ const formatProductsList = (products) => {
   if (!products || products.length === 0) return '[Sin artículos]';
   
   return products.map(product => {
-    const calculatedProductPrice = `$${calculateProductPrice(product).toFixed(2)}`;
+    const calculatedProductPrice = `RD$${Number(calculateProductPrice(product).toFixed(2)).toLocaleString()}`;
     // Prepend quantity if the buyer ordered more than 1 of this item
     const qtyPrefix = product.quantity > 1 ? `${product.quantity}x ` : '';
     
@@ -63,7 +63,9 @@ const formatProductsList = (products) => {
       const customizationsText = product.customizations.map(cust => {
         // Only append the price string if it is not $0.00
         const priceLabel = cust.price && cust.price !== '$0.00' ? ` (+${cust.price})` : '';
-        return `  • ${cust.category}: ${cust.option}${priceLabel}`;
+        const priceString = parseFloat(priceLabel.replace(/[^\d.]/g, '')) || 0;
+        const formattedPrice = parseFloat(priceString).toLocaleString();
+        return `  • ${cust.category}: ${cust.option} (+$${formattedPrice})`;
       }).join('\n');
       
       itemText += `\n${customizationsText}`;
@@ -180,8 +182,9 @@ const OrderSummary = () => {
     const subtotalNum = parseFloat(subtotalString.replace(/[^\d.]/g, '')) || 0;
     const totalNum = subtotalNum + deliveryNum;
 
-    const formattedDelivery = `$${deliveryNum.toFixed(2)}`;
-    const formattedTotal = `$${totalNum.toFixed(2)}`;
+    const formattedDisplay = `RD$${Number(subtotalNum).toLocaleString()}`;
+    const formattedDelivery = `RD$${Number(deliveryNum.toFixed(2)).toLocaleString()}`;
+    const formattedTotal = `RD$${Number(totalNum.toFixed(2)).toLocaleString()}`;
 
     const finalMessage = `¡Hola! Somos ${storeName}
 
@@ -190,7 +193,7 @@ Fecha de orden: ${orderDate}
 Detalle de tu orden:
 ${productDetails}
 
-Subtotal: ${subtotalString}
+Subtotal: ${formattedDisplay}
 Costo de Delivery: ${formattedDelivery}
 *Total a pagar: ${formattedTotal}*
 
