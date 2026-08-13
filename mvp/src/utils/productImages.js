@@ -61,3 +61,79 @@ export const saveStoreLogo = async (storeId, publicUrl) => {
     .eq('id', storeId);
   if (error) throw error;
 };
+
+export const deleteProductImageRow = async (imageUrl) => {
+  try {
+    // --- 1. Delete from Storage Bucket ---
+    // Replace 'product_images' with the EXACT name of your Supabase storage bucket
+    const bucketName = 'product-images'; 
+    
+    // Supabase public URLs look like: 
+    // https://[project].supabase.co/storage/v1/object/public/[bucket]/[file-path]
+    // We need to split the URL to grab just the [file-path] at the end
+    const urlParts = imageUrl.split(`/public/${bucketName}/`);
+    
+    if (urlParts.length > 1) {
+      // Decode URI component in case there are spaces or special characters in the file name
+      const filePath = decodeURIComponent(urlParts[1]);
+      
+      const { error: storageError } = await supabase
+        .storage
+        .from(bucketName)
+        .remove([filePath]);
+        
+      if (storageError) {
+        console.error("Error deleting image from storage bucket:", storageError);
+        // We log the error but don't throw it yet, so we can still try to delete the DB row
+      }
+    }
+
+    // --- 2. Delete from Database ---
+    const { error: dbError } = await supabase
+      .from('product_image')
+      .delete()
+      .eq('image_url', imageUrl);
+
+    if (dbError) {
+      throw dbError;
+    }
+    
+  } catch (error) {
+    console.error("Error in deleteProductImageRow:", error);
+    throw error;
+  }
+};
+
+export const deleteOptionImage = async (imageUrl) => {
+  try {
+    const bucketName = 'product-images'; 
+    const urlParts = imageUrl.split(`/public/${bucketName}/`);
+    
+    if (urlParts.length > 1) {
+      const filePath = decodeURIComponent(urlParts[1]);
+      
+      const { error: storageError } = await supabase
+        .storage
+        .from(bucketName)
+        .remove([filePath]);
+        
+      if (storageError) {
+        console.error("Error deleting option image from storage:", storageError);
+      }
+    }
+
+    // Instead of deleting the row, we set the image_url to null so the option itself isn't destroyed
+    const { error: dbError } = await supabase
+      .from('customization_option')
+      .update({ image_url: null })
+      .eq('image_url', imageUrl);
+
+    if (dbError) {
+      throw dbError;
+    }
+    
+  } catch (error) {
+    console.error("Error in deleteOptionImage:", error);
+    throw error;
+  }
+};

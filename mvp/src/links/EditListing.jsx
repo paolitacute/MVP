@@ -7,7 +7,9 @@ import {
   uploadProductPhoto, 
   saveProductImageRow, 
   uploadOptionPhoto, 
-  saveOptionImageUrl 
+  saveOptionImageUrl,
+  deleteProductImageRow,
+  deleteOptionImage
 } from '../utils/productImages';
 
 const EditListing = () => {
@@ -23,11 +25,8 @@ const EditListing = () => {
 
   const handleUpdate = async (formData) => {
     try {
-      // 1. Separate images from the form data so they aren't sent to the RPC
-      // Removed storeId from this destructuring because it isn't in formData
       const { productImages, customizations, ...restData } = formData;
       
-      // Clean customizations to remove image Files before sending to DB
       const cleanCustomizations = customizations?.map(cust => ({
         ...cust,
         options: cust.options.map(opt => {
@@ -41,16 +40,49 @@ const EditListing = () => {
         customizations: cleanCustomizations
       };
 
-      // 2. Call updateproductfull via mutation and get the IDs
       const result = await updateListingMutation.mutateAsync(dbFormData);
-      
-      // 3. Extract productid strictly in lowercase, alongside categories
       const { productid, categories } = result;
-
-      // 4. Retrieve storeId from the mutation result or fallback to the loaded listing data
       const storeId = result.storeId || existingProductData.storeId || existingProductData.store_id;
 
-      // 5. Upload new product images and save their URLs
+      // --- 5a. DELETE REMOVED MAIN IMAGES ---
+      const originalImages = existingProductData.image || [];
+      const keptImageUrls = productImages.filter(img => typeof img === 'string');
+      const deletedImageUrls = originalImages.filter(img => !keptImageUrls.includes(img));
+
+      for (const url of deletedImageUrls) {
+        await deleteProductImageRow(url);
+      }
+
+      // --- 5b. DELETE REMOVED CUSTOMIZATION IMAGES ---
+      // Gather all original option images
+      const originalOptionImages = [];
+      existingProductData.customizations?.forEach(cat => {
+        cat.options?.forEach(opt => {
+          if (opt.image && typeof opt.image === 'string') {
+            originalOptionImages.push(opt.image);
+          }
+        });
+      });
+
+      // Gather all option images that were kept in the submission
+      const keptOptionImages = [];
+      customizations?.forEach(cat => {
+        cat.options?.forEach(opt => {
+          if (opt.image && typeof opt.image === 'string') {
+            keptOptionImages.push(opt.image);
+          }
+        });
+      });
+
+      // Find the URLs that were removed and delete them
+      const deletedOptionImages = originalOptionImages.filter(img => !keptOptionImages.includes(img));
+
+      for (const url of deletedOptionImages) {
+        await deleteOptionImage(url);
+      }
+      // -----------------------------------------------
+
+      // 6. Upload new product images
       if (productImages && productImages.length > 0) {
         for (const file of productImages) {
           if (file instanceof File) {
@@ -60,7 +92,7 @@ const EditListing = () => {
         }
       }
 
-      // 6. Upload new customization option images and save their URLs matching by index position
+      // 7. Upload new customization option images
       if (customizations && categories) {
         for (let i = 0; i < customizations.length; i++) {
           const cust = customizations[i];
@@ -80,7 +112,6 @@ const EditListing = () => {
         }
       }
       
-      // Return true to tell ModifyListingPage that the submission succeeded
       return true; 
     } catch (err) {
       console.error("Error updating listing:", err); 

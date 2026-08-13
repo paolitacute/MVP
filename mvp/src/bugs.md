@@ -11,6 +11,11 @@
 - Al presionar el boton copiar en Order Summary, el estatus de la orden cambia a pendiente
 - Al pasar la fecha de send by the una orden, automaticamente marcarla como estado "Atrasada"
 - Add a button to choose the amount of products to add to the cart in the product page (keep the one in the cart)
+- Si una opcion de customizacion necesita un input, que el usuario pueda ponerlo ahi mismo
+- Si una opcion de customizacion necesita una foto, que el usuario pueda subir la foto ahi mismo
+- Que la descripcion de un producto permita \newline
+- En el icono flotante del carrito, poder ver cuantos productos tienes
+- Al crear una cuenta de vendedor, poder ver la contrasena (and login in too, and in account settings too)
 
 
 # IN PROGRESS
